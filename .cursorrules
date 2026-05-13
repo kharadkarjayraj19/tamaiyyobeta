@@ -1,0 +1,32 @@
+# Tamaiyyo — Cursor agent rules
+
+You are working on Tamaiyyo, an outstation cab booking marketplace for India (web-first).
+
+## Product stance
+
+- Do **not** invent product requirements, pricing rules, compliance details, or partner workflows. Ask the user when ambiguity affects code or data models.
+- Prefer **incremental, reviewable** changes over large refactors unless explicitly requested.
+
+## Engineering stance
+
+- Follow the conventions in `docs/architecture.md` and `docs/frontend-guidelines.md`.
+- Keep the codebase **startup-friendly**: avoid heavy frameworks, unnecessary indirection, and speculative abstractions.
+- Default to **Server Components**; add `"use client"` only when needed.
+- Use **Tailwind + shadcn tokens**; avoid magic color literals except in token definitions.
+- Centralize configuration in `src/config` and env helpers in `src/config/env/client.ts` or `src/config/env/server.ts`—never barrel-export client and server env from one file.
+
+## Structure reminders
+
+- `src/app/(customer|supplier|admin)/...` — role route groups and URLs under `/customer`, `/supplier`, `/admin`.
+- `src/components/ui` — shadcn primitives only.
+- `src/components/shared` — reusable non-domain UI.
+- `src/features/*` — domain-specific modules as the product grows.
+
+## Documentation
+
+- When you make an important architectural decision, capture it in `docs/architecture.md` (short, dated note) or a new doc linked from there.
+
+## Quality bar
+
+- Run or preserve **ESLint** and **TypeScript** cleanliness for touched files.
+- Prefer **accessibility-friendly** patterns (semantic elements, focusable controls).
