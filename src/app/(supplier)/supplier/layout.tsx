@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
-import { RoleShell } from "@/components/shared/role-shell";
+import { RoleDashboardShell } from "@/components/shared/layout/role-dashboard-shell";
 
 export default function SupplierLayout({ children }: { children: ReactNode }) {
-  return <RoleShell role="Supplier">{children}</RoleShell>;
+  return <RoleDashboardShell role="supplier">{children}</RoleDashboardShell>;
 }

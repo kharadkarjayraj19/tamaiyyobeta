@@ -22,9 +22,68 @@ You are working on Tamaiyyo, an outstation cab booking marketplace for India (we
 - `src/components/shared` — reusable non-domain UI.
 - `src/features/*` — domain-specific modules as the product grows.
 
-## Documentation
+## Cross-role UI & platform changes
 
-- When you make an important architectural decision, capture it in `docs/architecture.md` (short, dated note) or a new doc linked from there.
+Tamaiyyo is **multi-role** (customer, supplier, admin). Shared layers are high leverage: small mistakes propagate everywhere.
+
+**Before modifying** shared components, primitives (`components/ui`), shared composites, **root or role layouts**, **design tokens** (CSS variables / Tailwind theme), **navigation systems**, or **route / App Router architecture**:
+
+1. **Analyze ripple effects** across **customer**, **supplier**, and **admin** surfaces (and marketing/root entry if applicable)—including responsive breakpoints and keyboard/focus behavior.
+2. **Avoid breaking cross-role consistency** unless the change is intentional and documented; prefer additive patterns (new variant, new token) over silent semantic shifts to existing tokens or primitives.
+3. **Document major UI architecture changes** in **`docs/features/design-system.md`** (visual system, tokens, component hierarchy, motion) and/or **`docs/architecture.md`** (routing, repo structure, cross-cutting technical decisions)—same change set when practical, with a short revision note (and date) where those files maintain logs.
+
+Tiny UI changes at the wrong layer can break **all three** role systems; default to caution and verification.
+
+## Documentation-first & feature memory (AI development)
+
+Treat markdown in `docs/` as **durable memory** for the project, not optional commentary.
+
+### Feature specs (`docs/features/`)
+
+1. **One doc per major feature/module** — each must have a dedicated markdown file under `docs/features/` (use a clear slug filename, e.g. `booking-lifecycle.md`).
+2. **Before implementing or changing a feature** — check whether its feature doc exists; **read it** and align the implementation (structure, flows, rules, roles) with that document.
+3. **If no feature doc exists** — do **not** silently guess product behavior: **ask the user/author for clarification**, and/or **produce a draft** feature document in `docs/features/` (clearly marked as draft if details are still open) **before** substantial implementation.
+4. **When feature logic changes in a meaningful way** — update the corresponding `docs/features/*.md` in the same change set (or immediately after), so memory stays accurate.
+5. **Authoritative content** — feature docs (and `docs/architecture.md` where global) are the source of truth for **business rules**, **workflows**, **RBAC behavior**, **lifecycle states**, and **architectural decisions** that belong to that feature. Prefer updating the doc over encoding one-off tribal knowledge only in code or chat.
+6. **No undocumented assumptions** — if a behavior is not specified in the relevant doc and is not trivially obvious, resolve it via documentation (and/or user confirmation), not by inventing rules in code alone.
+7. **Alignment** — keep code, tests, and UX copy consistent with the feature doc; if they diverge, fix the code **or** fix the doc explicitly (never leave silent drift).
+8. **Prefer documentation-first** — default workflow: clarify → write or update the feature doc → implement → re-read doc before opening the PR.
+
+### Feature maturity levels
+
+Every `docs/features/<feature>.md` MUST declare a **maturity** near the top (after title is fine) so humans and AI share expectations about stability and how aggressively architecture may change:
+
+| Level | Meaning |
+| --- | --- |
+| **DRAFT** | Spec and/or code exploratory; expect churn; breaking changes acceptable with doc updates; not a production commitment. |
+| **FOUNDATION** | Core structure agreed (routes, tokens, data model sketches); still flexible—coordinate cross-cutting edits with `docs/architecture.md` / `docs/features/design-system.md`. |
+| **MVP** | Primary journeys for the feature work end-to-end; raise the bar for breaking changes (document migration / user impact). |
+| **STABLE** | Production expectations for covered scope; regressions are costly; prefer backward-compatible evolution or explicit versioning. |
+| **SCALING** | Performance, reliability, observability, and rollout are first-class; changes need operational awareness and safer rollout patterns. |
+
+**Format:** use a single line: `**Maturity:** DRAFT` or `**Maturity:** MVP` (UPPERCASE token). For legacy docs only, `**Status:**` with the **same five values** is acceptable—prefer **Maturity** for new files.
+
+**AI behavior:** infer risk from maturity—**DRAFT / FOUNDATION** allow faster iteration with docs kept in sync; **STABLE / SCALING** require extra care, smaller steps, and explicit approval for breaking platform or contract changes unless the user directs otherwise.
+
+### Global architecture
+
+9. **Cross-cutting or structural changes** — update `docs/architecture.md` **and** any **affected** `docs/features/*.md` so global and feature-level stories stay coherent.
+
+### Feature doc contents
+
+10. Each `docs/features/<feature>.md` should aim to include, when applicable:
+
+- **Maturity** — one of: `DRAFT`, `FOUNDATION`, `MVP`, `STABLE`, `SCALING` (see “Feature maturity levels” above).
+- **Purpose** — what problem it solves and for whom (customer / supplier / admin).
+- **Business rules** — explicit policies, validations, and invariants.
+- **UX flows** — primary paths, entry points, and key screens or states.
+- **Technical notes** — APIs, data shapes, integration points, ownership boundaries.
+- **Edge cases** — failure modes, empty states, concurrency or race considerations.
+- **Future extensibility** — known deferrals, hooks for later phases, open questions.
+
+## Documentation (repository-wide)
+
+- When you make an important **global** architectural decision, capture it in `docs/architecture.md` (short, dated note) or a new doc linked from there, and tie it to relevant feature docs when appropriate.
 
 ## Quality bar
 

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
-import { RoleShell } from "@/components/shared/role-shell";
+import { RoleDashboardShell } from "@/components/shared/layout/role-dashboard-shell";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  return <RoleShell role="Admin">{children}</RoleShell>;
+  return <RoleDashboardShell role="admin">{children}</RoleDashboardShell>;
 }

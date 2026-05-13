@@ -8,6 +8,7 @@ Practical conventions for Tamaiyyo’s Next.js + TypeScript + Tailwind + shadcn/
 - **Do not assume product requirements.** When in doubt, ask for clarification before modeling data or flows.
 - Keep files **small and focused**; split when a module handles routing, data fetching, and complex UI all at once.
 - Match existing **import style**, naming, and formatting (Prettier + ESLint).
+- Feature work: read `docs/features/<feature>.md` and respect its **Maturity** (`DRAFT` … `SCALING`); before editing primitives, shared UI, tokens, layouts, navigation, or route structure, follow **`.cursorrules` → “Cross-role UI & platform changes”**.
 
 ## React and Next.js
 

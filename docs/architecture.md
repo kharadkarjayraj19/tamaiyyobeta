@@ -20,13 +20,19 @@ src/
   app/                 # Routes, layouts, and route groups (Next.js App Router)
   components/
     ui/                # Design-system primitives (shadcn)
-    shared/            # Cross-role reusable UI (no domain rules)
+    shared/            # Cross-role reusable UI (see docs/features/app-shell.md)
+    shared/layout/     # App shell, navigation chrome, page framing
   config/              # App config, typed env accessors
   features/            # Domain modules (co-locate hooks, server actions, subcomponents later)
   hooks/               # Cross-cutting React hooks
   lib/                 # Pure utilities (no React assumptions unless clearly UI helpers)
   types/               # Shared TypeScript types
 ```
+
+## Documentation split
+
+- **`docs/architecture.md` (this file):** global structure, routing, environment patterns, and cross-repo technical decisions.
+- **`docs/features/*.md`:** one markdown file per major feature or module—source of truth for business rules, workflows, RBAC, lifecycle states, and feature-scoped technical decisions. Each file declares a **Maturity** (`DRAFT` → `SCALING`); see **`.cursorrules`** for definitions and AI behavior. Cross-cutting specs (e.g. **[features/design-system.md](./features/design-system.md)**, **[features/app-shell.md](./features/app-shell.md)**, **[features/auth-rbac.md](./features/auth-rbac.md)**) live here too. Workflow for authors and agents is defined in **`.cursorrules`**; see **`docs/features/README.md`** for where to add new specs.
 
 ## Routing and roles
 

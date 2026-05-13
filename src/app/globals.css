@@ -24,6 +24,12 @@
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
     --radius: 0.5rem;
+    /* App shell (semantic; use via Tailwind `sidebar` / arbitrary width) */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.9% 10%;
+    --sidebar-border: 0 0% 89.8%;
+    --sidebar-width: 16rem;
+    --elevated: 0 0% 100%;
   }
 
   .dark {
@@ -46,6 +52,10 @@
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --elevated: 240 5.9% 10%;
   }
 
   * {

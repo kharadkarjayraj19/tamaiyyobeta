@@ -54,6 +54,18 @@ const config: Config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar-background))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          border: "hsl(var(--sidebar-border))",
+        },
+        elevated: "hsl(var(--elevated))",
+      },
+      width: {
+        sidebar: "var(--sidebar-width)",
+      },
+      maxWidth: {
+        content: "80rem",
       },
     },
   },
