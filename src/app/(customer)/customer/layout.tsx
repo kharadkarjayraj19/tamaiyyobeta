@@ -1,7 +1,11 @@
 import type { ReactNode } from "react";
 
-import { RoleDashboardShell } from "@/components/shared/layout/role-dashboard-shell";
+import { RoleDashboardWithAuth } from "@/features/auth/role-dashboard-with-auth";
 
-export default function CustomerLayout({ children }: { children: ReactNode }) {
-  return <RoleDashboardShell role="customer">{children}</RoleDashboardShell>;
+export default async function CustomerLayout({ children }: { children: ReactNode }) {
+  return (
+    <RoleDashboardWithAuth role="customer" sessionPath="/customer">
+      {children}
+    </RoleDashboardWithAuth>
+  );
 }

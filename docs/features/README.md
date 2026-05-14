@@ -13,7 +13,7 @@ Near the top of every feature doc, set **one** of (UPPERCASE):
 
 Definitions and AI expectations live in **`.cursorrules`** under “Feature maturity levels”.
 
-Cross-cutting specifications that span many features (for example **[design-system.md](./design-system.md)**, **[app-shell.md](./app-shell.md)**, or **[auth-rbac.md](./auth-rbac.md)**) also live here and should declare **Maturity** like any other spec.
+Cross-cutting specifications that span many features (for example **[design-system.md](./design-system.md)**, **[app-shell.md](./app-shell.md)**, **[auth-rbac.md](./auth-rbac.md)**, or **[frontend-auth-architecture.md](./frontend-auth-architecture.md)**) also live here and should declare **Maturity** like any other spec.
 
 See `.cursorrules` (Documentation-first & feature memory) and `docs/architecture.md` for how feature docs interact with global architecture.
 

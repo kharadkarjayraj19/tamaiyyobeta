@@ -14,7 +14,11 @@ export default function HomePage() {
       <p className="text-sm text-muted-foreground">
         Foundation routes are grouped by role. No business features yet.
       </p>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap items-center gap-3">
+        <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
+          <Link href="/login">Sign in</Link>
+        </Button>
+        <span className="hidden h-4 w-px bg-border sm:block" aria-hidden />
         <Button asChild>
           <Link href="/customer">Customer area</Link>
         </Button>

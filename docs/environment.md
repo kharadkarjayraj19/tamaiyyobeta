@@ -12,5 +12,10 @@ Copy `.env.example` to `.env.local` for local development. Next.js loads `.env.l
 ## Current keys
 
 - `NEXT_PUBLIC_APP_URL` — canonical public site URL (used for absolute links, callbacks, and similar patterns).
+- `BETTER_AUTH_SECRET` — Better Auth signing secret (≥32 chars in real environments; see `src/config/env/auth.ts`).
+- `BETTER_AUTH_URL` — origin passed to Better Auth (defaults to `NEXT_PUBLIC_APP_URL` when unset).
+- `AUTH_MIDDLEWARE_ENABLED` — set to `false` to disable optimistic middleware redirects (local only).
 
-Add new variables in `.env.example` first, then wire them in `client.ts` or `server.ts` as appropriate.
+Details for the auth stack: **[features/frontend-auth-architecture.md](./features/frontend-auth-architecture.md)**.
+
+Add new variables in `.env.example` first, then wire them in `client.ts`, `server.ts`, or `config/env/auth.ts` as appropriate.

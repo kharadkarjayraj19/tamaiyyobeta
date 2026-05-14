@@ -64,10 +64,11 @@ Customer, supplier, and admin route layouts each render the same shell with a di
 
 ## Boundaries (intentionally)
 
-- **No auth UI** (sign-in, user menu, session) — add in a dedicated feature later.
+- **No full auth UI** (sign-in forms, OTP, OAuth buttons) in this milestone — placeholders live at `/login` and `/forbidden`; Better Auth HTTP surface is at `/api/auth/*`.
 - **No data fetching** in shell components — pages/layouts own data when introduced.
 - **No business rules** in `components/shared/**` — only presentation and layout composition.
 - **Navigation labels** are neutral placeholders until product/i18n owns copy.
+- **Session bridge:** `SessionBridgeProvider` supplies minimal client context from server layouts (`src/features/auth/role-dashboard-with-auth.tsx`); keep shell chrome free of secrets.
 
 ---
 
@@ -76,7 +77,7 @@ Customer, supplier, and admin route layouts each render the same shell with a di
 1. **More nav items:** append to `navigationByRole` with new `href`s; add icon keys to `NavIconKey` + `nav-icon.tsx` map.
 2. **Role-specific density:** pass `className` into `PageContainer` / `DashboardCard` from route-level wrappers—not by branching inside primitives.
 3. **Toolbar actions:** supply `DataTableShell` `toolbar` slot from page-level code or small feature components under `src/features/*`.
-4. **Authentication later:** prefer extending `TopNavbar` `trailing` slot from a **feature** wrapper rather than bloating the shared primitive.
+4. **Authentication:** `TopNavbar` `trailing` slot + `useSessionBridge()` from `src/features/auth/session-bridge-provider.tsx` (see `docs/features/frontend-auth-architecture.md`).
 
 ---
 
@@ -91,3 +92,4 @@ Behavioral and token-level parity for future Flutter work should follow `docs/fe
 | Date | Change |
 | --- | --- |
 | 2026-05-13 | Initial shell: tokens, layouts, nav, cards, table shell, skeletons, empty states, role layouts wired. |
+| 2026-05-14 | Linked Better Auth foundation: `RoleDashboardWithAuth` wraps shell with `SessionBridgeProvider`; `/login` placeholder. |

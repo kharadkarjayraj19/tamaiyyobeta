@@ -1,7 +1,11 @@
 import type { ReactNode } from "react";
 
-import { RoleDashboardShell } from "@/components/shared/layout/role-dashboard-shell";
+import { RoleDashboardWithAuth } from "@/features/auth/role-dashboard-with-auth";
 
-export default function SupplierLayout({ children }: { children: ReactNode }) {
-  return <RoleDashboardShell role="supplier">{children}</RoleDashboardShell>;
+export default async function SupplierLayout({ children }: { children: ReactNode }) {
+  return (
+    <RoleDashboardWithAuth role="supplier" sessionPath="/supplier">
+      {children}
+    </RoleDashboardWithAuth>
+  );
 }

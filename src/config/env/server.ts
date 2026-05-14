@@ -6,7 +6,9 @@ import "server-only";
  */
 export const serverEnv = {
   nodeEnv: process.env.NODE_ENV,
+  betterAuthSecret: process.env.BETTER_AUTH_SECRET,
+  betterAuthUrl: process.env.BETTER_AUTH_URL,
+  authMiddlewareEnabled: process.env.AUTH_MIDDLEWARE_ENABLED,
   // Example placeholders for future wiring (uncomment when integrated):
   // databaseUrl: process.env.DATABASE_URL,
-  // authSecret: process.env.AUTH_SECRET,
 } as const;

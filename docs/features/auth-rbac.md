@@ -3,7 +3,7 @@
 **Maturity:** DRAFT  
 **Purpose:** Define a **documentation-first**, scalable approach to authentication, sessions, roles, and authorization for Tamaiyyo’s multi-role web platform—without binding to a specific identity provider, token format, or legal/compliance regime.
 
-**Related docs:** `docs/architecture.md` (routing, repo boundaries), `docs/features/app-shell.md` (role-aware shell & navigation extension points), `docs/features/design-system.md` (trust-oriented UX, error/empty patterns), `docs/frontend-guidelines.md`, `.cursorrules`.
+**Related docs:** `docs/architecture.md` (routing, repo boundaries), `docs/features/app-shell.md` (role-aware shell & navigation extension points), `docs/features/design-system.md` (trust-oriented UX, error/empty patterns), **`docs/features/frontend-auth-architecture.md`** (Better Auth + Next.js wiring in this repo), `docs/frontend-guidelines.md`, `.cursorrules`.
 
 **Non-goals in this document:** concrete API schemas, vendor selection, India-specific statutory language, or implementation code.
 
