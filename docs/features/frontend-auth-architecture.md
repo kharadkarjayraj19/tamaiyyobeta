@@ -3,7 +3,7 @@
 **Maturity:** FOUNDATION  
 **Purpose:** Describe how the **Next.js App Router frontend** integrates with **Better Auth** for unified login, session handling, and **role-aware** dashboards. **Foundation code** lives under `src/lib/auth/**` (see “Repository implementation”); full login UX, OTP/Google, and persistence are phased in later.
 
-**Related docs:** `docs/features/auth-rbac.md` (platform auth/RBAC philosophy), `docs/features/app-shell.md` (shell & nav extension points), `docs/features/design-system.md` (loading/error/trust UX), `docs/architecture.md`, `docs/frontend-guidelines.md`, `.cursorrules`.
+**Related docs:** `docs/features/auth-rbac.md` (platform auth/RBAC philosophy), **`docs/architecture/domain-models/identity-domain-model.md`** (phone-first identity, account types, session linkage), `docs/features/app-shell.md` (shell & nav extension points), `docs/features/design-system.md` (loading/error/trust UX), `docs/architecture.md`, **`docs/architecture/backend-architecture.md`** (persistence, API, and auth integration at MVP), `docs/frontend-guidelines.md`, `.cursorrules`.
 
 **Non-goals (this milestone):** full sign-in UI, OTP/Google flows, database-backed user tables, booking/pricing logic, or legal/compliance claims.
 
