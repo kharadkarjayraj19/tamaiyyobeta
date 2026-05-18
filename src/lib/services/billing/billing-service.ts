@@ -11,7 +11,7 @@
 import { Prisma } from "@prisma/client";
 import prisma from "@/lib/db/prisma";
 import { withTransaction } from "@/lib/db/transactions";
-import { ValidationError, NotFoundError, ConflictError } from "@/lib/errors";
+import { ValidationError, NotFoundError, ConflictError, ForbiddenError } from "@/lib/errors";
 import { bookingRepository } from "@/lib/repositories/booking/booking-repository";
 import { tripExecutionRepository } from "@/lib/repositories/booking/trip-execution-repository";
 import { finalBillRepository } from "@/lib/repositories/billing/final-bill-repository";
@@ -24,8 +24,19 @@ import type { LineItem } from "@/lib/repositories/booking/trip-execution-reposit
 import type { BillLineItem } from "@/lib/repositories/billing/final-bill-repository";
 
 /**
- * MVP commission configuration (hardcoded for MVP).
- * TODO: Replace with database-driven commission config in production.
+ * MVP PLACEHOLDER: Hardcoded commission configuration.
+ * 
+ * PRODUCTION TODO: Replace with database-driven commission config that supports:
+ * - Category-specific rates
+ * - City-specific rates
+ * - Supplier-tier-specific rates
+ * - Time-based versioning
+ * 
+ * Current MVP rates:
+ * - Platform fee: ₹500 flat per booking
+ * - Per-km commission: ₹2/km
+ * 
+ * Commission calculation: platformFee + (perKmRate × actualKm)
  */
 const MVP_COMMISSION_CONFIG = {
   platformFeeFlat: new Prisma.Decimal(500), // ₹500 flat platform fee
@@ -66,6 +77,17 @@ export class BillingService {
       // 3. Validate actual km (sanity check)
       if (params.actualKm < 1) {
         throw new ValidationError("Actual km must be at least 1");
+      }
+
+      // 3a. LIFECYCLE GUARD: Validate trip has not already been completed
+      const existingExecution = await tripExecutionRepository.findByBookingId(
+        params.bookingId,
+        tx
+      );
+      if (existingExecution) {
+        throw new ConflictError(
+          "Trip execution already submitted for this booking. Cannot submit again."
+        );
       }
 
       // 4. Create trip execution record
@@ -126,20 +148,27 @@ export class BillingService {
       // 1. Fetch booking
       const booking = await bookingRepository.findById(params.bookingId, tx);
 
-      // 2. Validate state
+      // 2. OWNERSHIP VALIDATION: Customer can only confirm own booking
+      if (booking.customerId !== params.customerId) {
+        throw new ForbiddenError(
+          "Customer does not own this booking. Cannot confirm km."
+        );
+      }
+
+      // 3. Validate state
       if (booking.status !== "COMPLETED") {
         throw new ValidationError(
           `Cannot confirm km for booking in ${booking.status} state`
         );
       }
 
-      // 3. Fetch trip execution
+      // 4. Fetch trip execution
       const execution = await tripExecutionRepository.findByBookingIdOrThrow(
         params.bookingId,
         tx
       );
 
-      // 4. Check for km mismatch
+      // 5. Check for km mismatch
       const supplierKm = execution.actualKm!;
       const kmDiff = Math.abs(supplierKm - params.confirmedKm);
       const mismatchThreshold = 20; // Allow 20km variance for MVP (auto-resolvable)
@@ -170,7 +199,7 @@ export class BillingService {
         );
       }
 
-      // 5. Small mismatch: Auto-resolve in favor of customer
+      // 6. Small mismatch: Auto-resolve in favor of customer
       let resolvedKm = params.confirmedKm;
       let autoResolved = false;
 
@@ -185,7 +214,7 @@ export class BillingService {
         autoResolved = true;
       }
 
-      // 6. Record customer confirmation event
+      // 7. Record customer confirmation event
       await domainEventRepository.append(
         {
           entityType: "Booking",
@@ -232,6 +261,14 @@ export class BillingService {
       if (booking.status !== "COMPLETED") {
         throw new ValidationError(
           `Cannot generate final bill for booking in ${booking.status} state`
+        );
+      }
+
+      // 2a. IDEMPOTENCY GUARD: Check if final bill already exists
+      const existingBill = await finalBillRepository.findByBookingId(params.bookingId, tx);
+      if (existingBill) {
+        throw new ConflictError(
+          "Final bill already exists for this booking. Cannot generate duplicate."
         );
       }
 
@@ -463,27 +500,34 @@ export class BillingService {
       // 1. Fetch booking
       const booking = await bookingRepository.findById(params.bookingId, tx);
 
-      // 2. Validate state
+      // 2. IDEMPOTENCY GUARD: Check if already closed
+      if (booking.status === "CLOSED") {
+        throw new ConflictError(
+          "Booking is already closed. Cannot close again."
+        );
+      }
+
+      // 3. Validate state
       if (booking.status !== "BILLING_IN_PROGRESS") {
         throw new ValidationError(
           `Cannot close booking in ${booking.status} state. Must be in BILLING_IN_PROGRESS.`
         );
       }
 
-      // 3. Verify final bill exists
+      // 4. Verify final bill exists
       const finalBill = await finalBillRepository.findByBookingId(params.bookingId, tx);
       if (!finalBill) {
         throw new ValidationError("Cannot close booking without final bill");
       }
 
-      // 4. Update booking status to CLOSED
+      // 5. Update booking status to CLOSED
       await bookingRepository.updateStatus(
         params.bookingId,
         "CLOSED",
         tx
       );
 
-      // 5. Record domain event
+      // 6. Record domain event
       await domainEventRepository.append(
         {
           entityType: "Booking",

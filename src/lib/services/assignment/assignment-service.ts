@@ -86,6 +86,9 @@ export class AssignmentService {
   /**
    * Get supplier booking queue.
    * Returns bookings available for supplier to view.
+   * 
+   * PAGINATION LIMIT: Server enforces maximum limit of 100 to prevent
+   * memory exhaustion from client requesting excessive records.
    */
   async getSupplierBookingQueue(
     supplierId: string,
@@ -102,6 +105,9 @@ export class AssignmentService {
     offset: number;
     limit: number;
   }> {
+    // CRITICAL: Enforce server-side maximum limit
+    const enforcedLimit = Math.min(limit, 100);
+
     // For REQUESTED bookings, show unassigned bookings (supplierId = null)
     // For other statuses, show bookings assigned to this supplier
     const bookingFilters: any = {};
@@ -122,7 +128,7 @@ export class AssignmentService {
     if (filters.toDate) bookingFilters.toDate = filters.toDate;
 
     const [bookings, total] = await Promise.all([
-      bookingRepository.list(bookingFilters, offset, limit),
+      bookingRepository.list(bookingFilters, offset, enforcedLimit),
       bookingRepository.count(bookingFilters),
     ]);
 
@@ -130,7 +136,7 @@ export class AssignmentService {
       bookings,
       total,
       offset,
-      limit,
+      limit: enforcedLimit,
     };
   }
 
@@ -155,6 +161,14 @@ export class AssignmentService {
       if (booking.supplierId !== null) {
         throw new ValidationError(
           "Booking already assigned to a supplier"
+        );
+      }
+
+      // LIFECYCLE GUARD: Validate trip start date hasn't passed
+      const now = new Date();
+      if (booking.tripStartDate < now) {
+        throw new ValidationError(
+          "Cannot accept booking - trip start date has already passed"
         );
       }
 

@@ -25,16 +25,19 @@ import { NotFoundError } from "@/lib/errors";
 
 /**
  * Domain type for Booking (ORM-agnostic).
+ * 
+ * NOTE: This type mirrors the Prisma Booking model exactly.
+ * - No vehicleCategory: must be fetched from BookingPricingSnapshot if needed
+ * - No deletedAt: Booking table does not support soft-delete (use status=CANCELLED)
+ * - supplierId is nullable until supplier assigned
  */
 export interface BookingDomain {
   id: string;
   bookingRef: string;
   customerId: string;
   supplierId: string | null;
-  assignedSupplierId: string | null;
   status: BookingStatus;
   productType: ProductType;
-  vehicleCategory: string;
   tripStartDate: Date;
   tripEndDate: Date | null;
   estimatedKm: number | null;
@@ -43,7 +46,6 @@ export interface BookingDomain {
   cancelledBy: ActorType | null;
   cancelledAt: Date | null;
   cancelledReason: string | null;
-  deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -387,16 +389,20 @@ export class BookingRepository {
   /**
    * Map Prisma model to domain type.
    */
+  /**
+   * Map Prisma Booking model to domain type.
+   * 
+   * ARCHITECTURE NOTE: This is a 1:1 mapping with no phantom fields.
+   * If you need vehicleCategory, fetch BookingPricingSnapshot separately.
+   */
   private toDomain(booking: Booking): BookingDomain {
     return {
       id: booking.id,
       bookingRef: booking.bookingRef,
       customerId: booking.customerId,
       supplierId: booking.supplierId,
-      assignedSupplierId: booking.supplierId, // Same as supplierId for now
       status: booking.status,
       productType: booking.productType,
-      vehicleCategory: "UNKNOWN", // TODO: Should be joined from BookingPricingSnapshot
       tripStartDate: booking.tripStartDate,
       tripEndDate: booking.tripEndDate,
       estimatedKm: booking.estimatedKm,
@@ -405,7 +411,6 @@ export class BookingRepository {
       cancelledBy: booking.cancelledBy,
       cancelledAt: booking.cancelledAt,
       cancelledReason: booking.cancelledReason,
-      deletedAt: null, // Booking doesn't have soft-delete
       createdAt: booking.createdAt,
       updatedAt: booking.updatedAt,
     };

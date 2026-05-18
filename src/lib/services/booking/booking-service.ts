@@ -253,6 +253,9 @@ export class BookingService {
 
   /**
    * List bookings with filters.
+   * 
+   * PAGINATION LIMIT: Server enforces maximum limit of 100 to prevent
+   * memory exhaustion from client requesting excessive records.
    */
   async listBookings(
     filters: {
@@ -270,8 +273,11 @@ export class BookingService {
     offset: number;
     limit: number;
   }> {
+    // CRITICAL: Enforce server-side maximum limit
+    const enforcedLimit = Math.min(limit, 100);
+
     const [bookings, total] = await Promise.all([
-      bookingRepository.list(filters, offset, limit),
+      bookingRepository.list(filters, offset, enforcedLimit),
       bookingRepository.count(filters),
     ]);
 
@@ -279,7 +285,7 @@ export class BookingService {
       bookings,
       total,
       offset,
-      limit,
+      limit: enforcedLimit,
     };
   }
 
@@ -299,7 +305,15 @@ export class BookingService {
 
   /**
    * Generate unique booking reference.
-   * MVP: timestamp + random; real implementation would check DB uniqueness.
+   * 
+   * MVP PLACEHOLDER: Simple random generation with single collision check.
+   * 
+   * PRODUCTION TODO: Implement robust collision handling:
+   * - Retry loop (max 5 attempts)
+   * - Use database sequence or Redis counter
+   * - Consider time-based prefixes for distribution
+   * 
+   * Current format: TM-XXXXXXXX (8 alphanumeric chars, excluding confusing chars)
    */
   private async generateBookingRef(): Promise<string> {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -308,7 +322,7 @@ export class BookingService {
       ref += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
-    // Check for collision (in production, use retry loop)
+    // MVP: Single collision check (production should retry on collision)
     const existing = await bookingRepository.findByIdOrNull(ref);
     if (existing) {
       throw new ConflictError("Booking reference collision (rare)", { ref });

@@ -6,6 +6,23 @@
  * - Pricing calculation based on trip parameters
  * - MVP placeholder pricing (configuration-driven later)
  * - Aligns with pricing-engine.md philosophy
+ * 
+ * MVP PLACEHOLDER: All pricing rates are hardcoded inline in methods below.
+ * 
+ * PRODUCTION TODO: Replace inline rates with database-driven configuration:
+ * - PricingConfig table with versioning
+ * - City/region-specific rates
+ * - Dynamic surge pricing
+ * - Partner-negotiated rates
+ * - Seasonal adjustments
+ * - Real-time inventory-based pricing
+ * 
+ * Current MVP rates (see method implementations):
+ * - Base rates: ₹3,000-7,000/day by category
+ * - Included km: 300km/day (fixed)
+ * - Extra km: ₹12-25/km by category
+ * - One-way surcharge: 30% of base fare
+ * - Age bucket discounts: 0-10-20% by vehicle age
  */
 
 import { VehicleCategory, AgeBucket, ProductType } from "@prisma/client";
