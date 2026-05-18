@@ -35,6 +35,7 @@ src/
 - **`docs/architecture.md` (this file):** global structure, routing, environment patterns, and cross-repo technical decisions.
 - **`docs/architecture/backend-architecture.md`:** MVP **backend** implementation blueprint (modular monolith, PostgreSQL/Prisma, REST, deployment, observability)—see **Implemented / Planned / Exploratory** labels inside.
 - **`docs/architecture/api-architecture.md`:** executable **REST API** contract philosophy (`/api/v1/`, auth, validation, responses, handler layering)—not OpenAPI artifacts.
+- **`docs/architecture/backend-foundation.md`:** Backend application foundation (repositories, services, validation, errors, transactions)—implementation patterns.
 - **`docs/architecture/prisma-data-architecture.md`:** PostgreSQL + Prisma persistence blueprint (UUID, refs, snapshots, audit, indexing, repositories)—foundational philosophy.
 - **`docs/architecture/prisma-schema-planning.md`:** Prisma schema planning (concrete model groups, fields, relationships, transactions)—implementation blueprint before `schema.prisma`.
 - **`docs/architecture/domain-models/*.md`:** foundational **entity** architecture (e.g. [identity-domain-model.md](./architecture/domain-models/identity-domain-model.md), [vehicle-domain-model.md](./architecture/domain-models/vehicle-domain-model.md), [booking-domain-model.md](./architecture/domain-models/booking-domain-model.md), [billing-domain-model.md](./architecture/domain-models/billing-domain-model.md))—not SQL or API contracts.

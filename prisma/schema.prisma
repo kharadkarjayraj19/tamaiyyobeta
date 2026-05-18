@@ -1,0 +1,552 @@
+// Tamaiyyo — Prisma schema (MVP foundation)
+// Generated: 2026-05-18
+// Architecture: docs/architecture/prisma-schema-planning.md
+// Philosophy: docs/architecture/prisma-data-architecture.md
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum SupplierAccountStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  SUSPENDED
+  REJECTED
+}
+
+enum VehicleStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  INACTIVE
+  ON_TRIP
+  SUSPENDED
+  REMOVED
+}
+
+enum VehicleCategory {
+  SEDAN
+  ERTIGA
+  KIA_CARENS
+  INNOVA_CRYSTA
+  TEMPO_TRAVELLER // Placeholder only - not finalized product
+}
+
+enum AgeBucket {
+  ZERO_TO_THREE
+  THREE_TO_SEVEN
+  SEVEN_TO_TWELVE
+}
+
+enum FuelType {
+  PETROL
+  DIESEL
+  CNG
+  EV
+}
+
+enum DriverStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  REMOVED
+}
+
+enum BookingStatus {
+  REQUESTED
+  SUPPLIER_ASSIGNED
+  ACCEPTED
+  READY_FOR_TRIP
+  IN_PROGRESS
+  COMPLETED
+  BILLING_IN_PROGRESS
+  CLOSED
+  CANCELLED
+}
+
+enum ProductType {
+  ONE_WAY
+  ROUND_TRIP
+}
+
+enum PaymentMode {
+  ONLINE_CARD
+  ONLINE_UPI
+  CASH
+}
+
+enum PaymentStatus {
+  INITIATED
+  AUTHORIZED
+  CAPTURED
+  FAILED
+  REFUNDED
+}
+
+enum RefundStatus {
+  INITIATED
+  SUCCEEDED
+  FAILED
+}
+
+enum SupplierEarningStatus {
+  EARNED
+  ELIGIBLE
+  BATCHED
+  PAID
+  HELD
+}
+
+enum PayoutBatchStatus {
+  DRAFT
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum ActorType {
+  CUSTOMER
+  SUPPLIER
+  DRIVER
+  ADMIN
+  SYSTEM
+}
+
+// ============================================================================
+// IDENTITY & ACCOUNTS MODULE
+// ============================================================================
+
+// Note: Better Auth tables (user, session, account, verification) managed separately
+// Identity links to Better Auth user via betterAuthUserId when OTP/login implemented
+
+model Identity {
+  id              String   @id @default(uuid())
+  phone           String   @unique
+  email           String?
+  betterAuthUserId String? @unique // Links to Better Auth user table when implemented
+  verifiedAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  customerAccount CustomerAccount?
+  supplierAccount SupplierAccount?
+  adminAccount    AdminAccount?
+
+  @@index([phone])
+}
+
+model CustomerAccount {
+  id         String   @id @default(uuid())
+  identityId String   @unique
+  name       String?
+  status     String   @default("ACTIVE") // active/suspended - flexible string for now
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  identity Identity   @relation(fields: [identityId], references: [id], onDelete: Restrict)
+  bookings Booking[]
+
+  @@index([status])
+}
+
+model SupplierAccount {
+  id                      String                 @id @default(uuid())
+  identityId              String                 @unique
+  businessName            String
+  status                  SupplierAccountStatus  @default(PENDING_VERIFICATION)
+  verificationApprovedAt  DateTime?
+  verificationApprovedBy  String? // adminId - nullable until admin accounts implemented
+  payoutBankDetails       Json? // { accountNumber, ifsc, accountHolderName, ... }
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @updatedAt
+
+  identity          Identity            @relation(fields: [identityId], references: [id], onDelete: Restrict)
+  vehicles          Vehicle[]
+  drivers           Driver[]
+  bookings          Booking[]
+  earnings          SupplierEarning[]
+  assignmentHistory AssignmentHistory[]
+
+  @@index([status])
+}
+
+model AdminAccount {
+  id         String   @id @default(uuid())
+  identityId String   @unique
+  role       String   @default("ADMIN_ALL") // MVP: single admin role
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  identity Identity @relation(fields: [identityId], references: [id], onDelete: Restrict)
+}
+
+// ============================================================================
+// VEHICLE MODULE
+// ============================================================================
+
+model Vehicle {
+  id                 String          @id @default(uuid())
+  supplierId         String
+  registrationNumber String
+  category           VehicleCategory
+  ageYears           Int? // Nullable until verified
+  ageBucket          AgeBucket?
+  fuelType           FuelType
+  status             VehicleStatus   @default(PENDING_VERIFICATION)
+  deletedAt          DateTime? // Soft delete for operational entities
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  supplier          SupplierAccount     @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  assignmentHistory AssignmentHistory[]
+
+  // Unique constraint on active registration numbers only (enforce in app layer for deletedAt filter)
+  @@unique([registrationNumber])
+  @@index([supplierId, status])
+  @@index([status])
+}
+
+model Driver {
+  id            String       @id @default(uuid())
+  supplierId    String
+  name          String
+  phone         String
+  licenseNumber String?
+  status        DriverStatus @default(PENDING_VERIFICATION)
+  deletedAt     DateTime? // Soft delete for operational entities
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  supplier          SupplierAccount     @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  assignmentHistory AssignmentHistory[]
+
+  @@index([supplierId, status])
+}
+
+// ============================================================================
+// BOOKING MODULE
+// ============================================================================
+
+model Booking {
+  id               String        @id @default(uuid())
+  bookingRef       String        @unique // Non-sequential human-readable reference
+  customerId       String
+  supplierId       String? // Nullable until supplier assigned
+  status           BookingStatus @default(REQUESTED)
+  productType      ProductType
+  tripStartDate    DateTime
+  tripEndDate      DateTime?
+  estimatedKm      Int?
+  sourceCity       String
+  destinationCity  String?
+  cancelledBy      ActorType?
+  cancelledAt      DateTime?
+  cancelledReason  String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  customer          CustomerAccount      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  supplier          SupplierAccount?     @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  itinerary         BookingItinerary?
+  pricingSnapshot   BookingPricingSnapshot?
+  assignmentHistory AssignmentHistory[]
+  tripExecution     TripExecution?
+  quote             Quote?
+  finalBill         FinalBill?
+  payments          Payment[]
+  refunds           Refund[]
+  earning           SupplierEarning?
+  domainEvents      DomainEvent[]
+  supportNotes      SupportNote[]
+
+  @@index([bookingRef])
+  @@index([customerId, status, tripStartDate])
+  @@index([supplierId, status, tripStartDate])
+  @@index([status, tripStartDate])
+}
+
+model BookingItinerary {
+  id                String   @id @default(uuid())
+  bookingId         String   @unique
+  pickupLocation    String
+  pickupGeo         Json? // { lat, lng } - nullable until geocoded
+  destinations      Json // [{ location, geo? }] - array of destination stops
+  estimatedDistance Int?
+  createdAt         DateTime @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+}
+
+model BookingPricingSnapshot {
+  id                     String          @id @default(uuid())
+  bookingId              String          @unique
+  category               VehicleCategory
+  ageBucket              AgeBucket
+  includedKmPerDay       Int
+  includedDays           Int
+  totalIncludedKm        Int
+  basePrice              Decimal         @db.Decimal(10, 2)
+  pricingConfigVersionId String? // Reference to PricingConfig when implemented
+  snapshotData           Json // Full pricing detail snapshot
+  createdAt              DateTime        @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+}
+
+model AssignmentHistory {
+  id          String    @id @default(uuid())
+  bookingId   String
+  supplierId  String
+  vehicleId   String?
+  driverId    String?
+  assignedAt  DateTime  @default(now())
+  replacedAt  DateTime? // Null = current assignment
+  assignedBy  ActorType
+  createdAt   DateTime  @default(now())
+
+  booking  Booking          @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  supplier SupplierAccount  @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  vehicle  Vehicle?         @relation(fields: [vehicleId], references: [id], onDelete: Restrict)
+  driver   Driver?          @relation(fields: [driverId], references: [id], onDelete: Restrict)
+
+  @@index([bookingId, assignedAt])
+}
+
+model TripExecution {
+  id                  String    @id @default(uuid())
+  bookingId           String    @unique
+  startedAt           DateTime?
+  completedAt         DateTime?
+  actualKm            Int?
+  actualStartOdometer Int?
+  actualEndOdometer   Int?
+  tollLines           Json? // [{ description, amount, receiptUrl? }]
+  parkingLines        Json? // [{ description, amount, receiptUrl? }]
+  extensionsUsed      Json? // { "8hr80km": 1, "1day300km": 0 }
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+}
+
+// ============================================================================
+// BILLING MODULE
+// ============================================================================
+
+model Quote {
+  id             String   @id @default(uuid())
+  bookingId      String   @unique
+  estimatedTotal Decimal  @db.Decimal(10, 2)
+  lineItems      Json // [{ lineType, description, amount }]
+  issuedAt       DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+}
+
+model FinalBill {
+  id                String    @id @default(uuid())
+  bookingId         String    @unique
+  quoteId           String?
+  subtotal          Decimal   @db.Decimal(10, 2)
+  platformFee       Decimal?  @db.Decimal(10, 2)
+  totalAmount       Decimal   @db.Decimal(10, 2)
+  varianceFromQuote Decimal?  @db.Decimal(10, 2)
+  lineItems         Json // [{ lineType, description, quantity?, rate?, amount }]
+  issuedAt          DateTime  @default(now())
+  createdAt         DateTime  @default(now())
+
+  booking            Booking             @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  commissionSnapshot CommissionSnapshot?
+  earning            SupplierEarning?
+}
+
+model CommissionSnapshot {
+  id                  String   @id @default(uuid())
+  finalBillId         String   @unique
+  ruleVersionId       String? // Reference to commission config version when implemented
+  perKmRate           Decimal? @db.Decimal(10, 2)
+  platformFeeFlat     Decimal? @db.Decimal(10, 2)
+  calculatedCommission Decimal @db.Decimal(10, 2)
+  snapshotData        Json // Full commission rule detail
+  createdAt           DateTime @default(now())
+
+  finalBill FinalBill @relation(fields: [finalBillId], references: [id], onDelete: Restrict)
+}
+
+model Payment {
+  id               String        @id @default(uuid())
+  bookingId        String
+  finalBillId      String? // Nullable until final bill issued
+  amount           Decimal       @db.Decimal(10, 2)
+  mode             PaymentMode
+  status           PaymentStatus @default(INITIATED)
+  gatewayOrderId   String?
+  gatewayPaymentId String?
+  gatewayRefundId  String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  booking Booking  @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  refunds Refund[]
+
+  @@index([bookingId, status])
+}
+
+model Refund {
+  id              String       @id @default(uuid())
+  bookingId       String
+  paymentId       String
+  amount          Decimal      @db.Decimal(10, 2)
+  reason          String?
+  initiatedBy     ActorType
+  status          RefundStatus @default(INITIATED)
+  gatewayRefundId String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+
+  @@index([bookingId])
+}
+
+model SupplierEarning {
+  id              String                @id @default(uuid())
+  bookingId       String                @unique
+  supplierId      String
+  finalBillId     String                @unique
+  grossAmount     Decimal               @db.Decimal(10, 2)
+  commissionAmount Decimal              @db.Decimal(10, 2)
+  netAmount       Decimal               @db.Decimal(10, 2)
+  status          SupplierEarningStatus @default(EARNED)
+  payoutBatchId   String? // Nullable until batched
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  booking      Booking          @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  supplier     SupplierAccount  @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  finalBill    FinalBill        @relation(fields: [finalBillId], references: [id], onDelete: Restrict)
+  payoutBatch  PayoutBatch?     @relation(fields: [payoutBatchId], references: [id], onDelete: Restrict)
+
+  @@index([supplierId, status, createdAt])
+  @@index([payoutBatchId])
+}
+
+model PayoutBatch {
+  id               String            @id @default(uuid())
+  batchRef         String            @unique
+  supplierId       String? // Nullable for multi-supplier batches
+  cycleStartDate   DateTime
+  cycleEndDate     DateTime
+  totalEarnings    Decimal           @db.Decimal(10, 2)
+  totalDeductions  Decimal?          @db.Decimal(10, 2)
+  netPayout        Decimal           @db.Decimal(10, 2)
+  status           PayoutBatchStatus @default(DRAFT)
+  paidAt           DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  earnings SupplierEarning[]
+
+  @@index([supplierId, cycleStartDate])
+  @@index([status])
+}
+
+// ============================================================================
+// CROSS-CUTTING MODELS
+// ============================================================================
+
+model Upload {
+  id           String    @id @default(uuid())
+  storageKey   String // S3/object storage key
+  mimeType     String
+  sizeBytes    Int
+  uploadedBy   String // UUID -> Identity
+  entityType   String // Polymorphic: "booking", "vehicle", "driver", etc.
+  entityId     String // UUID of linked entity
+  deletedAt    DateTime? // Soft delete for mistaken uploads
+  archivedAt   DateTime? // Retention policy marker
+  createdAt    DateTime  @default(now())
+
+  @@index([entityType, entityId])
+}
+
+model DomainEvent {
+  id         String    @id @default(uuid())
+  entityType String // "booking", "payment", "vehicle", etc.
+  entityId   String // UUID of target entity
+  eventType  String // Flexible string: "booking.created", "payment.captured", etc.
+  actorType  ActorType
+  actorId    String? // UUID of actor (nullable for SYSTEM)
+  payload    Json // Event-specific details (minimal PII)
+  occurredAt DateTime  @default(now()) // Business time
+  recordedAt DateTime  @default(now()) // Insert time
+  createdAt  DateTime  @default(now())
+
+  booking Booking? @relation(fields: [entityId], references: [id], onDelete: NoAction, map: "fk_domain_event_booking")
+
+  @@index([entityType, entityId, recordedAt])
+  @@index([eventType])
+}
+
+model SupportNote {
+  id         String   @id @default(uuid())
+  entityType String // Polymorphic: "booking", "payment", "supplier", etc.
+  entityId   String // UUID of linked entity
+  authorId   String // UUID -> AdminAccount
+  body       String   @db.Text
+  createdAt  DateTime @default(now())
+
+  booking Booking? @relation(fields: [entityId], references: [id], onDelete: NoAction, map: "fk_support_note_booking")
+
+  @@index([entityType, entityId, createdAt])
+}
+
+// ============================================================================
+// NOTES & UNRESOLVED MECHANICS
+// ============================================================================
+
+// 1. Better Auth tables (user, session, account, verification) are managed separately
+//    Identity.betterAuthUserId will link to Better Auth user.id when OTP/login implemented
+//
+// 2. UUID generation: Using default uuid() - can migrate to cuid() or custom generator later
+//
+// 3. Soft delete: Only on operational entities (Vehicle, Driver, Upload)
+//    Financial entities use status enums - never hard deleted
+//
+// 4. Polymorphic relations (Upload, DomainEvent, SupportNote):
+//    entityType + entityId pattern - no FK constraints at MVP
+//    Partial FK added for Booking relations for referential integrity on primary use case
+//
+// 5. JSON fields: Flexible for MVP - can normalize later based on query patterns:
+//    - lineItems (Quote, FinalBill)
+//    - tollLines, parkingLines (TripExecution)
+//    - destinations (BookingItinerary)
+//    - snapshotData (BookingPricingSnapshot, CommissionSnapshot)
+//    - payload (DomainEvent)
+//
+// 6. Money fields: Decimal(10,2) - supports up to 99,999,999.99
+//    Adjust precision if higher values needed
+//
+// 7. Indexes: Added for primary operational queries
+//    Tune based on actual query patterns in production
+//
+// 8. Enums: Prisma schema-level enums for core states
+//    Adding values requires migration - acceptable for lifecycle states
+//    DomainEvent.eventType is String for flexibility
+//
+// 9. Timestamps: createdAt/updatedAt on mutable entities
+//    Immutable snapshots (Quote, FinalBill, CommissionSnapshot) have createdAt only
+//
+// 10. Relationships: onDelete Restrict for financial paths
+//     NoAction for polymorphic optional FKs
+//     Preserves historical integrity per architecture

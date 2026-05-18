@@ -9,6 +9,12 @@ export const serverEnv = {
   betterAuthSecret: process.env.BETTER_AUTH_SECRET,
   betterAuthUrl: process.env.BETTER_AUTH_URL,
   authMiddlewareEnabled: process.env.AUTH_MIDDLEWARE_ENABLED,
-  // Example placeholders for future wiring (uncomment when integrated):
-  // databaseUrl: process.env.DATABASE_URL,
+  databaseUrl: process.env.DATABASE_URL,
 } as const;
+
+// Runtime validation for required database configuration
+if (!serverEnv.databaseUrl && serverEnv.nodeEnv !== "development") {
+  throw new Error(
+    "DATABASE_URL is required for production deployments. See .env.example for setup."
+  );
+}

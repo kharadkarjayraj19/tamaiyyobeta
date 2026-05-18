@@ -68,3 +68,8 @@
 | 2026-05-18 | **Planned:** `docs/architecture/api-architecture.md` (FOUNDATION). |
 | 2026-05-18 | **Planned:** `docs/architecture/prisma-data-architecture.md` (FOUNDATION). |
 | 2026-05-18 | **Planned:** `docs/architecture/prisma-schema-planning.md` (FOUNDATION). |
+| 2026-05-18 | **Implemented:** `prisma/schema.prisma` — 21 models, PostgreSQL, UUID ids, enums, soft-delete, immutable snapshots. |
+| 2026-05-18 | **Implemented:** Prisma foundation — client generation, singleton pattern, initial migration, seed structure, repository folders. |
+| 2026-05-18 | **Implemented:** Backend foundation — repositories (CustomerAccount, Booking), services (BookingService), validation (Zod), errors, transactions. |
+| 2026-05-18 | **Implemented:** Supplier and vehicle onboarding APIs — repositories (SupplierAccount, Vehicle, Upload), services (SupplierService, VehicleService), validation schemas (supplier/vehicle DTOs), REST API routes (`/api/v1/suppliers/*`, `/api/v1/vehicles/*`, `/api/v1/admin/*/verify`). Documented in `docs/features/supplier-vehicle-onboarding-apis.md` (MVP). |
+| 2026-05-18 | **Implemented:** Booking quote and creation APIs — repositories (BookingItinerary, BookingPricingSnapshot, Quote, DomainEvent), services (BookingService with QuoteService), MVP placeholder pricing (300km/day, category/age bucket rates), transactional booking creation (booking+itinerary+snapshot+quote+events), REST API routes (`/api/v1/bookings/*`). Domain events: BOOKING_CREATED, QUOTE_GENERATED. |

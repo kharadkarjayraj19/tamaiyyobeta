@@ -95,3 +95,6 @@
 | 2026-05-18 | API architecture doc (`docs/architecture/api-architecture.md`); ADR-B03 updated for `/api/v1/`. |
 | 2026-05-18 | Prisma data architecture (`prisma-data-architecture.md`); ADR-P01–P03. |
 | 2026-05-18 | Prisma schema planning (`prisma-schema-planning.md`); ADR-P04. |
+| 2026-05-18 | **Implemented:** `prisma/schema.prisma` — 21 models implementing persistence architecture. |
+| 2026-05-18 | **Implemented:** Prisma backend foundation—client singleton, PostgreSQL adapter (Prisma 7.x), initial migration, seed structure. |
+| 2026-05-18 | **Implemented:** Backend application foundation—repositories, services, validation (Zod), operational errors, transaction helpers. |

@@ -374,7 +374,7 @@ interface BookingRepository {
 
 **Implemented**
 
-- **No** `schema.prisma` or Prisma migrations in repository; Better Auth stateless (no app DB).
+- **`prisma/schema.prisma`** — 21 models across identity, vehicle, booking, billing, and cross-cutting concerns; PostgreSQL provider, UUID ids, enums for lifecycle states, indexes for operational queries.
 
 **Planned**
 
@@ -454,5 +454,4 @@ interface BookingRepository {
 | Date | Change |
 | --- | --- |
 | 2026-05-18 | **FOUNDATION:** Schema planning blueprint—model groups (identity, vehicle, booking, billing, cross-cutting), relationships, soft-delete, enums, indexes, transactions, upload/event modeling, repository boundaries, unresolved mechanics, extensibility. |
-
-When `schema.prisma` is generated, cross-reference this doc and update with actual model/field names and resolved mechanics; link from `prisma-data-architecture.md`.
+| 2026-05-18 | **Implemented:** `prisma/schema.prisma` generated—21 models, 13 enums, core indexes, append-only events, immutable snapshots, soft-delete on operational entities only. |

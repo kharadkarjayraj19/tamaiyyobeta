@@ -100,7 +100,50 @@ Domain logic lives primarily under **`src/features/<domain>/`** (and supporting 
 
 **Implemented**
 
-- **No** application PostgreSQL/Prisma layer in repo yet; Better Auth runs **stateless** cookie sessions (`docs/features/frontend-auth-architecture.md`).
+- **`prisma/schema.prisma`** — PostgreSQL + Prisma schema foundation with 21 models for marketplace MVP.
+- **`src/lib/db/prisma.ts`** — Prisma Client singleton with PostgreSQL adapter (Prisma 7.x).
+- **`src/lib/db/types.ts`** — PrismaTransactionClient type for repository transaction support.
+- **`src/lib/db/transactions.ts`** — Transaction helper utilities (`withTransaction`, `withTransactionTimeout`).
+- **`prisma/migrations/20260518_init/`** — Initial database migration SQL.
+- **`prisma/seed.ts`** — Seed foundation (placeholders for admin, pricing, city data).
+- **Repository foundation** at `src/lib/repositories/`:
+  - `identity/customer-repository.ts` — CustomerAccount CRUD
+  - `identity/supplier-repository.ts` — SupplierAccount CRUD, filters, verification
+  - `booking/booking-repository.ts` — Booking queries with filters
+  - `booking/booking-itinerary-repository.ts` — BookingItinerary (one-to-one with Booking)
+  - `booking/booking-pricing-snapshot-repository.ts` — Immutable pricing snapshots
+  - `booking/quote-repository.ts` — Quote generation and storage
+  - `vehicle/vehicle-repository.ts` — Vehicle inventory, soft-delete, age bucket calculation
+  - `upload/upload-repository.ts` — Upload metadata (placeholder)
+  - `event/domain-event-repository.ts` — Append-only event log for audit
+  - Conventions documented in `repositories/README.md`
+- **Service foundation** at `src/lib/services/`:
+  - `booking/booking-service.ts` — Booking orchestration (quote gen, creation, listing)
+  - `booking/quote-service.ts` — Pricing calculations (MVP placeholder rates)
+  - `supplier/supplier-service.ts` — Supplier onboarding, verification, status transitions
+  - `vehicle/vehicle-service.ts` — Vehicle inventory, verification, status transitions
+  - Conventions documented in `services/README.md`
+- **Validation foundation** at `src/lib/validation/`:
+  - Zod helpers (`validateDto`, `safeValidateDto`)
+  - Common schemas (UUID, phone, email, pagination)
+  - `schemas/supplier-schemas.ts` — Supplier onboarding DTOs
+  - `schemas/vehicle-schemas.ts` — Vehicle creation/update DTOs
+- **Error system** at `src/lib/errors/`:
+  - `ValidationError`, `NotFoundError`, `ConflictError`, `ForbiddenError`, `UnauthorizedError`
+- **Backend types** at `src/types/backend.ts` (pagination, results)
+- **REST API routes** at `src/app/api/v1/`:
+  - `/suppliers/onboarding/draft` — POST supplier draft
+  - `/suppliers/onboarding/submit` — POST supplier submission
+  - `/suppliers/[id]` — GET supplier details
+  - `/suppliers` — GET supplier list with filters
+  - `/vehicles` — POST create vehicle, GET vehicle list
+  - `/vehicles/[id]` — GET/PATCH/DELETE vehicle
+  - `/admin/suppliers/[id]/verify` — POST approve/reject supplier
+  - `/admin/vehicles/[id]/verify` — POST approve/reject vehicle
+  - `/bookings/quote` — POST generate quote (no booking created)
+  - `/bookings` — POST create booking, GET list bookings
+  - `/bookings/[id]` — GET booking details
+  - `/bookings/ref/[ref]` — GET booking by bookingRef
 
 **Unresolved mechanics**
 

@@ -30,7 +30,7 @@
 
 **Implemented**
 
-- **No** `prisma` dependency or schema in repository; Better Auth **stateless** (no app DB).
+- **`prisma/schema.prisma`** — PostgreSQL provider, 21 models, UUID primary keys, soft-delete on operational entities, immutable financial snapshots.
 
 **Exploratory**
 
@@ -271,5 +271,6 @@
 | Date | Change |
 | --- | --- |
 | 2026-05-18 | **FOUNDATION:** Postgres/Prisma philosophy, UUID+refs, soft-delete, timestamps, snapshots, relationships, audit events, enums, indexing, uploads, repository boundaries, extensibility. |
+| 2026-05-18 | **Implemented:** `prisma/schema.prisma` with 21 models implementing this architecture. |
 
-When `schema.prisma` is introduced, add dated row linking tables to this doc and domain models; resolve `backend-architecture.md` §4 open items (soft-delete, tenant scoping).
+Schema implementation aligns with domain models; see `prisma/schema.prisma` for actual table definitions.
