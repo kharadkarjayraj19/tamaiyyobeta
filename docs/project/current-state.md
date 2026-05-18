@@ -7,7 +7,7 @@
 ## Read next (typical order)
 
 1. **This file** — snapshot and doc map.
-2. **`docs/architecture.md`** — global structure, routing, env patterns; **`docs/architecture/backend-architecture.md`** for MVP backend blueprint; **`docs/architecture/domain-models/`** for entity models (e.g. identity).
+2. **`docs/architecture.md`** — global structure, routing, env patterns; **`docs/architecture/backend-architecture.md`**, **`api-architecture.md`**, **`prisma-data-architecture.md`**, **`prisma-schema-planning.md`**; **`docs/architecture/domain-models/`** for entity models (e.g. identity).
 3. **`docs/features/*.md`** relevant to the task — behavior and cross-cutting UI/auth/shell specs.
 4. **`docs/frontend-guidelines.md`** — when touching UI or App Router conventions.
 5. **`docs/project/roadmap.md`**, **`architecture-decisions.md`**, **`future-initiatives.md`** — when changing phase, direction, or recorded ADR-style decisions.
@@ -63,3 +63,8 @@
 | 2026-05-18 | **Planned:** `docs/architecture/backend-architecture.md` (MVP backend blueprint); Exploratory backend bullet split out. |
 | 2026-05-18 | **Planned:** `docs/architecture/domain-models/identity-domain-model.md` (FOUNDATION). |
 | 2026-05-18 | **Planned:** `docs/architecture/domain-models/vehicle-domain-model.md` (FOUNDATION); identity doc corrected (no permanent vehicle–driver link). |
+| 2026-05-18 | **Planned:** `docs/architecture/domain-models/booking-domain-model.md` (FOUNDATION). |
+| 2026-05-18 | **Planned:** `docs/architecture/domain-models/billing-domain-model.md` (FOUNDATION). |
+| 2026-05-18 | **Planned:** `docs/architecture/api-architecture.md` (FOUNDATION). |
+| 2026-05-18 | **Planned:** `docs/architecture/prisma-data-architecture.md` (FOUNDATION). |
+| 2026-05-18 | **Planned:** `docs/architecture/prisma-schema-planning.md` (FOUNDATION). |

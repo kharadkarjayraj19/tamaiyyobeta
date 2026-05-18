@@ -3,7 +3,7 @@
 **Maturity:** FOUNDATION  
 **Purpose:** First **authoritative operational specification** for how an outstation cab **booking** moves from intent through assignment, execution, billing, and closure—including extensions, pass-through charges, and cancellation/refund **philosophy**. Audience: product, operations, engineering, and AI agents implementing marketplace behavior.
 
-**Related docs:** `docs/architecture.md` (roles/routing), `docs/features/auth-rbac.md` (identity/RBAC philosophy—**not** booking permissions until extended here), `docs/features/app-shell.md`, `docs/features/design-system.md`, **[`docs/features/pricing-engine.md`](./pricing-engine.md)** (quotes, dimensions, configuration—feeds booking creation), **[`docs/features/vehicle-management.md`](./vehicle-management.md)** (inventory, category/bucket compatibility for assignment), **[`docs/features/supplier-operations.md`](./supplier-operations.md)** (supplier routing, acceptance, onboarding ops), **[`docs/features/billing-settlement.md`](./billing-settlement.md)** (payment capture, settlement, payout architecture), `docs/project/current-state.md`.
+**Related docs:** `docs/architecture.md` (roles/routing), **`docs/architecture/domain-models/booking-domain-model.md`** (booking vs trip execution entities, snapshots, assignment history), `docs/features/auth-rbac.md` (identity/RBAC philosophy—**not** booking permissions until extended here), `docs/features/app-shell.md`, `docs/features/design-system.md`, **[`docs/features/pricing-engine.md`](./pricing-engine.md)** (quotes, dimensions, configuration—feeds booking creation), **[`docs/features/vehicle-management.md`](./vehicle-management.md)** (inventory, category/bucket compatibility for assignment), **[`docs/features/supplier-operations.md`](./supplier-operations.md)** (supplier routing, acceptance, onboarding ops), **[`docs/features/billing-settlement.md`](./billing-settlement.md)** (payment capture, settlement, payout architecture), `docs/project/current-state.md`.
 
 **Non-goals (this document):** database schemas, API contracts, payment-gateway integration, legal/tax language, exact rupee formulas not stated below, pixel-level UX flows, or **granular supplier onboarding steps** (see **`supplier-operations.md`**); **detailed financial state machines** (see **`billing-settlement.md`**).
 
@@ -247,5 +247,6 @@ Extensions consume **additional time and/or distance** beyond the base package. 
 | 2026-05-15 | Related: cross-link **`docs/features/vehicle-management.md`** for fleet inventory and assignment compatibility. |
 | 2026-05-16 | Related: **`supplier-operations.md`**; non-goals defer granular onboarding there. |
 | 2026-05-17 | Related: **`billing-settlement.md`**; non-goals defer detailed financial state machines. |
+| 2026-05-18 | Related: **`docs/architecture/domain-models/booking-domain-model.md`** (entity architecture). |
 
 When numeric policies, RBAC matrices, or payment integration land, add dated rows and consider raising **Maturity** toward `MVP` for covered scope.

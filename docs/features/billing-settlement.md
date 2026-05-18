@@ -3,7 +3,7 @@
 **Maturity:** FOUNDATION  
 **Purpose:** Foundational **billing, settlement, payout, and financial workflow** architecture for Tamaiyyo: how money **moves** relative to trips, who **confirms** operational inputs, how **final bills** are produced, and how **suppliers** are paid—**startup-friendly**, **configuration-friendly**, and **server-truth** aligned. Does **not** define legal relationships, tax filings, or payment-processor contracts.
 
-**Related docs:** [`docs/features/booking-lifecycle.md`](./booking-lifecycle.md) (final bill **composition** philosophy, cancellation/refund posture), [`docs/features/pricing-engine.md`](./pricing-engine.md) (quoted dimensions, rate configuration), [`docs/features/supplier-operations.md`](./supplier-operations.md) (supplier billing inputs, payout cadence posture, disputes escalation), [`docs/features/vehicle-management.md`](./vehicle-management.md) (fulfillment compatibility affecting billing outcomes), [`docs/features/auth-rbac.md`](./auth-rbac.md) (admin authority, audit), [`docs/architecture.md`](../architecture.md), [`docs/project/current-state.md`](../project/current-state.md).
+**Related docs:** [`docs/features/booking-lifecycle.md`](./booking-lifecycle.md) (final bill **composition** philosophy, cancellation/refund posture), **[`docs/architecture/domain-models/billing-domain-model.md`](../architecture/domain-models/billing-domain-model.md)** (financial **entities**: quote, bill, payment, settlement, refund), **[`docs/architecture/domain-models/booking-domain-model.md`](../architecture/domain-models/booking-domain-model.md)** (booking linkage, estimated vs actual kms), [`docs/features/pricing-engine.md`](./pricing-engine.md) (quoted dimensions, rate configuration), [`docs/features/supplier-operations.md`](./supplier-operations.md) (supplier billing inputs, payout cadence posture, disputes escalation), [`docs/features/vehicle-management.md`](./vehicle-management.md) (fulfillment compatibility affecting billing outcomes), [`docs/features/auth-rbac.md`](./auth-rbac.md) (admin authority, audit), [`docs/architecture.md`](../architecture.md), [`docs/project/current-state.md`](../project/current-state.md).
 
 **Non-goals (this document):** database schemas; REST/GraphQL; payment-gateway field mappings; statutory tax positions; accounting ledger schemas; interest on held funds.
 
@@ -284,5 +284,7 @@
 | Date | Change |
 | --- | --- |
 | 2026-05-17 | **FOUNDATION:** billing/settlement philosophy, payment modes, platform fund flow, final billing workflow, km/toll confirmation, eligibility, payout, commission, refund, disputes, visibility, tax caution, edge cases, extensibility. |
+| 2026-05-18 | Related: **`billing-domain-model.md`** (entity architecture); default **24h** refund window documented there as **Planned**—ratify here when product confirms. |
+| 2026-05-18 | Entity doc expanded: variance, gateway refs, **7-day payout cycle** default, notification hooks—align §8 payout when ratified. |
 
 When merchant-of-record, capture rules, and commission matrices are fixed, add dated rows and consider raising **Maturity** toward `MVP` for covered scope.

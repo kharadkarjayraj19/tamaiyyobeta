@@ -3,9 +3,9 @@
 **Maturity:** FOUNDATION  
 **Purpose:** Define the **MVP backend implementation architecture** for Tamaiyyo: how server-side logic, data, APIs, auth, and operations are structured in this repository—**startup-friendly**, **modular**, and **extractable later** without premature microservices.
 
-**Related docs:** [`docs/architecture.md`](../architecture.md) (global repo layout), [`docs/features/frontend-auth-architecture.md`](../features/frontend-auth-architecture.md) (current Better Auth wiring), [`docs/features/auth-rbac.md`](../features/auth-rbac.md) (RBAC philosophy), **[`docs/architecture/domain-models/`](./domain-models/README.md)** (entity blueprints), marketplace domain specs under `docs/features/`, [`docs/project/current-state.md`](../project/current-state.md).
+**Related docs:** [`docs/architecture.md`](../architecture.md) (global repo layout), **[`docs/architecture/api-architecture.md`](./api-architecture.md)** (REST routes, responses, handler layering), **[`docs/architecture/prisma-data-architecture.md`](./prisma-data-architecture.md)** (Postgres, Prisma, snapshots, audit persistence), **[`docs/architecture/prisma-schema-planning.md`](./prisma-schema-planning.md)** (schema planning blueprint), [`docs/features/frontend-auth-architecture.md`](../features/frontend-auth-architecture.md) (current Better Auth wiring), [`docs/features/auth-rbac.md`](../features/auth-rbac.md) (RBAC philosophy), **[`docs/architecture/domain-models/`](./domain-models/README.md)** (entity blueprints), marketplace domain specs under `docs/features/`, [`docs/project/current-state.md`](../project/current-state.md).
 
-**Non-goals (this document):** Prisma schema definitions; OpenAPI specs; Kubernetes or multi-region infra; payment-processor integration detail; exact RBAC permission matrices.
+**Non-goals (this document):** Prisma schema contents (see **`prisma-data-architecture.md`**, **`prisma-schema-planning.md`**); OpenAPI specs; Kubernetes or multi-region infra; payment-processor integration detail; exact RBAC permission matrices.
 
 ---
 
@@ -47,7 +47,7 @@
 | **Database** | **PostgreSQL** as system of record | **Planned** |
 | **ORM** | **Prisma** | **Planned** |
 | **Authentication** | **Better Auth** (session integration; persistence adapter **Planned**) | **Implemented** (stateless foundation); **Planned** (DB-backed users/sessions) |
-| **HTTP APIs** | **REST** (JSON), versioned path prefix when externalized | **Planned** (internal-only at MVP) |
+| **HTTP APIs** | **REST** (JSON), **`/api/v1/`** per [`api-architecture.md`](./api-architecture.md) | **Planned** (internal-only at MVP; auth at `/api/auth/*` **Implemented**) |
 
 **Planned — integration notes**
 
@@ -68,11 +68,11 @@ Domain logic lives primarily under **`src/features/<domain>/`** (and supporting 
 | --- | --- | --- | --- |
 | **auth** | Sessions, identity linkage, entitlement resolution hooks | `auth-rbac.md`, `frontend-auth-architecture.md`, [`domain-models/identity-domain-model.md`](./domain-models/identity-domain-model.md) | **Implemented** (session foundation); **Planned** (RBAC + DB) |
 | **customer** | Customer profile, booking intent surfaces, post-trip customer actions | `booking-lifecycle.md` (customer actor) | **Planned** |
-| **booking** | Booking lifecycle state, transitions, assignment orchestration | `booking-lifecycle.md` | **Planned** |
+| **booking** | Booking lifecycle state, transitions, assignment orchestration | `booking-lifecycle.md`, [`domain-models/booking-domain-model.md`](./domain-models/booking-domain-model.md) | **Planned** |
 | **pricing** | Quote inputs, rate-card resolution, eligibility flags | `pricing-engine.md` | **Planned** |
 | **vehicle** | Supplier vehicle records, category/age mapping, compatibility checks | `vehicle-management.md`, [`domain-models/vehicle-domain-model.md`](./domain-models/vehicle-domain-model.md) | **Planned** |
 | **supplier** | Onboarding status, routing/acceptance, ops workflows | `supplier-operations.md` | **Planned** |
-| **billing** | Final bill composition, settlement eligibility, payout batches | `billing-settlement.md` | **Planned** |
+| **billing** | Final bill composition, settlement eligibility, payout batches | `billing-settlement.md`, [`domain-models/billing-domain-model.md`](./domain-models/billing-domain-model.md) | **Planned** |
 | **admin** | Overrides, config CRUD, operational interventions, audit triggers | `auth-rbac.md`, domain specs (admin actor) | **Planned** |
 | **notifications** | Email/SMS/push dispatch (templates, delivery status) | Cross-cutting; per-feature triggers **Planned** | **Planned** |
 | **analytics** | Product/event capture, operational metrics export | PostHog integration (§9) | **Planned** (lightweight MVP) |
@@ -104,7 +104,7 @@ Domain logic lives primarily under **`src/features/<domain>/`** (and supporting 
 
 **Unresolved mechanics**
 
-- Migration strategy (Prisma Migrate vs custom); **multi-tenant** row scoping (`supplier_id`) patterns; soft-delete vs hard-delete defaults.
+- Migration strategy (Prisma Migrate vs custom); **multi-tenant** row scoping (`supplier_id`) patterns—see **`prisma-data-architecture.md`** for soft-delete, UUID/refs, snapshots, audit defaults.
 
 **Exploratory**
 
