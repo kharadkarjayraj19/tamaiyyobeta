@@ -40,9 +40,19 @@
 - Additional per-domain **`docs/features/*.md`** (narrower tax/payment-rail addenda) as product defines them.
 - Full login product (factors, persistence, RBAC beyond session presence) once specified.
 
-**Planned (backend blueprint documented)**
+**Implemented (backend foundation)**
 
-- MVP backend per **[`docs/architecture/backend-architecture.md`](../architecture/backend-architecture.md)**: modular monolith, PostgreSQL + Prisma, REST (internal), Vercel + managed Postgres initially, Better Auth with DB persistence, Sentry/PostHog/audit logging—**not implemented in code yet**.
+- **Prisma schema** (`prisma/schema.prisma`): 21 models, PostgreSQL, UUID ids, soft-delete, immutable snapshots, domain events.
+- **Repositories**: domain-scoped data access (identity, booking, billing, vehicle, event).
+- **Services**: business logic orchestration (BookingService, QuoteService, AssignmentService, BillingService, SupplierService, VehicleService).
+- **REST APIs**: supplier/vehicle onboarding, booking (quote, create, accept, reject, assign, reassign, complete, confirm-km, generate-bill), billing (final bill retrieval).
+- **Domain events**: BOOKING_CREATED, QUOTE_GENERATED, BOOKING_ACCEPTED, BOOKING_REJECTED, ASSIGNMENT_CREATED, ASSIGNMENT_CHANGED, BOOKING_REASSIGNED, TRIP_COMPLETED, CUSTOMER_CONFIRMED, KM_MISMATCH_DETECTED, FINAL_BILL_GENERATED.
+- **MVP placeholders**: pricing rates (₹300/day base), commission (₹500 flat + ₹2/km), mocked identity (Better Auth integration pending).
+
+**Planned**
+
+- Payment gateway integration, payout batching, GST automation, live tracking, automated routing algorithms.
+- Better Auth with database-backed user accounts and actual authentication flows.
 
 **Exploratory**
 
@@ -73,3 +83,5 @@
 | 2026-05-18 | **Implemented:** Backend foundation — repositories (CustomerAccount, Booking), services (BookingService), validation (Zod), errors, transactions. |
 | 2026-05-18 | **Implemented:** Supplier and vehicle onboarding APIs — repositories (SupplierAccount, Vehicle, Upload), services (SupplierService, VehicleService), validation schemas (supplier/vehicle DTOs), REST API routes (`/api/v1/suppliers/*`, `/api/v1/vehicles/*`, `/api/v1/admin/*/verify`). Documented in `docs/features/supplier-vehicle-onboarding-apis.md` (MVP). |
 | 2026-05-18 | **Implemented:** Booking quote and creation APIs — repositories (BookingItinerary, BookingPricingSnapshot, Quote, DomainEvent), services (BookingService with QuoteService), MVP placeholder pricing (300km/day, category/age bucket rates), transactional booking creation (booking+itinerary+snapshot+quote+events), REST API routes (`/api/v1/bookings/*`). Domain events: BOOKING_CREATED, QUOTE_GENERATED. |
+| 2026-05-18 | **Implemented:** Supplier assignment and booking fulfillment APIs — repositories (AssignmentHistory, Driver), services (AssignmentService), booking lifecycle transitions (REQUESTED→ACCEPTED→READY_FOR_TRIP), validation (ownership, status, compatibility), REST API routes (`/api/v1/supplier/bookings/*`, `/api/v1/bookings/*/assign`, `/api/v1/admin/bookings/*/reassign`). Domain events: BOOKING_ACCEPTED, BOOKING_REJECTED, ASSIGNMENT_CREATED, ASSIGNMENT_CHANGED, BOOKING_REASSIGNED. |
+| 2026-05-18 | **Implemented:** Trip completion, final billing, and operational closure APIs — repositories (TripExecution with updateActualKm, FinalBill, CommissionSnapshot, SupplierEarning, Payment), services (BillingService with MVP commission rates: ₹500 flat + ₹2/km), transactional final billing (execution+bill+earnings+commission+events), lifecycle transitions (IN_PROGRESS→COMPLETED→BILLING_IN_PROGRESS→CLOSED), customer km confirmation with auto-resolution (≤20km difference auto-resolves in favor of customer, >20km requires manual support), REST API routes (`/api/v1/bookings/*/complete`, `/api/v1/bookings/*/confirm-km`, `/api/v1/bookings/*/generate-bill`, `/api/v1/bookings/*/close`, `/api/v1/billing/bookings/*`). Domain events: TRIP_COMPLETED, CUSTOMER_CONFIRMED, KM_MISMATCH_DETECTED, FINAL_BILL_GENERATED, BOOKING_CLOSED. |

@@ -14,6 +14,8 @@ type Decimal = Prisma.Decimal;
 import type { PrismaTransactionClient } from "@/lib/db/types";
 import { NotFoundError } from "@/lib/errors";
 
+// Note: findByBookingIdOrThrow is already implemented above as findByBookingId with throw
+
 /**
  * Domain type for BookingPricingSnapshot (ORM-agnostic).
  */

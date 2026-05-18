@@ -109,17 +109,26 @@ Domain logic lives primarily under **`src/features/<domain>/`** (and supporting 
 - **Repository foundation** at `src/lib/repositories/`:
   - `identity/customer-repository.ts` — CustomerAccount CRUD
   - `identity/supplier-repository.ts` — SupplierAccount CRUD, filters, verification
-  - `booking/booking-repository.ts` — Booking queries with filters
+  - `booking/booking-repository.ts` — Booking queries with filters, status updates, cancellation
   - `booking/booking-itinerary-repository.ts` — BookingItinerary (one-to-one with Booking)
   - `booking/booking-pricing-snapshot-repository.ts` — Immutable pricing snapshots
   - `booking/quote-repository.ts` — Quote generation and storage
+  - `booking/assignment-history-repository.ts` — Assignment tracking (supplier/vehicle/driver)
+  - `booking/trip-execution-repository.ts` — Trip execution (actual km, tolls, parking)
+  - `billing/final-bill-repository.ts` — Immutable final bills
+  - `billing/commission-snapshot-repository.ts` — Immutable commission snapshots
+  - `billing/supplier-earning-repository.ts` — Supplier earnings and payout tracking
+  - `billing/payment-repository.ts` — Payment records (placeholder)
   - `vehicle/vehicle-repository.ts` — Vehicle inventory, soft-delete, age bucket calculation
+  - `vehicle/driver-repository.ts` — Driver CRUD, filters, soft-delete
   - `upload/upload-repository.ts` — Upload metadata (placeholder)
   - `event/domain-event-repository.ts` — Append-only event log for audit
   - Conventions documented in `repositories/README.md`
 - **Service foundation** at `src/lib/services/`:
   - `booking/booking-service.ts` — Booking orchestration (quote gen, creation, listing)
   - `booking/quote-service.ts` — Pricing calculations (MVP placeholder rates)
+  - `assignment/assignment-service.ts` — Supplier assignment, acceptance/rejection, vehicle/driver assignment, admin reassignment
+  - `billing/billing-service.ts` — Trip completion, final billing, settlement (MVP commission rates)
   - `supplier/supplier-service.ts` — Supplier onboarding, verification, status transitions
   - `vehicle/vehicle-service.ts` — Vehicle inventory, verification, status transitions
   - Conventions documented in `services/README.md`
@@ -144,6 +153,16 @@ Domain logic lives primarily under **`src/features/<domain>/`** (and supporting 
   - `/bookings` — POST create booking, GET list bookings
   - `/bookings/[id]` — GET booking details
   - `/bookings/ref/[ref]` — GET booking by bookingRef
+  - `/bookings/[id]/complete` — POST supplier/driver submits trip execution
+  - `/bookings/[id]/confirm-km` — POST customer confirms km (optional, auto-resolves ≤20km mismatch)
+  - `/bookings/[id]/generate-bill` — POST generate final bill (admin/system)
+  - `/bookings/[id]/close` — POST operational closure (BILLING_IN_PROGRESS → CLOSED)
+  - `/billing/bookings/[id]` — GET final bill by booking ID
+  - `/supplier/bookings/available` — GET supplier booking queue
+  - `/supplier/bookings/[id]/accept` — POST supplier accept booking
+  - `/supplier/bookings/[id]/reject` — POST supplier reject booking
+  - `/bookings/[id]/assign` — POST assign vehicle/driver to booking
+  - `/admin/bookings/[id]/reassign` — POST admin reassign booking to different supplier
 
 **Unresolved mechanics**
 

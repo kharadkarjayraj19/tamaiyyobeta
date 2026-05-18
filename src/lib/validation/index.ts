@@ -110,3 +110,5 @@ export const commonSchemas = {
 export * from "./schemas/supplier-schemas";
 export * from "./schemas/vehicle-schemas";
 export * from "./schemas/booking-schemas";
+export * from "./schemas/assignment-schemas";
+export * from "./schemas/billing-schemas";

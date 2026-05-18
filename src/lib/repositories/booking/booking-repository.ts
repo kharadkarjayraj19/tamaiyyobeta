@@ -31,8 +31,10 @@ export interface BookingDomain {
   bookingRef: string;
   customerId: string;
   supplierId: string | null;
+  assignedSupplierId: string | null;
   status: BookingStatus;
   productType: ProductType;
+  vehicleCategory: string;
   tripStartDate: Date;
   tripEndDate: Date | null;
   estimatedKm: number | null;
@@ -41,6 +43,7 @@ export interface BookingDomain {
   cancelledBy: ActorType | null;
   cancelledAt: Date | null;
   cancelledReason: string | null;
+  deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -281,6 +284,107 @@ export class BookingRepository {
   }
 
   /**
+   * Update booking status (single field).
+   */
+  async updateStatus(
+    id: string,
+    status: BookingStatus,
+    tx?: PrismaTransactionClient
+  ): Promise<BookingDomain> {
+    const client = tx ?? prisma;
+
+    try {
+      const booking = await client.booking.update({
+        where: { id },
+        data: { status },
+      });
+
+      return this.toDomain(booking);
+    } catch (error) {
+      if (
+        error &&
+        typeof error === "object" &&
+        "code" in error &&
+        error.code === "P2025"
+      ) {
+        throw new NotFoundError("Booking", id);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Update booking status and supplier assignment.
+   * Used for supplier acceptance and assignment workflows.
+   */
+  async updateStatusAndSupplier(
+    id: string,
+    status: BookingStatus,
+    supplierId: string | null,
+    tx?: PrismaTransactionClient
+  ): Promise<BookingDomain> {
+    const client = tx ?? prisma;
+
+    try {
+      const booking = await client.booking.update({
+        where: { id },
+        data: {
+          status,
+          supplierId,
+        },
+      });
+
+      return this.toDomain(booking);
+    } catch (error) {
+      if (
+        error &&
+        typeof error === "object" &&
+        "code" in error &&
+        error.code === "P2025"
+      ) {
+        throw new NotFoundError("Booking", id);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Cancel booking with reason.
+   */
+  async cancel(
+    id: string,
+    cancelledBy: ActorType,
+    reason: string,
+    tx?: PrismaTransactionClient
+  ): Promise<BookingDomain> {
+    const client = tx ?? prisma;
+
+    try {
+      const booking = await client.booking.update({
+        where: { id },
+        data: {
+          status: "CANCELLED",
+          cancelledBy,
+          cancelledAt: new Date(),
+          cancelledReason: reason,
+        },
+      });
+
+      return this.toDomain(booking);
+    } catch (error) {
+      if (
+        error &&
+        typeof error === "object" &&
+        "code" in error &&
+        error.code === "P2025"
+      ) {
+        throw new NotFoundError("Booking", id);
+      }
+      throw error;
+    }
+  }
+
+  /**
    * Map Prisma model to domain type.
    */
   private toDomain(booking: Booking): BookingDomain {
@@ -289,8 +393,10 @@ export class BookingRepository {
       bookingRef: booking.bookingRef,
       customerId: booking.customerId,
       supplierId: booking.supplierId,
+      assignedSupplierId: booking.supplierId, // Same as supplierId for now
       status: booking.status,
       productType: booking.productType,
+      vehicleCategory: "UNKNOWN", // TODO: Should be joined from BookingPricingSnapshot
       tripStartDate: booking.tripStartDate,
       tripEndDate: booking.tripEndDate,
       estimatedKm: booking.estimatedKm,
@@ -299,6 +405,7 @@ export class BookingRepository {
       cancelledBy: booking.cancelledBy,
       cancelledAt: booking.cancelledAt,
       cancelledReason: booking.cancelledReason,
+      deletedAt: null, // Booking doesn't have soft-delete
       createdAt: booking.createdAt,
       updatedAt: booking.updatedAt,
     };
