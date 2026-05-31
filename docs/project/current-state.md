@@ -43,15 +43,16 @@
 **Implemented (backend foundation)**
 
 - **Prisma schema** (`prisma/schema.prisma`): 21 models, PostgreSQL, UUID ids, soft-delete, immutable snapshots, domain events.
-- **Repositories**: domain-scoped data access (identity, booking, billing, vehicle, event).
-- **Services**: business logic orchestration (BookingService, QuoteService, AssignmentService, BillingService, SupplierService, VehicleService).
-- **REST APIs**: supplier/vehicle onboarding, booking (quote, create, accept, reject, assign, reassign, complete, confirm-km, generate-bill), billing (final bill retrieval).
-- **Domain events**: BOOKING_CREATED, QUOTE_GENERATED, BOOKING_ACCEPTED, BOOKING_REJECTED, ASSIGNMENT_CREATED, ASSIGNMENT_CHANGED, BOOKING_REASSIGNED, TRIP_COMPLETED, CUSTOMER_CONFIRMED, KM_MISMATCH_DETECTED, FINAL_BILL_GENERATED.
-- **MVP placeholders**: pricing rates (₹300/day base), commission (₹500 flat + ₹2/km), mocked identity (Better Auth integration pending).
+- **Repositories**: domain-scoped data access (identity, booking, billing, payment, refund, settlement, vehicle, event).
+- **Services**: business logic orchestration (BookingService, QuoteService, AssignmentService, BillingService, PaymentService, RefundService, SettlementService, SupplierService, VehicleService).
+- **REST APIs**: supplier/vehicle onboarding, booking (quote, create, accept, reject, assign, reassign, complete, confirm-km, generate-bill, close), billing (final bill retrieval), payment (record, list), refund (create with 24h policy, list), settlement (mark eligible, create batch, list batches, supplier history).
+- **Domain events**: BOOKING_CREATED, QUOTE_GENERATED, BOOKING_ACCEPTED, BOOKING_REJECTED, ASSIGNMENT_CREATED, ASSIGNMENT_CHANGED, BOOKING_REASSIGNED, TRIP_COMPLETED, CUSTOMER_CONFIRMED, KM_MISMATCH_DETECTED, FINAL_BILL_GENERATED, PAYMENT_RECORDED, PAYMENT_COMPLETED, REFUND_CREATED, SETTLEMENT_ELIGIBLE, PAYOUT_BATCH_CREATED.
+- **Financial operations**: Payment recording (advance/partial/full), refund with 24h cancellation policy, supplier earning eligibility tracking, payout batch creation.
+- **MVP placeholders**: pricing rates (₹3-7k/day), commission (₹500 flat + ₹2/km), mocked identity (Better Auth pending), manual payment gateway integration, manual payout execution.
 
 **Planned**
 
-- Payment gateway integration, payout batching, GST automation, live tracking, automated routing algorithms.
+- Razorpay payment gateway integration with webhooks, automatic bank payouts, GST invoice generation, live tracking, automated routing algorithms.
 - Better Auth with database-backed user accounts and actual authentication flows.
 
 **Exploratory**
@@ -86,3 +87,4 @@
 | 2026-05-18 | **Implemented:** Supplier assignment and booking fulfillment APIs — repositories (AssignmentHistory, Driver), services (AssignmentService), booking lifecycle transitions (REQUESTED→ACCEPTED→READY_FOR_TRIP), validation (ownership, status, compatibility), REST API routes (`/api/v1/supplier/bookings/*`, `/api/v1/bookings/*/assign`, `/api/v1/admin/bookings/*/reassign`). Domain events: BOOKING_ACCEPTED, BOOKING_REJECTED, ASSIGNMENT_CREATED, ASSIGNMENT_CHANGED, BOOKING_REASSIGNED. |
 | 2026-05-18 | **Implemented:** Trip completion, final billing, and operational closure APIs — repositories (TripExecution with updateActualKm, FinalBill, CommissionSnapshot, SupplierEarning, Payment), services (BillingService with MVP commission rates: ₹500 flat + ₹2/km), transactional final billing (execution+bill+earnings+commission+events), lifecycle transitions (IN_PROGRESS→COMPLETED→BILLING_IN_PROGRESS→CLOSED), customer km confirmation with auto-resolution (≤20km difference auto-resolves in favor of customer, >20km requires manual support), REST API routes (`/api/v1/bookings/*/complete`, `/api/v1/bookings/*/confirm-km`, `/api/v1/bookings/*/generate-bill`, `/api/v1/bookings/*/close`, `/api/v1/billing/bookings/*`). Domain events: TRIP_COMPLETED, CUSTOMER_CONFIRMED, KM_MISMATCH_DETECTED, FINAL_BILL_GENERATED, BOOKING_CLOSED. |
 | 2026-05-18 | **Hardened:** Backend correctness fixes post-architecture-review — idempotency guards (final bill, booking closure, trip execution), customer ownership validation (km confirmation), financial type safety (toll/parking amount limits, odometer validation, line item count limits), BookingDomain drift cleanup (removed phantom fields), pagination limits (max 100 records server-enforced), lifecycle guards (trip date validation, duplicate prevention), MVP placeholder documentation (commission, pricing, booking ref generation). See `docs/architecture/CORRECTNESS_FIXES_2026-05-18.md` for details. |
+| 2026-05-20 | **Implemented:** Payment and settlement operations APIs — repositories (Payment with updateStatus/getTotalPaid, Refund with SUCCEEDED status support, SupplierEarning with findEligible/attachToBatch, PayoutBatch), services (PaymentService with outstanding balance calculation, RefundService with 24h policy enforcement, SettlementService with batch operations), REST API routes (`/api/v1/payments/*`, `/api/v1/refunds/*`, `/api/v1/settlements/*`). Payment modes: ONLINE_CARD, ONLINE_UPI, CASH. Refund policy: >24h full refund, <24h no automatic refund. Settlement lifecycle: EARNED→ELIGIBLE→BATCHED→PAID. Domain events: PAYMENT_RECORDED, PAYMENT_COMPLETED, REFUND_CREATED, SETTLEMENT_ELIGIBLE, PAYOUT_BATCH_CREATED. MVP placeholders: manual gateway integration, manual payout execution. |

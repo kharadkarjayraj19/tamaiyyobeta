@@ -5,9 +5,10 @@
  * - Prisma queries for supplier earnings
  * - One-to-one relationship with Booking and FinalBill
  * - Tracks supplier payout amounts
+ * - Supports settlement lifecycle (EARNED → ELIGIBLE → BATCHED → PAID/HELD)
  */
 
-import type { SupplierEarning, Prisma } from "@prisma/client";
+import type { SupplierEarning, SupplierEarningStatus, Prisma } from "@prisma/client";
 import prisma from "@/lib/db/prisma";
 import type { PrismaTransactionClient } from "@/lib/db/types";
 
@@ -61,6 +62,69 @@ export class SupplierEarningRepository {
   }
 
   /**
+   * Find earning by supplier and status.
+   */
+  async findBySupplierId(
+    supplierId: string,
+    filters?: {
+      status?: SupplierEarningStatus;
+      payoutBatchId?: string;
+    },
+    offset: number = 0,
+    limit: number = 20,
+    tx?: PrismaTransactionClient
+  ): Promise<SupplierEarningDomain[]> {
+    const client = tx ?? prisma;
+
+    const where: any = { supplierId };
+
+    if (filters?.status) {
+      where.status = filters.status;
+    }
+
+    if (filters?.payoutBatchId) {
+      where.payoutBatchId = filters.payoutBatchId;
+    }
+
+    const earnings = await client.supplierEarning.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: offset,
+      take: limit,
+    });
+
+    return earnings.map((e: SupplierEarning) => this.toDomain(e));
+  }
+
+  /**
+   * Find eligible earnings (status = ELIGIBLE, not yet batched).
+   */
+  async findEligible(
+    supplierId?: string,
+    limit: number = 100,
+    tx?: PrismaTransactionClient
+  ): Promise<SupplierEarningDomain[]> {
+    const client = tx ?? prisma;
+
+    const where: any = {
+      status: "ELIGIBLE",
+      payoutBatchId: null,
+    };
+
+    if (supplierId) {
+      where.supplierId = supplierId;
+    }
+
+    const earnings = await client.supplierEarning.findMany({
+      where,
+      orderBy: { createdAt: "asc" },
+      take: limit,
+    });
+
+    return earnings.map((e: SupplierEarning) => this.toDomain(e));
+  }
+
+  /**
    * Create supplier earning record.
    */
   async create(
@@ -82,6 +146,70 @@ export class SupplierEarningRepository {
     });
 
     return this.toDomain(earning);
+  }
+
+  /**
+   * Update earning status.
+   */
+  async updateStatus(
+    bookingId: string,
+    status: SupplierEarningStatus,
+    tx?: PrismaTransactionClient
+  ): Promise<SupplierEarningDomain> {
+    const client = tx ?? prisma;
+
+    const earning = await client.supplierEarning.update({
+      where: { bookingId },
+      data: { status },
+    });
+
+    return this.toDomain(earning);
+  }
+
+  /**
+   * Attach earning to payout batch.
+   */
+  async attachToBatch(
+    bookingId: string,
+    payoutBatchId: string,
+    status: SupplierEarningStatus,
+    tx?: PrismaTransactionClient
+  ): Promise<SupplierEarningDomain> {
+    const client = tx ?? prisma;
+
+    const earning = await client.supplierEarning.update({
+      where: { bookingId },
+      data: {
+        payoutBatchId,
+        status,
+      },
+    });
+
+    return this.toDomain(earning);
+  }
+
+  /**
+   * Update multiple earnings to a status (for batch operations).
+   */
+  async updateMany(
+    bookingIds: string[],
+    status: SupplierEarningStatus,
+    payoutBatchId?: string,
+    tx?: PrismaTransactionClient
+  ): Promise<number> {
+    const client = tx ?? prisma;
+
+    const result = await client.supplierEarning.updateMany({
+      where: {
+        bookingId: { in: bookingIds },
+      },
+      data: {
+        status,
+        payoutBatchId: payoutBatchId || undefined,
+      },
+    });
+
+    return result.count;
   }
 
   /**

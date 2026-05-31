@@ -7,7 +7,8 @@
  * - Tracks payment gateway integration details
  */
 
-import type { Payment, PaymentMode, PaymentStatus, Prisma } from "@prisma/client";
+import type { Payment, PaymentMode, PaymentStatus } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import prisma from "@/lib/db/prisma";
 import type { PrismaTransactionClient } from "@/lib/db/types";
 
@@ -44,6 +45,22 @@ export interface CreatePaymentData {
  */
 export class PaymentRepository {
   /**
+   * Find payment by ID.
+   */
+  async findById(
+    id: string,
+    tx?: PrismaTransactionClient
+  ): Promise<PaymentDomain | null> {
+    const client = tx ?? prisma;
+
+    const payment = await client.payment.findUnique({
+      where: { id },
+    });
+
+    return payment ? this.toDomain(payment) : null;
+  }
+
+  /**
    * Find payments by booking ID.
    */
   async findByBookingId(
@@ -58,6 +75,28 @@ export class PaymentRepository {
     });
 
     return payments.map((p: Payment) => this.toDomain(p));
+  }
+
+  /**
+   * Get total paid amount for a booking (only CAPTURED payments).
+   */
+  async getTotalPaidForBooking(
+    bookingId: string,
+    tx?: PrismaTransactionClient
+  ): Promise<Prisma.Decimal> {
+    const client = tx ?? prisma;
+
+    const result = await client.payment.aggregate({
+      where: {
+        bookingId,
+        status: "CAPTURED",
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    return result._sum.amount || new Prisma.Decimal(0);
   }
 
   /**
@@ -77,6 +116,28 @@ export class PaymentRepository {
         mode: data.mode,
         status: "INITIATED",
         gatewayOrderId: data.gatewayOrderId,
+      },
+    });
+
+    return this.toDomain(payment);
+  }
+
+  /**
+   * Update payment status.
+   */
+  async updateStatus(
+    id: string,
+    status: PaymentStatus,
+    gatewayPaymentId?: string,
+    tx?: PrismaTransactionClient
+  ): Promise<PaymentDomain> {
+    const client = tx ?? prisma;
+
+    const payment = await client.payment.update({
+      where: { id },
+      data: {
+        status,
+        gatewayPaymentId: gatewayPaymentId || undefined,
       },
     });
 

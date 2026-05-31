@@ -106,9 +106,23 @@ export const commonSchemas = {
   paginationLimit: z.coerce.number().int().positive().max(100).default(20),
 };
 
+/**
+ * Create enum schema from array of values.
+ * 
+ * Helper for creating Zod enum schemas from constant arrays.
+ */
+export function createEnumSchema<T extends [string, ...string[]]>(
+  values: T
+) {
+  return z.enum(values);
+}
+
 // Re-export validation schemas
 export * from "./schemas/supplier-schemas";
 export * from "./schemas/vehicle-schemas";
 export * from "./schemas/booking-schemas";
 export * from "./schemas/assignment-schemas";
 export * from "./schemas/billing-schemas";
+export * from "./schemas/payment-schemas";
+export * from "./schemas/refund-schemas";
+export * from "./schemas/settlement-schemas";
