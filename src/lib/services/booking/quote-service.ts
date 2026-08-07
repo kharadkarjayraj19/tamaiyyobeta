@@ -18,16 +18,17 @@
  * - Real-time inventory-based pricing
  * 
  * Current MVP rates (see method implementations):
- * - Base rates: ₹3,000-7,000/day by category
- * - Included km: 300km/day (fixed)
- * - Extra km: ₹12-25/km by category
- * - One-way surcharge: 30% of base fare
- * - Age bucket discounts: 0-10-20% by vehicle age
+ * - Minimum km/day: 300km/day (fixed)
+ * - Per-km rates: ₹12-25/km by category
+ * - Operational bundle: ₹3/km (computed in backend, shown as total)
+ * - One-way corridor fare: admin-configured fixed price
  */
 
 import { VehicleCategory, AgeBucket, ProductType } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import type { QuoteLineItem } from "@/lib/repositories/booking/quote-repository";
+import { oneWayCorridorRepository } from "@/lib/repositories/pricing/one-way-corridor-repository";
+import { ValidationError } from "@/lib/errors";
 
 /**
  * Pricing calculation input.
@@ -39,7 +40,9 @@ export interface PricingInput {
   tripStartDate: Date;
   tripEndDate?: Date;
   estimatedKm?: number;
+  returnDistanceKm?: number;
   sourceCity: string;
+  destinationCity?: string;
 }
 
 /**
@@ -47,14 +50,23 @@ export interface PricingInput {
  */
 export interface PricingResult {
   includedKmPerDay: number;
+  minimumKmPerDay: number;
   includedDays: number;
   totalIncludedKm: number;
+  billableKm: number;
+  perKmRate: Prisma.Decimal;
   basePrice: Prisma.Decimal;
-  extraKmCharge: Prisma.Decimal;
+  operationalBundleAmount: Prisma.Decimal;
   estimatedTotal: Prisma.Decimal;
   lineItems: QuoteLineItem[];
+  routeDistanceKm: number | null;
+  returnDistanceKm: number | null;
+  usableDistanceKm: number | null;
   snapshotData: Record<string, unknown>;
 }
+
+const MINIMUM_KM_PER_DAY = 300;
+const OPERATIONAL_BUNDLE_RATE = 3;
 
 /**
  * QuoteService — pricing calculation logic.
@@ -64,82 +76,144 @@ export class QuoteService {
    * Calculate pricing for a trip.
    * MVP placeholder pricing — real configuration TBD.
    */
-  calculatePricing(input: PricingInput): PricingResult {
+  async calculatePricing(input: PricingInput): Promise<PricingResult> {
     // Calculate trip duration (days)
     const tripDays = this.calculateTripDays(
       input.tripStartDate,
       input.tripEndDate
     );
 
-    // Get base rate per day (MVP placeholder)
-    const baseRatePerDay = this.getBaseRatePerDay(
-      input.category,
-      input.ageBucket,
-      input.productType
+    const includedKmPerDay = MINIMUM_KM_PER_DAY;
+    const totalIncludedKm = includedKmPerDay * tripDays;
+    const perKmRate = new Prisma.Decimal(this.getPerKmRate(input.category));
+    const routeDistanceKm = input.estimatedKm ?? null;
+    const returnDistanceKm = input.returnDistanceKm ?? null;
+    const usableDistanceKm =
+      returnDistanceKm !== null
+        ? Math.max(totalIncludedKm - returnDistanceKm, 0)
+        : totalIncludedKm;
+
+    if (input.productType === "ONE_WAY") {
+      if (!input.destinationCity) {
+        throw new ValidationError("Destination city is required for one-way pricing");
+      }
+
+      const corridor = await oneWayCorridorRepository.findActiveByRoute({
+        sourceCity: input.sourceCity,
+        destinationCity: input.destinationCity,
+        vehicleCategory: input.category,
+      });
+
+      if (!corridor) {
+        throw new ValidationError("One-way pricing is not available for this route");
+      }
+
+      const corridorRouteKm = corridor.routeDistanceKm ?? routeDistanceKm;
+      const corridorReturnKm =
+        corridor.returnDistanceKm ?? returnDistanceKm ?? 0;
+      const corridorBillableKm = corridorRouteKm
+        ? corridorRouteKm + corridorReturnKm
+        : totalIncludedKm;
+      const operationalBundleAmount = new Prisma.Decimal(corridorBillableKm).times(
+        OPERATIONAL_BUNDLE_RATE
+      );
+
+      const lineItems: QuoteLineItem[] = [
+        {
+          lineType: "CORRIDOR_FARE",
+          description: `${input.sourceCity} → ${input.destinationCity}`,
+          amount: corridor.fareAmount.toFixed(2),
+        },
+        {
+          lineType: "OPERATIONAL_BUNDLE",
+          description: "Toll, parking, driver food & halting (bundled)",
+          amount: operationalBundleAmount.toFixed(2),
+        },
+      ];
+
+      const estimatedTotal = corridor.fareAmount.plus(operationalBundleAmount);
+
+      return {
+        includedKmPerDay,
+        minimumKmPerDay: MINIMUM_KM_PER_DAY,
+        includedDays: tripDays,
+        totalIncludedKm,
+        billableKm: corridorBillableKm,
+        perKmRate,
+        basePrice: corridor.fareAmount,
+        operationalBundleAmount,
+        estimatedTotal,
+        lineItems,
+        routeDistanceKm: corridorRouteKm ?? null,
+        returnDistanceKm: corridorReturnKm || null,
+        usableDistanceKm,
+        snapshotData: {
+          pricingMode: "CORRIDOR",
+          category: input.category,
+          ageBucket: input.ageBucket,
+          productType: input.productType,
+          sourceCity: input.sourceCity,
+          destinationCity: input.destinationCity,
+          corridorId: corridor.id,
+          corridorFare: corridor.fareAmount.toFixed(2),
+          corridorRouteKm,
+          corridorReturnKm,
+          operationalBundleRate: OPERATIONAL_BUNDLE_RATE,
+          operationalBundleIncludesActuals: true,
+          calculatedAt: new Date().toISOString(),
+          configVersion: "MVP_PLACEHOLDER_V1",
+        },
+      };
+    }
+
+    const billableKm = Math.max(routeDistanceKm ?? totalIncludedKm, totalIncludedKm);
+    const basePrice = new Prisma.Decimal(billableKm).times(perKmRate);
+    const operationalBundleAmount = new Prisma.Decimal(billableKm).times(
+      OPERATIONAL_BUNDLE_RATE
     );
 
-    // Included km per day (MVP: 300km/day default per pricing-engine.md §5)
-    const includedKmPerDay = 300;
-    const totalIncludedKm = includedKmPerDay * tripDays;
+    const lineItems: QuoteLineItem[] = [
+      {
+        lineType: "BASE_DISTANCE",
+        description: `${billableKm} km @ ₹${perKmRate.toFixed(2)}/km`,
+        amount: basePrice.toFixed(2),
+      },
+      {
+        lineType: "OPERATIONAL_BUNDLE",
+        description: "Toll, parking, driver food & halting (bundled)",
+        amount: operationalBundleAmount.toFixed(2),
+      },
+    ];
 
-    // Calculate base price
-    const basePrice = new Prisma.Decimal(baseRatePerDay).times(tripDays);
-
-    // Calculate extra km charge if estimated km provided
-    let extraKmCharge = new Prisma.Decimal(0);
-    const lineItems: QuoteLineItem[] = [];
-
-    lineItems.push({
-      lineType: "BASE_PACKAGE",
-      description: `${tripDays} day(s) @ ${includedKmPerDay}km/day (${input.category}, ${input.ageBucket})`,
-      amount: basePrice.toFixed(2),
-    });
-
-    if (input.estimatedKm && input.estimatedKm > totalIncludedKm) {
-      const extraKm = input.estimatedKm - totalIncludedKm;
-      const extraKmRate = this.getExtraKmRate(input.category);
-      extraKmCharge = new Prisma.Decimal(extraKm).times(extraKmRate);
-
-      lineItems.push({
-        lineType: "EXTRA_KM",
-        description: `${extraKm} extra km @ ₹${extraKmRate}/km`,
-        amount: extraKmCharge.toFixed(2),
-      });
-    }
-
-    // One-way surcharge for ONE_WAY product type (MVP: 30% of base)
-    let oneWaySurcharge = new Prisma.Decimal(0);
-    if (input.productType === "ONE_WAY") {
-      oneWaySurcharge = basePrice.times(0.3);
-      lineItems.push({
-        lineType: "ONE_WAY_SURCHARGE",
-        description: "One-way repositioning charge",
-        amount: oneWaySurcharge.toFixed(2),
-      });
-    }
-
-    const estimatedTotal = basePrice
-      .plus(extraKmCharge)
-      .plus(oneWaySurcharge);
+    const estimatedTotal = basePrice.plus(operationalBundleAmount);
 
     return {
       includedKmPerDay,
+      minimumKmPerDay: MINIMUM_KM_PER_DAY,
       includedDays: tripDays,
       totalIncludedKm,
+      billableKm,
+      perKmRate,
       basePrice,
-      extraKmCharge,
+      operationalBundleAmount,
       estimatedTotal,
       lineItems,
+      routeDistanceKm,
+      returnDistanceKm,
+      usableDistanceKm,
       snapshotData: {
+        pricingMode: "TOUR",
         category: input.category,
         ageBucket: input.ageBucket,
         productType: input.productType,
         sourceCity: input.sourceCity,
-        baseRatePerDay,
-        includedKmPerDay,
-        extraKmRate: input.estimatedKm
-          ? this.getExtraKmRate(input.category)
-          : null,
+        routeDistanceKm,
+        returnDistanceKm,
+        billableKm,
+        minimumKmPerDay: MINIMUM_KM_PER_DAY,
+        perKmRate: perKmRate.toFixed(2),
+        operationalBundleRate: OPERATIONAL_BUNDLE_RATE,
+        operationalBundleIncludesActuals: true,
         calculatedAt: new Date().toISOString(),
         configVersion: "MVP_PLACEHOLDER_V1",
       },
@@ -152,7 +226,7 @@ export class QuoteService {
    */
   private calculateTripDays(startDate: Date, endDate?: Date): number {
     if (!endDate) {
-      // Default to 1 day for one-way trips without explicit end date
+      // Default to 1 day for trips without explicit end date
       return 1;
     }
 
@@ -164,42 +238,10 @@ export class QuoteService {
   }
 
   /**
-   * Get base rate per day for category/age bucket/product type.
+   * Get per-km rate per category.
    * MVP placeholder rates — real configuration TBD per pricing-engine.md.
    */
-  private getBaseRatePerDay(
-    category: VehicleCategory,
-    ageBucket: AgeBucket,
-    productType: ProductType
-  ): number {
-    // Base rates by category (MVP placeholders)
-    const categoryRates: Record<VehicleCategory, number> = {
-      SEDAN: 3000,
-      ERTIGA: 3500,
-      KIA_CARENS: 4000,
-      INNOVA_CRYSTA: 5000,
-      TEMPO_TRAVELLER: 7000,
-    };
-
-    let baseRate = categoryRates[category];
-
-    // Age bucket adjustment (MVP: percentage adjustments)
-    const ageBucketMultipliers: Record<AgeBucket, number> = {
-      ZERO_TO_THREE: 1.0, // Newest vehicles
-      THREE_TO_SEVEN: 0.9, // 10% discount
-      SEVEN_TO_TWELVE: 0.8, // 20% discount
-    };
-
-    baseRate = baseRate * ageBucketMultipliers[ageBucket];
-
-    return Math.round(baseRate);
-  }
-
-  /**
-   * Get extra km rate per category.
-   * MVP placeholder rates.
-   */
-  private getExtraKmRate(category: VehicleCategory): number {
+  private getPerKmRate(category: VehicleCategory): number {
     const extraKmRates: Record<VehicleCategory, number> = {
       SEDAN: 12,
       ERTIGA: 14,

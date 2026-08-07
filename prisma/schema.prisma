@@ -74,6 +74,7 @@ enum BookingStatus {
 
 enum ProductType {
   ONE_WAY
+  MULTI_CITY
   ROUND_TRIP
 }
 
@@ -279,7 +280,8 @@ model BookingItinerary {
   pickupLocation    String
   pickupGeo         Json? // { lat, lng } - nullable until geocoded
   destinations      Json // [{ location, geo? }] - array of destination stops
-  estimatedDistance Int?
+  routeDistanceKm   Int?
+  returnDistanceKm  Int? // Optional return distance back to origin for tours
   createdAt         DateTime @default(now())
 
   booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
@@ -291,9 +293,13 @@ model BookingPricingSnapshot {
   category               VehicleCategory
   ageBucket              AgeBucket
   includedKmPerDay       Int
+  minimumKmPerDay        Int
   includedDays           Int
   totalIncludedKm        Int
+  billableKm             Int
+  perKmRate              Decimal         @db.Decimal(10, 2)
   basePrice              Decimal         @db.Decimal(10, 2)
+  operationalBundleAmount Decimal        @db.Decimal(10, 2)
   pricingConfigVersionId String? // Reference to PricingConfig when implemented
   snapshotData           Json // Full pricing detail snapshot
   createdAt              DateTime        @default(now())
@@ -318,6 +324,23 @@ model AssignmentHistory {
   driver   Driver?          @relation(fields: [driverId], references: [id], onDelete: Restrict)
 
   @@index([bookingId, assignedAt])
+}
+
+model OneWayCorridor {
+  id               String          @id @default(uuid())
+  sourceCity       String
+  destinationCity  String
+  vehicleCategory  VehicleCategory
+  fareAmount       Decimal         @db.Decimal(10, 2)
+  routeDistanceKm  Int?
+  returnDistanceKm Int?
+  isActive         Boolean         @default(true)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@unique([sourceCity, destinationCity, vehicleCategory])
+  @@index([sourceCity, destinationCity])
+  @@index([isActive])
 }
 
 model TripExecution {

@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
       ageBucket: validatedData.ageBucket,
       productType: validatedData.productType,
       estimatedKm: validatedData.estimatedKm,
+      returnDistanceKm: validatedData.returnDistanceKm,
     });
 
     return NextResponse.json(

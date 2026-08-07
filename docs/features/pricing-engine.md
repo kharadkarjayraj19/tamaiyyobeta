@@ -3,7 +3,7 @@
 **Maturity:** FOUNDATION  
 **Purpose:** Foundational **pricing engine architecture** and **pricing philosophy** for Tamaiyyo’s outstation marketplace: how quotes and final charges are **derived** from **configuration** (not hardcoded app logic), which **dimensions** participate, and how this ties to **booking & billing** (`docs/features/booking-lifecycle.md`). Audience: product, ops, engineering, AI agents.
 
-**Related docs:** `docs/features/booking-lifecycle.md` (extensions, included vs extra km, toll/parking actuals), [`docs/features/vehicle-management.md`](./vehicle-management.md) (fleet inventory, category/age mapping for fulfillment), [`docs/features/supplier-operations.md`](./supplier-operations.md) (supplier billing inputs, payout cadence posture), **[`docs/features/billing-settlement.md`](./billing-settlement.md)** (capture, settlement, commission, refunds), `docs/architecture.md`, `docs/features/auth-rbac.md` (admin change audit philosophy), `docs/project/current-state.md`.
+**Related docs:** `docs/features/booking-lifecycle.md` (extensions, billable km, operational bundle), [`docs/features/vehicle-management.md`](./vehicle-management.md) (fleet inventory, category/age mapping for fulfillment), [`docs/features/supplier-operations.md`](./supplier-operations.md) (supplier billing inputs, payout cadence posture), **[`docs/features/billing-settlement.md`](./billing-settlement.md)** (capture, settlement, commission, refunds), `docs/architecture.md`, `docs/features/auth-rbac.md` (admin change audit philosophy), `docs/project/current-state.md`.
 
 **Non-goals (this document):** rupee formulas, rate tables as committed data, SQL/NoSQL schemas, REST/GraphQL contracts, payment capture timing detail, tax/legal copy.
 
@@ -25,10 +25,11 @@
 
 **Agreed**
 
-- **Transparent pricing:** Customers see **which dimensions** applied (city, vehicle category, age bucket, fuel, trip type, days, included km, extensions, pass-throughs) and **why** the total changed—without exposing internal supplier economics unless product later defines that.
-- **Predictable pricing:** Same inputs (configuration version + trip inputs) yield the **same quoted outcome** until configuration or policy intentionally changes; surprise charges are limited to **metered** components already disclosed (extra km, verified toll/parking)—aligned with `booking-lifecycle.md` §7.
+- **Transparent pricing:** Customers see **which dimensions** applied (city, vehicle category, age bucket, fuel, trip type, days, included km, extensions, operational bundle) and **why** the total changed—without exposing internal supplier economics unless product later defines that.
+- **Predictable pricing:** Same inputs (configuration version + trip inputs) yield the **same quoted outcome** until configuration or policy intentionally changes; surprise charges are limited to **metered** components already disclosed (billable km, operational bundle)—aligned with `booking-lifecycle.md` §7.
 - **Configuration-driven pricing:** All customer-visible **rate inputs** (base packages, per-km slabs, extension SKUs, eligibility flags, surge/night **when enabled**) are sourced from **data the platform controls** (admin tooling + optional automation), not embedded as immutable literals in application code.
 - **City-aware pricing:** Outstation markets differ by **origin/primary city** (and possibly corridor); the engine must **key** primary rates by **city** (or defined zone) so ops can tune markets independently.
+- **Trip-type alignment:** **Round Trip** and **Multi-City** share the **same pricing mode** (tour pricing). **One Way** uses **corridor pricing** (fixed route fare for hotspot drops).
 
 **Unresolved mechanics**
 
@@ -55,11 +56,11 @@ Dimensions are **inputs** to a quote or final reconciliation. The engine compose
 | **Fuel type** | Cost and availability signal (e.g. petrol / diesel / CNG / EV)—**policy weight** is configuration-driven. |
 | **One-way eligibility** | Whether a **one-way** product is offered for the city/category/trip pattern; may **block** or **price** differently from round trip. |
 | **Round-trip fallback** | When one-way is ineligible or customer selects round trip, pricing uses the **round-trip** product rules and included packages. |
-| **Included kms/day** | Bundled distance entitlement per day (or per agreed day model) before **extra km** applies—see §5. |
-| **Extra km pricing** | Marginal rate for distance **above** total included km for the priced itinerary (base + extensions + accumulation rules). |
+| **Included kms/day** | Bundled distance entitlement per day that defines the **minimum billable distance**—see §5. |
+| **Per-km pricing** | Rate applied to **billable km** (max of actual vs included km). |
 | **Extension packages** | Adds **included** time/km envelopes per `booking-lifecycle.md` §6—priced per §7 here. |
 | **Surge / night charges** | Optional multipliers or flat adders for **time-of-day** or **demand**—**off by default** at foundation; admin may enable per §8. |
-| **Toll / parking** | Typically **pass-through actuals** at billing time per `booking-lifecycle.md` §7—not part of the **base rate card** unless product explicitly adds a bundled toll estimate feature. |
+| **Operational bundle** | Bundled operational charge (toll, parking, driver food, halting) computed in backend and shown as a **single total** line item; rate is not shown to customers. |
 
 **Unresolved mechanics**
 
@@ -120,7 +121,8 @@ Dimensions are **inputs** to a quote or final reconciliation. The engine compose
 
 - **Baseline anchor:** **300 km per day** is the **default included-distance anchor** for packaged outstation products in initial launch configuration—expressed as **configuration**, not a hardcoded constant in code paths.
 - **Multi-day accumulation:** For an **N-day** itinerary, included distance for the **package** is conceptually **N × (per-day included km)** **before** extensions—subject to **day definition** (calendar day vs 24h rolling window) which remains **Unresolved mechanics** and must match `booking-lifecycle.md` once unified.
-- **Extra km** applies only to distance **above** the **total** included km entitlement after accumulation and after any **included** extension envelopes.
+- **Billable km rule:** **Billable km** equals **max(actual km, included km)** for the booking. If the customer drives fewer km than the included total, they still pay the included total; if they drive more, they pay the higher km.
+- **Route distance source:** Estimated route distance is sourced from **Google Maps API**; return distance may be shown to compute usable km for tours.
 
 **Unresolved mechanics**
 
@@ -137,8 +139,9 @@ Dimensions are **inputs** to a quote or final reconciliation. The engine compose
 
 **Agreed**
 
-- **One-way** is a **distinct commercial product** where **eligible**: pricing must reflect **deadhead / repositioning** economics at a high level—implemented via **configuration** (one-way factor, minimum charge, or separate one-way rate rows)—**not** silent markup in UI copy alone.
-- **Round-trip fallback:** When one-way is **ineligible** for the selected city/category/route pattern, the customer journey falls back to **round-trip** pricing and included-km rules **transparently** (clear messaging that product is round trip).
+- **One-way** is a **distinct commercial product** where **eligible**: pricing uses **corridor pricing** (admin-configured fixed fare for hotspot routes) rather than a percentage surcharge.
+- **Round-trip and multi-city** share the same **tour pricing** model (included km/day, billable km = max(actual, included)).
+- **Round-trip fallback:** When one-way is **ineligible** for the selected city/category/route pattern, the customer journey falls back to **tour pricing** and included-km rules **transparently** (clear messaging that product is round trip).
 - **Eligibility** is a **first-class output** of the pricing engine (boolean + reason code for ops), not an ad-hoc UI check.
 
 **Unresolved mechanics**
@@ -179,6 +182,7 @@ Aligned with **`docs/features/booking-lifecycle.md` §6** (included envelopes); 
 
 - **Admin-configurable pricing:** Admins (with appropriate RBAC—see `auth-rbac.md`) manage the **rate configuration** that feeds the engine; changes are **auditable** (who/when/what version)—detailed audit event list **Unresolved mechanics**.
 - **City-wise configuration:** Rate cards and eligibility matrices are **scoped** by city (or zone) so ops can tune markets without redeploying code.
+- **One-way corridors:** Admins maintain **corridor fare** rows for hotspot one-way transfers (source → destination + vehicle category + fixed fare).
 - **Future surge / night configuration:** Architecture reserves **optional** dimensions (§2) with **defaults off**; enabling surge/night requires **explicit** admin policy + config rows and customer disclosure rules.
 
 **Unresolved mechanics**
@@ -242,7 +246,8 @@ Aligned with **`docs/features/booking-lifecycle.md` §6** (included envelopes); 
 
 **Agreed (UX intent)**
 
-- Customer sees **package + included km + extension SKUs** before pay/hold; **extra km** shown as **variable** component explanation, not a hidden footnote.
+- Customer sees **package + included km + extension SKUs** before pay/hold; **billable km** logic shown as a **variable** component explanation, not a hidden footnote.
+- Operational bundle is displayed as a **single total line item** (no per-km rate shown in UI).
 
 **Technical notes**
 
@@ -258,5 +263,6 @@ Aligned with **`docs/features/booking-lifecycle.md` §6** (included envelopes); 
 | 2026-05-15 | Related: cross-link **`vehicle-management.md`** for inventory and fulfillment alignment. |
 | 2026-05-16 | Related: **`supplier-operations.md`** for supplier settlement and billing-input orchestration. |
 | 2026-05-17 | Related: **`billing-settlement.md`** for financial lifecycle beyond rate dimensions. |
+| 2026-07-11 | **Updated:** Round-trip and multi-city share tour pricing; one-way uses corridor pricing; billable km = max(actual, included); operational bundle added as a single line item; Google Maps route distance as input. |
 
 When rate-card RBAC, version drift rules, and surge policies are fixed, add dated rows and consider raising **Maturity** toward `MVP` for covered scope.

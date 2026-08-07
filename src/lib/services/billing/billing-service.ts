@@ -43,6 +43,8 @@ const MVP_COMMISSION_CONFIG = {
   perKmRate: new Prisma.Decimal(2), // ₹2 per km commission
 };
 
+const MVP_OPERATIONAL_BUNDLE_RATE = new Prisma.Decimal(3); // ₹3/km bundled ops charge
+
 /**
  * BillingService — business logic for billing, trip completion, and settlement.
  */
@@ -200,7 +202,7 @@ export class BillingService {
       }
 
       // 6. Small mismatch: Auto-resolve in favor of customer
-      let resolvedKm = params.confirmedKm;
+      const resolvedKm = params.confirmedKm;
       let autoResolved = false;
 
       if (kmDiff > 0) {
@@ -293,77 +295,78 @@ export class BillingService {
       // 5. Calculate final bill line items
       const billLines: BillLineItem[] = [];
 
-      // Extract pricing rates from snapshot data (MVP placeholder rates)
-      const snapshotData = pricingSnapshot.snapshotData as any;
-      const ratePerDay = new Prisma.Decimal(snapshotData.ratePerDay || pricingSnapshot.basePrice);
-      const extraKmRate = new Prisma.Decimal(snapshotData.extraKmRate || 10);
-      const oneWaySurcharge = snapshotData.oneWaySurcharge 
-        ? new Prisma.Decimal(snapshotData.oneWaySurcharge) 
-        : null;
+      const snapshotData = pricingSnapshot.snapshotData as Record<string, unknown>;
+      const pricingMode = snapshotData.pricingMode ?? "TOUR";
+      const actualKm = execution.actualKm!;
+      const billableKm =
+        pricingMode === "CORRIDOR"
+          ? pricingSnapshot.billableKm
+          : Math.max(actualKm, pricingSnapshot.totalIncludedKm);
+      const perKmRate = pricingSnapshot.perKmRate;
+      const rawOperationalBundleRate = snapshotData.operationalBundleRate;
+      const operationalBundleRate = snapshotData.operationalBundleRate
+        ? new Prisma.Decimal(
+            typeof rawOperationalBundleRate === "number" ||
+              typeof rawOperationalBundleRate === "string"
+              ? rawOperationalBundleRate
+              : MVP_OPERATIONAL_BUNDLE_RATE
+          )
+        : MVP_OPERATIONAL_BUNDLE_RATE;
 
-      // Base fare (category + age bucket)
-      const tripEndDate = booking.tripEndDate || new Date();
-      const tripDays = Math.max(
-        1,
-        Math.ceil(
-          (tripEndDate.getTime() - booking.tripStartDate.getTime()) /
-            (1000 * 60 * 60 * 24)
-        )
+      const baseFare =
+        pricingMode === "CORRIDOR"
+          ? pricingSnapshot.basePrice
+          : new Prisma.Decimal(billableKm).mul(perKmRate);
+
+      billLines.push(
+        pricingMode === "CORRIDOR"
+          ? {
+              lineType: "CORRIDOR_FARE",
+              description:
+                snapshotData.sourceCity && snapshotData.destinationCity
+                  ? `${snapshotData.sourceCity} → ${snapshotData.destinationCity}`
+                  : "One-way corridor fare",
+              amount: baseFare.toString(),
+            }
+          : {
+              lineType: "BASE_DISTANCE",
+              description: `Billable distance (${billableKm} km)`,
+              quantity: billableKm,
+              rate: perKmRate.toString(),
+              amount: baseFare.toString(),
+            }
       );
 
-      const baseFare = ratePerDay.mul(tripDays);
+      const operationalBundleAmount = new Prisma.Decimal(billableKm).mul(
+        operationalBundleRate
+      );
 
       billLines.push({
-        lineType: "BASE_FARE",
-        description: `${pricingSnapshot.category} (${pricingSnapshot.ageBucket}) - ${tripDays} day(s)`,
-        quantity: tripDays,
-        rate: ratePerDay.toString(),
-        amount: baseFare.toString(),
+        lineType: "OPERATIONAL_BUNDLE",
+        description: "Toll, parking, driver food & halting (bundled)",
+        amount: operationalBundleAmount.toString(),
       });
 
-      // Extra km charge
-      const includedKmPerDay = pricingSnapshot.includedKmPerDay;
-      const totalIncludedKm = includedKmPerDay * tripDays;
-      const actualKm = execution.actualKm!;
-      const extraKm = Math.max(0, actualKm - totalIncludedKm);
+      const includeActuals = snapshotData.operationalBundleIncludesActuals !== true;
 
-      if (extraKm > 0) {
-        const extraKmCharge = extraKmRate.mul(extraKm);
+      if (includeActuals) {
+        // Tolls
+        for (const toll of execution.tollLines) {
+          billLines.push({
+            lineType: "TOLL",
+            description: toll.description,
+            amount: toll.amount,
+          });
+        }
 
-        billLines.push({
-          lineType: "EXTRA_KM",
-          description: `Extra km (${extraKm} km)`,
-          quantity: extraKm,
-          rate: extraKmRate.toString(),
-          amount: extraKmCharge.toString(),
-        });
-      }
-
-      // Tolls
-      for (const toll of execution.tollLines) {
-        billLines.push({
-          lineType: "TOLL",
-          description: toll.description,
-          amount: toll.amount,
-        });
-      }
-
-      // Parking
-      for (const parking of execution.parkingLines) {
-        billLines.push({
-          lineType: "PARKING",
-          description: parking.description,
-          amount: parking.amount,
-        });
-      }
-
-      // One-way surcharge (if applicable)
-      if (oneWaySurcharge && oneWaySurcharge.gt(0)) {
-        billLines.push({
-          lineType: "ONE_WAY_SURCHARGE",
-          description: "One-way surcharge",
-          amount: oneWaySurcharge.toString(),
-        });
+        // Parking
+        for (const parking of execution.parkingLines) {
+          billLines.push({
+            lineType: "PARKING",
+            description: parking.description,
+            amount: parking.amount,
+          });
+        }
       }
 
       // Calculate subtotal
@@ -399,7 +402,7 @@ export class BillingService {
       );
 
       // 7. Calculate commission
-      const perKmCommission = MVP_COMMISSION_CONFIG.perKmRate.mul(actualKm);
+      const perKmCommission = MVP_COMMISSION_CONFIG.perKmRate.mul(billableKm);
       const calculatedCommission = platformFee.add(perKmCommission);
 
       // 8. Create commission snapshot
@@ -412,7 +415,7 @@ export class BillingService {
           snapshotData: {
             config: MVP_COMMISSION_CONFIG,
             actualKm,
-            tripDays,
+            billableKm,
           },
         },
         tx

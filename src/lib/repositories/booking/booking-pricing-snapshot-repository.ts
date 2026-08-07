@@ -25,9 +25,13 @@ export interface BookingPricingSnapshotDomain {
   category: VehicleCategory;
   ageBucket: AgeBucket;
   includedKmPerDay: number;
+  minimumKmPerDay: number;
   includedDays: number;
   totalIncludedKm: number;
+  billableKm: number;
+  perKmRate: Decimal;
   basePrice: Decimal;
+  operationalBundleAmount: Decimal;
   pricingConfigVersionId: string | null;
   snapshotData: Record<string, unknown>;
   createdAt: Date;
@@ -41,9 +45,13 @@ export interface CreateBookingPricingSnapshotData {
   category: VehicleCategory;
   ageBucket: AgeBucket;
   includedKmPerDay: number;
+  minimumKmPerDay: number;
   includedDays: number;
   totalIncludedKm: number;
+  billableKm: number;
+  perKmRate: Decimal;
   basePrice: Decimal;
+  operationalBundleAmount: Decimal;
   pricingConfigVersionId?: string;
   snapshotData: Record<string, unknown>;
 }
@@ -102,11 +110,15 @@ export class BookingPricingSnapshotRepository {
         category: data.category,
         ageBucket: data.ageBucket,
         includedKmPerDay: data.includedKmPerDay,
+        minimumKmPerDay: data.minimumKmPerDay,
         includedDays: data.includedDays,
         totalIncludedKm: data.totalIncludedKm,
+        billableKm: data.billableKm,
+        perKmRate: data.perKmRate,
         basePrice: data.basePrice,
+        operationalBundleAmount: data.operationalBundleAmount,
         pricingConfigVersionId: data.pricingConfigVersionId,
-        snapshotData: data.snapshotData as any,
+        snapshotData: data.snapshotData as Prisma.InputJsonValue,
       },
     });
 
@@ -125,9 +137,13 @@ export class BookingPricingSnapshotRepository {
       category: snapshot.category,
       ageBucket: snapshot.ageBucket,
       includedKmPerDay: snapshot.includedKmPerDay,
+      minimumKmPerDay: snapshot.minimumKmPerDay,
       includedDays: snapshot.includedDays,
       totalIncludedKm: snapshot.totalIncludedKm,
+      billableKm: snapshot.billableKm,
+      perKmRate: snapshot.perKmRate,
       basePrice: snapshot.basePrice,
+      operationalBundleAmount: snapshot.operationalBundleAmount,
       pricingConfigVersionId: snapshot.pricingConfigVersionId,
       snapshotData: snapshot.snapshotData as Record<string, unknown>,
       createdAt: snapshot.createdAt,

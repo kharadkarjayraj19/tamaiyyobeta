@@ -72,7 +72,8 @@ model BookingItinerary {
   pickupLocation    String
   pickupGeo         Json?    // { lat, lng }
   destinations      Json     // [{ location, geo? }] — ARRAY of destinations
-  estimatedDistance Int?
+  routeDistanceKm   Int?
+  returnDistanceKm  Int?
   createdAt         DateTime @default(now())
 
   booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
@@ -476,7 +477,7 @@ model Booking {
 model BookingItinerary {
   pickupLocation    String            // ✅ Single pickup
   destinations      Json              // ✅ ARRAY of destinations (already supports multiple)
-  estimatedDistance Int?              // ✅ Can store total route distance
+  routeDistanceKm Int?              // ✅ Can store total route distance
   // ...
 }
 ```

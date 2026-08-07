@@ -665,7 +665,8 @@ return {
 **Current Schema (BookingItinerary):**
 ```prisma
 model BookingItinerary {
-  estimatedDistance Int?  // Ambiguous: route or billable?
+  routeDistanceKm   Int?
+  returnDistanceKm  Int?
 }
 ```
 

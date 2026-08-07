@@ -52,6 +52,7 @@ export interface BookingQuoteRequest {
   ageBucket: AgeBucket;
   productType: ProductType;
   estimatedKm?: number;
+  returnDistanceKm?: number;
 }
 
 /**
@@ -69,6 +70,7 @@ export interface CreateBooking {
   ageBucket: AgeBucket;
   productType: ProductType;
   estimatedKm?: number;
+  returnDistanceKm?: number;
 }
 
 /**
@@ -93,6 +95,12 @@ export class BookingService {
     includedKmPerDay: number;
     includedDays: number;
     totalIncludedKm: number;
+    billableKm: number;
+    perKmRate: string;
+    operationalBundleAmount: string;
+    routeDistanceKm: number | null;
+    returnDistanceKm: number | null;
+    usableDistanceKm: number | null;
   }> {
     // Validate trip dates
     this.validateTripDates(request.tripStartDate, request.tripEndDate);
@@ -105,10 +113,12 @@ export class BookingService {
       tripStartDate: request.tripStartDate,
       tripEndDate: request.tripEndDate,
       estimatedKm: request.estimatedKm,
+      returnDistanceKm: request.returnDistanceKm,
       sourceCity: request.sourceCity,
+      destinationCity: request.destinationCity,
     };
 
-    const pricing = quoteService.calculatePricing(pricingInput);
+    const pricing = await quoteService.calculatePricing(pricingInput);
 
     return {
       estimatedTotal: pricing.estimatedTotal.toFixed(2),
@@ -116,6 +126,12 @@ export class BookingService {
       includedKmPerDay: pricing.includedKmPerDay,
       includedDays: pricing.includedDays,
       totalIncludedKm: pricing.totalIncludedKm,
+      billableKm: pricing.billableKm,
+      perKmRate: pricing.perKmRate.toFixed(2),
+      operationalBundleAmount: pricing.operationalBundleAmount.toFixed(2),
+      routeDistanceKm: pricing.routeDistanceKm,
+      returnDistanceKm: pricing.returnDistanceKm,
+      usableDistanceKm: pricing.usableDistanceKm,
     };
   }
 
@@ -144,10 +160,12 @@ export class BookingService {
         tripStartDate: data.tripStartDate,
         tripEndDate: data.tripEndDate,
         estimatedKm: data.estimatedKm,
+        returnDistanceKm: data.returnDistanceKm,
         sourceCity: data.sourceCity,
+        destinationCity: data.destinationCity,
       };
 
-      const pricing = quoteService.calculatePricing(pricingInput);
+      const pricing = await quoteService.calculatePricing(pricingInput);
 
       // 1. Create booking
       const bookingData: CreateBookingData = {
@@ -168,7 +186,8 @@ export class BookingService {
         bookingId: booking.id,
         pickupLocation: data.pickupLocation,
         destinations: data.destinations,
-        estimatedDistance: data.estimatedKm,
+        routeDistanceKm: data.estimatedKm,
+        returnDistanceKm: data.returnDistanceKm,
       };
 
       await bookingItineraryRepository.create(itineraryData, tx);
@@ -179,9 +198,13 @@ export class BookingService {
         category: data.category,
         ageBucket: data.ageBucket,
         includedKmPerDay: pricing.includedKmPerDay,
+        minimumKmPerDay: pricing.minimumKmPerDay,
         includedDays: pricing.includedDays,
         totalIncludedKm: pricing.totalIncludedKm,
+        billableKm: pricing.billableKm,
+        perKmRate: pricing.perKmRate,
         basePrice: pricing.basePrice,
+        operationalBundleAmount: pricing.operationalBundleAmount,
         snapshotData: pricing.snapshotData,
       };
 

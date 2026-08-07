@@ -1,7 +1,7 @@
 # Tamaiyyo — booking lifecycle (marketplace operations)
 
 **Maturity:** FOUNDATION  
-**Purpose:** First **authoritative operational specification** for how an outstation cab **booking** moves from intent through assignment, execution, billing, and closure—including extensions, pass-through charges, and cancellation/refund **philosophy**. Audience: product, operations, engineering, and AI agents implementing marketplace behavior.
+**Purpose:** First **authoritative operational specification** for how an outstation cab **booking** moves from intent through assignment, execution, billing, and closure—including extensions, operational bundles, and cancellation/refund **philosophy**. Audience: product, operations, engineering, and AI agents implementing marketplace behavior.
 
 **Related docs:** `docs/architecture.md` (roles/routing), **`docs/architecture/domain-models/booking-domain-model.md`** (booking vs trip execution entities, snapshots, assignment history), `docs/features/auth-rbac.md` (identity/RBAC philosophy—**not** booking permissions until extended here), `docs/features/app-shell.md`, `docs/features/design-system.md`, **[`docs/features/pricing-engine.md`](./pricing-engine.md)** (quotes, dimensions, configuration—feeds booking creation), **[`docs/features/vehicle-management.md`](./vehicle-management.md)** (inventory, category/bucket compatibility for assignment), **[`docs/features/supplier-operations.md`](./supplier-operations.md)** (supplier routing, acceptance, onboarding ops), **[`docs/features/billing-settlement.md`](./billing-settlement.md)** (payment capture, settlement, payout architecture), `docs/project/current-state.md`.
 
@@ -69,7 +69,7 @@ State **groups** are stable buckets; **fine-grained states** inside each group (
 2. **Supplier assignment** — Marketplace matches the booking to a **supplier**; supplier **accepts** operational responsibility or rejects/reassigns per policy. Output: supplier is the accountable party for fulfillment unless platform re-routes.
 3. **Driver assignment** — Supplier (or platform policy) binds a **driver** and vehicle to the booking. Output: trip is **executable** with identifiable driver/vehicle for ops and safety.
 4. **Trip execution** — Vehicle is deployed; **start**, **in-progress**, and **completion** (including extensions and actuals capture) live here. Output: auditable trip facts for billing.
-5. **Billing & settlement** — Reconciliation of **package**, **extra kms**, **extensions**, and **pass-through actuals** into charges/credits; allocation between customer, supplier, and platform **fee** model is **Planned but unresolved** at line-item level.
+5. **Billing & settlement** — Reconciliation of **package**, **billable kms**, **extensions**, and **operational bundle** into charges/credits; allocation between customer, supplier, and platform **fee** model is **Planned but unresolved** at line-item level.
 6. **Cancellation / refund** — Terminal paths when the trip does not complete as originally sold; governed by **philosophy** in §8, not by unstated numeric tables.
 
 **Planned but unresolved**
@@ -142,14 +142,14 @@ Extensions consume **additional time and/or distance** beyond the base package. 
 
 **Agreed**
 
-- Final bill is composed from: **(a)** contracted **included** kms/days/hours (base + any **Agreed** extensions), **(b)** **extra kms** (usage above included distance, measured per policy), **(c)** **toll and parking actuals** (pass-through to customer based on **verified actuals**, not markup in this philosophy unless product later adopts a different policy).
-- **Included kms/day** (and hour windows where relevant) define what the customer **pre-pays or holds authorization against**; **extra kms** are **variable** post-trip components tied to measured distance.
-- **Toll/parking actuals** require **evidence discipline** (receipts, FASTag logs, or supplier attestation rules)—specific evidence rules **Planned but unresolved**.
+- Final bill is composed from: **(a)** contracted **included** kms/days/hours (base + any **Agreed** extensions), **(b)** **billable kms** (max of actual vs included), **(c)** a **bundled operational charge** (toll, parking, driver food, halting) computed in backend and shown as a **single total line item**.
+- **Included kms/day** define the **minimum billable distance**; if the customer drives fewer km than included, they still pay the included total. If they drive more, they pay the higher km.
+- **Operational bundle** replaces pass-through toll/parking for MVP; rates are configuration-driven and **not shown per-km** in the UI.
 
 **Planned but unresolved**
 
 - Platform **commission**, GST presentation, rounding, and invoice issuer (platform vs supplier).
-- Whether **extra kms** use a single global rate table, supplier-specific table, or dynamic surge.
+- Whether **per-km rates** use a single global table, supplier-specific table, or dynamic surge.
 - Currency, holds, captures, and failed payment retry—payment **feature** spec to follow.
 
 **Exploratory**
@@ -248,5 +248,6 @@ Extensions consume **additional time and/or distance** beyond the base package. 
 | 2026-05-16 | Related: **`supplier-operations.md`**; non-goals defer granular onboarding there. |
 | 2026-05-17 | Related: **`billing-settlement.md`**; non-goals defer detailed financial state machines. |
 | 2026-05-18 | Related: **`docs/architecture/domain-models/booking-domain-model.md`** (entity architecture). |
+| 2026-07-11 | **Updated:** Billable km rule = max(actual, included); operational bundle replaces pass-through toll/parking for MVP. |
 
 When numeric policies, RBAC matrices, or payment integration land, add dated rows and consider raising **Maturity** toward `MVP` for covered scope.

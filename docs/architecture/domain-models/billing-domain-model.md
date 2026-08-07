@@ -85,10 +85,10 @@
 
 **Planned**
 
-- **Estimated totals:** On **quote**—base package, selected extensions, optional estimated pass-through hints—not final collection authority.
+- **Estimated totals:** On **quote**—base package, selected extensions, operational bundle total—not final collection authority.
 - **Final totals:** On **final bill**—subtotal, fee lines, optional **tax presentation placeholders** (§13), **grand total**.
-- **Additional charges visibility:** Line items for **extra km**, **toll/parking actuals**, extensions consumed beyond prepaid—no opaque “misc” at MVP.
-- **Variance visibility:** Store and show **estimate vs final** at total and (where useful) **line-category** level—e.g. `estimated_total`, `final_total`, `variance_amount` (conceptual fields); explain **why** (actual kms, tolls, extensions)—wording **Unresolved mechanics**.
+- **Additional charges visibility:** Line items for **billable km**, **operational bundle**, extensions consumed beyond prepaid—no opaque “misc” at MVP.
+- **Variance visibility:** Store and show **estimate vs final** at total and (where useful) **line-category** level—e.g. `estimated_total`, `final_total`, `variance_amount` (conceptual fields); explain **why** (actual kms vs included kms, operational bundle)—wording **Unresolved mechanics**.
 
 **Unresolved mechanics**
 
@@ -147,7 +147,7 @@
 **Planned**
 
 - **Platform fee:** Configurable flat or percentage—visible per policy on customer bill and/or supplier settlement view.
-- **Per-km commission:** Configurable on billed distance (all km vs extra km only)—from configuration.
+- **Per-km commission:** Configurable on billed distance (all billable km)—from configuration.
 - **Historical preservation of calculated values:** Persist **both** rule references (version ids) **and** computed **amounts** at settlement time—later config edits must not recompute past trips.
 
 **Unresolved mechanics**
@@ -302,5 +302,6 @@ Booking
 | --- | --- |
 | 2026-05-18 | **FOUNDATION:** quote vs bill, integrity, payments, settlement, commission, 24h refund, audit, admin, extensibility. |
 | 2026-05-18 | Expanded: variance visibility, gateway refs, **7-day payout cycle** default, typed financial events, notifications, historical preservation detail, GST extensibility hook. |
+| 2026-07-11 | **Updated:** Billable km and operational bundle line items incorporated into bill concepts. |
 
 When policies are ratified, sync `billing-settlement.md`, `supplier-operations.md` (payout §10), and `booking-lifecycle.md` §8.

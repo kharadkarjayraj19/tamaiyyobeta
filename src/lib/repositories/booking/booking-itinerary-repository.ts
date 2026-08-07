@@ -7,7 +7,7 @@
  * - Supports multiple destinations (JSON array)
  */
 
-import type { BookingItinerary } from "@prisma/client";
+import type { BookingItinerary, Prisma } from "@prisma/client";
 import prisma from "@/lib/db/prisma";
 import type { PrismaTransactionClient } from "@/lib/db/types";
 import { NotFoundError } from "@/lib/errors";
@@ -24,7 +24,8 @@ export interface BookingItineraryDomain {
     location: string;
     geo?: { lat: number; lng: number };
   }>;
-  estimatedDistance: number | null;
+  routeDistanceKm: number | null;
+  returnDistanceKm: number | null;
   createdAt: Date;
 }
 
@@ -39,7 +40,8 @@ export interface CreateBookingItineraryData {
     location: string;
     geo?: { lat: number; lng: number };
   }>;
-  estimatedDistance?: number;
+  routeDistanceKm?: number;
+  returnDistanceKm?: number;
 }
 
 /**
@@ -94,9 +96,10 @@ export class BookingItineraryRepository {
       data: {
         bookingId: data.bookingId,
         pickupLocation: data.pickupLocation,
-        pickupGeo: data.pickupGeo as any,
-        destinations: data.destinations as any,
-        estimatedDistance: data.estimatedDistance,
+        pickupGeo: data.pickupGeo as Prisma.InputJsonValue,
+        destinations: data.destinations as Prisma.InputJsonValue,
+        routeDistanceKm: data.routeDistanceKm,
+        returnDistanceKm: data.returnDistanceKm,
       },
     });
 
@@ -118,7 +121,8 @@ export class BookingItineraryRepository {
         location: string;
         geo?: { lat: number; lng: number };
       }>,
-      estimatedDistance: itinerary.estimatedDistance,
+      routeDistanceKm: itinerary.routeDistanceKm,
+      returnDistanceKm: itinerary.returnDistanceKm,
       createdAt: itinerary.createdAt,
     };
   }

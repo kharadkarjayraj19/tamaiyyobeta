@@ -176,8 +176,8 @@
 
 **Agreed**
 
-- **Customer / driver km confirmation:** Trip distance for **extra km** may require **supplier-reported** odometer/GPS milestones and optional **customer acknowledgement**—who must confirm and dispute timing **Unresolved mechanics** (`booking-lifecycle.md` measurement disputes).
-- **Toll / parking entry:** Suppliers (or drivers via supplier) enter **actuals** with **evidence** per `booking-lifecycle.md` §7; platform rules define **validation** depth **Unresolved mechanics**.
+- **Customer / driver km confirmation:** Trip distance for **billable km** may require **supplier-reported** odometer/GPS milestones and optional **customer acknowledgement**—who must confirm and dispute timing **Unresolved mechanics** (`booking-lifecycle.md` measurement disputes).
+- **Operational bundle inputs:** Toll/parking/driver allowances are bundled in MVP pricing; supplier entry is kept for audit but does not change the customer bill unless policy later switches to pass-through actuals.
 - **Mismatch / dispute handling categories:** At minimum: **reading dispute**, **missing receipt**, **route deviation**, **extension disagreement**, **wrong category fulfillment**—playbooks **Unresolved mechanics** (link to §14).
 
 **Exploratory**

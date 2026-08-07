@@ -42,42 +42,50 @@
   "category": "SEDAN",
   "ageBucket": "ZERO_TO_THREE",
   "productType": "ROUND_TRIP",
-  "estimatedKm": 400
+  "estimatedKm": 400,
+  "returnDistanceKm": 120
 }
 ```
 
 **Validation:** Zod schema `BookingQuoteRequestSchema`.
 - `category` enum: `SEDAN`, `ERTIGA`, `KIA_CARENS`, `INNOVA_CRYSTA`, `TEMPO_TRAVELLER`
 - `ageBucket` enum: `ZERO_TO_THREE`, `THREE_TO_SEVEN`, `SEVEN_TO_TWELVE`
-- `productType` enum: `ONE_WAY`, `ROUND_TRIP`
+- `productType` enum: `ONE_WAY`, `MULTI_CITY`, `ROUND_TRIP`
 - `destinations` array: min 1, max 10
 
 **Business rules (MVP):**
 - Trip start date must be in future
-- Included km per day: **300 km/day** (default per pricing-engine.md §5)
-- Trip days calculated as ceiling(tripEndDate - tripStartDate)
-- Extra km charged beyond total included km
-- One-way surcharge: 30% of base price (for ONE_WAY product type)
+- Minimum included km per day: **300 km/day**
+- Billable km = **max(estimated km, included km total)**
+- Round-trip and multi-city share the same tour pricing logic
+- One-way uses **corridor pricing** (admin-configured fixed fare)
+- Operational bundle (toll, parking, driver food, halting) added as a **single total line item**
 
 **Response:**
 ```json
 {
   "success": true,
   "data": {
-    "estimatedTotal": "6840.00",
+    "estimatedTotal": "9000.00",
     "includedKmPerDay": 300,
     "includedDays": 2,
     "totalIncludedKm": 600,
+    "billableKm": 600,
+    "perKmRate": "12.00",
+    "operationalBundleAmount": "1800.00",
+    "routeDistanceKm": 400,
+    "returnDistanceKm": 120,
+    "usableDistanceKm": 480,
     "lineItems": [
       {
-        "lineType": "BASE_PACKAGE",
-        "description": "2 day(s) @ 300km/day (SEDAN, ZERO_TO_THREE)",
-        "amount": "6000.00"
+        "lineType": "BASE_DISTANCE",
+        "description": "600 km @ ₹12.00/km",
+        "amount": "7200.00"
       },
       {
-        "lineType": "EXTRA_KM",
-        "description": "200 extra km @ ₹12/km",
-        "amount": "2400.00"
+        "lineType": "OPERATIONAL_BUNDLE",
+        "description": "Toll, parking, driver food & halting (bundled)",
+        "amount": "1800.00"
       }
     ]
   }
@@ -85,28 +93,40 @@
 ```
 
 **MVP Placeholder Pricing:**
-- **Base rates per day by category:**
-  - `SEDAN`: ₹3,000
-  - `ERTIGA`: ₹3,500
-  - `KIA_CARENS`: ₹4,000
-  - `INNOVA_CRYSTA`: ₹5,000
-  - `TEMPO_TRAVELLER`: ₹7,000
-
-- **Age bucket multipliers:**
-  - `ZERO_TO_THREE`: 1.0 (no adjustment)
-  - `THREE_TO_SEVEN`: 0.9 (10% discount)
-  - `SEVEN_TO_TWELVE`: 0.8 (20% discount)
-
-- **Extra km rates by category:**
+- **Per-km rates by category:**
   - `SEDAN`: ₹12/km
   - `ERTIGA`: ₹14/km
   - `KIA_CARENS`: ₹15/km
   - `INNOVA_CRYSTA`: ₹18/km
   - `TEMPO_TRAVELLER`: ₹25/km
-
-- **One-way surcharge:** 30% of base price (for `ONE_WAY` product type)
+- **Minimum included km:** 300 km/day
+- **Operational bundle:** computed in backend, shown as a single total line item
+- **One-way pricing:** fixed corridor fare configured by admin
 
 ---
+
+## 1.2. Admin one-way corridor API (pricing dependency)
+
+**Endpoint:** `POST /api/v1/admin/one-way-corridors`
+
+**Purpose:** Admin-configured fixed fares for hotspot one-way transfers. Required for ONE_WAY quotes.
+
+**Request body:**
+```json
+{
+  "sourceCity": "Nashik",
+  "destinationCity": "Aurangabad",
+  "vehicleCategory": "INNOVA_CRYSTA",
+  "fareAmount": "6500.00",
+  "routeDistanceKm": 180,
+  "returnDistanceKm": 180,
+  "isActive": true
+}
+```
+
+**Notes:**
+- ONE_WAY quotes fail if no active corridor exists for the route + category.
+- Corridor fare is treated as fixed base fare; operational bundle is added separately.
 
 ## 2. Booking creation API
 
@@ -133,7 +153,8 @@
   "category": "SEDAN",
   "ageBucket": "ZERO_TO_THREE",
   "productType": "ROUND_TRIP",
-  "estimatedKm": 400
+  "estimatedKm": 400,
+  "returnDistanceKm": 120
 }
 ```
 
@@ -179,17 +200,17 @@ Creates all related entities atomically within a single transaction:
     "quote": {
       "id": "quote-uuid",
       "bookingId": "booking-uuid",
-      "estimatedTotal": "8400.00",
+      "estimatedTotal": "9000.00",
       "lineItems": [
         {
-          "lineType": "BASE_PACKAGE",
-          "description": "2 day(s) @ 300km/day (SEDAN, ZERO_TO_THREE)",
-          "amount": "6000.00"
+          "lineType": "BASE_DISTANCE",
+          "description": "600 km @ ₹12.00/km",
+          "amount": "7200.00"
         },
         {
-          "lineType": "EXTRA_KM",
-          "description": "200 extra km @ ₹12/km",
-          "amount": "2400.00"
+          "lineType": "OPERATIONAL_BUNDLE",
+          "description": "Toll, parking, driver food & halting (bundled)",
+          "amount": "1800.00"
         }
       ],
       "issuedAt": "2026-05-18T...",
@@ -289,7 +310,7 @@ Creates all related entities atomically within a single transaction:
 
 - **`QuoteService`**:
   - `calculatePricing()` — MVP pricing logic with placeholder rates
-  - Calculates: included km, trip days, base price, extra km, one-way surcharge
+  - Calculates: included km, trip days, billable km, per-km base price, operational bundle
   - Returns: line items, snapshot data
 
 ### 4.3. Validation (DTOs)
@@ -327,15 +348,15 @@ The current implementation uses **hardcoded placeholder rates** in `QuoteService
 5. **Surge/night charges** (optional multipliers)
 
 **Current placeholder logic:**
-- Base rate per day varies by category (₹3,000 - ₹7,000)
-- Age bucket applies percentage adjustment (80% - 100%)
-- Included km: 300 km/day (all categories)
-- Extra km: per-km rate by category (₹12 - ₹25/km)
-- One-way surcharge: 30% of base
+- Per-km rates by category (₹12 - ₹25/km)
+- Included km: 300 km/day (minimum billable distance)
+- Billable km = max(actual, included)
+- Operational bundle computed in backend (shown as total line item)
+- One-way corridor fare (admin-configured fixed price)
 
 **Snapshot data includes:**
 - `configVersion: "MVP_PLACEHOLDER_V1"` (to identify placeholder pricing)
-- `baseRatePerDay`, `includedKmPerDay`, `extraKmRate`
+- `includedKmPerDay`, `minimumKmPerDay`, `perKmRate`, `billableKm`, `operationalBundleRate`
 - `category`, `ageBucket`, `productType`, `sourceCity`
 
 ---
@@ -350,7 +371,7 @@ The current implementation uses **hardcoded placeholder rates** in `QuoteService
 - **Supplier routing:** Booking created in `REQUESTED` status; supplier assignment TBD.
 - **Quote expiry:** Quotes generated via `POST /bookings/quote` are not persisted; no expiry tracking yet.
 - **Geocoding:** Pickup/destination geo coordinates optional; real geocoding integration TBD.
-- **Distance calculation:** `estimatedKm` provided by customer; real distance API integration TBD.
+- **Distance calculation:** Google Maps API is the source of route distance; current implementation accepts `estimatedKm` from client until maps integration lands server-side.
 
 ---
 
@@ -373,3 +394,4 @@ The current implementation uses **hardcoded placeholder rates** in `QuoteService
 | Date | Change |
 | --- | --- |
 | 2026-05-18 | **Implemented:** Booking quote and creation APIs with repositories, services, MVP placeholder pricing, transactional integrity, and domain events. |
+| 2026-07-11 | **Updated:** Per-km tour pricing (min 300 km/day), operational bundle line item, one-way corridor pricing, return distance support, and admin corridor API documented. |

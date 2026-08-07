@@ -1,6 +1,7 @@
 # Tamaiyyo Backend Implementation Summary
 
 **Date:** 2026-05-18  
+**Updated:** 2026-07-11  
 **Maturity:** MVP  
 **Purpose:** Comprehensive summary of implemented backend APIs and workflows.
 
@@ -64,14 +65,16 @@ All implementations follow the established **layered architecture** (repositorie
 
 **Admin Actions:**
 - **POST** `/api/v1/admin/bookings/[id]/reassign` — Admin reassigns booking to different supplier
+- **POST** `/api/v1/admin/one-way-corridors` — Admin creates one-way corridor fare
 
 ### Key Features
 
 **Quote Generation:**
-- MVP placeholder pricing: ₹300/day base rate (category + age bucket specific)
-- Included km/day calculation
-- One-way surcharge support
-- Line item breakdown
+- MVP placeholder pricing: per-km rates by category (₹12-25/km)
+- Minimum included km/day: 300 km
+- Billable km = max(actual, included)
+- One-way corridor pricing (admin-configured fixed fares)
+- Operational bundle added as a single total line item
 
 **Transactional Booking Creation:**
 - Atomically creates: Booking + Itinerary + Pricing Snapshot + Quote + Domain Events
@@ -115,8 +118,8 @@ REQUESTED → ACCEPTED → READY_FOR_TRIP
 
 **Trip Execution Submission:**
 - Actual km, odometer readings
-- Toll line items (description, amount, receipt URL)
-- Parking line items
+- Toll line items (description, amount, receipt URL) captured for ops audit
+- Parking line items captured for ops audit
 - Transitions: `IN_PROGRESS` → `COMPLETED`
 
 **Customer Km Confirmation (Auto-Resolution):**
@@ -132,12 +135,10 @@ REQUESTED → ACCEPTED → READY_FOR_TRIP
 
 **Final Bill Generation:**
 - **Line items:**
-  - Base fare: `category + age bucket rate × trip days`
-  - Extra km: `(actual km - included km) × extra km rate`
-  - **Every extra km is chargeable** (no billing tolerance)
-  - Tolls: Pass-through from trip execution
-  - Parking: Pass-through from trip execution
-  - One-way surcharge (if applicable)
+  - Base fare: `billable km × per-km rate`
+  - Operational bundle: single total line item (toll/parking/driver food/halting)
+  - Billable km = max(actual, included)
+  - One-way corridor fare (if applicable)
 - **Commission calculation (MVP):**
   - Flat platform fee: ₹500
   - Per-km commission: ₹2/km
@@ -213,9 +214,10 @@ IN_PROGRESS → COMPLETED → BILLING_IN_PROGRESS → CLOSED
 ### MVP Placeholders
 
 1. **Pricing:**
-   - Hardcoded base rates (₹300/day × category/age multipliers)
-   - Hardcoded extra km rate (₹10/km)
-   - Hardcoded one-way surcharge (20% of base fare)
+   - Hardcoded per-km rates (₹12-25/km by category)
+   - Minimum included km/day (300 km)
+   - Operational bundle computed in backend (rate hidden in UI)
+   - One-way corridor fare configured by admin
    - **Future:** Database-driven pricing config with versioning
 
 2. **Commission:**

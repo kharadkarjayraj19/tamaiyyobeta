@@ -75,9 +75,10 @@
 
 | Model | Purpose | Key fields (illustrative) |
 | --- | --- | --- |
-| **Booking** | Central commercial booking aggregate | `id`, `bookingRef` (unique, non-sequential), `customerId`, `supplierId` (nullable until assigned), `status` (enum: requested/assigned/accepted/ready/in-progress/completed/cancelled/closed), `tripStartDate`, `tripEndDate`, `estimatedKm`, `sourceCity`, `destinationCity`, `productType` (enum: one-way/round-trip), `cancelledBy`, `cancelledAt`, `createdAt`, `updatedAt` |
-| **BookingItinerary** | Trip itinerary details | `id`, `bookingId`, `pickupLocation`, `pickupGeo` (JSON or separate lat/lng), `destinations` (JSON array or normalized rows—**Unresolved**), `estimatedDistance`, `createdAt` |
-| **BookingPricingSnapshot** | Immutable pricing at booking time | `id`, `bookingId`, `category`, `ageBucket`, `includedKmPerDay`, `includedDays`, `totalIncludedKm`, `basePrice`, `pricingConfigVersionId`, `snapshotData` (JSON for full detail), `createdAt` |
+| **Booking** | Central commercial booking aggregate | `id`, `bookingRef` (unique, non-sequential), `customerId`, `supplierId` (nullable until assigned), `status` (enum: requested/assigned/accepted/ready/in-progress/completed/cancelled/closed), `tripStartDate`, `tripEndDate`, `estimatedKm`, `sourceCity`, `destinationCity`, `productType` (enum: one-way/multi-city/round-trip), `cancelledBy`, `cancelledAt`, `createdAt`, `updatedAt` |
+| **BookingItinerary** | Trip itinerary details | `id`, `bookingId`, `pickupLocation`, `pickupGeo` (JSON or separate lat/lng), `destinations` (JSON array or normalized rows—**Unresolved**), `routeDistanceKm`, `returnDistanceKm`, `createdAt` |
+| **BookingPricingSnapshot** | Immutable pricing at booking time | `id`, `bookingId`, `category`, `ageBucket`, `includedKmPerDay`, `minimumKmPerDay`, `includedDays`, `totalIncludedKm`, `billableKm`, `perKmRate`, `basePrice`, `operationalBundleAmount`, `pricingConfigVersionId`, `snapshotData` (JSON for full detail), `createdAt` |
+| **OneWayCorridor** | Admin-configured one-way corridor pricing | `id`, `sourceCity`, `destinationCity`, `vehicleCategory`, `fareAmount`, `routeDistanceKm`, `returnDistanceKm`, `isActive`, `createdAt`, `updatedAt` |
 | **AssignmentHistory** | Vehicle+driver assignment timeline | `id`, `bookingId`, `supplierId`, `vehicleId`, `driverId`, `assignedAt`, `replacedAt` (nullable; null = current assignment), `assignedBy` (admin/supplier/system), `createdAt` |
 | **TripExecution** | Operational execution facts | `id`, `bookingId`, `startedAt`, `completedAt`, `actualKm`, `actualStartOdometer`, `actualEndOdometer`, `tollLines` (JSON or normalized—**Unresolved**), `parkingLines` (JSON), `extensionsUsed` (JSON), `createdAt`, `updatedAt` |
 

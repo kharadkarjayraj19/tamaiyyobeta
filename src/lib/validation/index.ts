@@ -126,3 +126,4 @@ export * from "./schemas/billing-schemas";
 export * from "./schemas/payment-schemas";
 export * from "./schemas/refund-schemas";
 export * from "./schemas/settlement-schemas";
+export * from "./schemas/corridor-schemas";

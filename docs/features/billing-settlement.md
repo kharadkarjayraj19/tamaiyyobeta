@@ -94,7 +94,7 @@
 
 **Agreed**
 
-- **Extra km** depends on **measured** distance above **included** entitlement (`booking-lifecycle.md`, `pricing-engine.md`); therefore **km confirmation** is a **first-class** billing gate when variable km applies.
+- **Billable km** depends on **measured** distance vs **included** entitlement (`booking-lifecycle.md`, `pricing-engine.md`); therefore **km confirmation** is a **first-class** billing gate when variable km applies.
 - **Trust model:** Prefer **multiple corroborating signals** (odometer, GPS trace, supplier attestation) over a single unverifiable number—weighting **Unresolved mechanics**.
 - **Disputes** elevate to §11 categories without blocking entire platform; **hold strategy** on disputed portions **Unresolved mechanics**.
 
@@ -108,9 +108,8 @@
 
 **Agreed**
 
-- **Pass-through actuals** default posture matches `booking-lifecycle.md` §7: customer sees **evidence-backed** lines where possible.
-- **Entry responsibility** sits primarily with **supplier/driver**; **customer** may supplement with receipts in dispute flows—**Unresolved mechanics**.
-- **Markup** on toll/parking is **not** the default philosophy; if introduced later, it must be **disclosed configuration**, not silent.
+- **Bundled operational charge** (toll, parking, driver food, halting) is the MVP default; it is computed by backend and shown as a **single total line item** to customers.
+- **Pass-through actuals** may return in later phases; if introduced, it must be **explicitly configured and disclosed**, not silent.
 
 **Unresolved mechanics**
 
@@ -157,7 +156,7 @@
 
 **Agreed**
 
-- **Per-km commission:** Platform may take a **variable** component tied to **billed distance** (e.g. extra km or all km) via **configuration**—**rates and stacking with flat fees** **Unresolved mechanics**; not asserted as the only commission model.
+- **Per-km commission:** Platform may take a **variable** component tied to **billed distance** (all billable km) via **configuration**—**rates and stacking with flat fees** **Unresolved mechanics**; not asserted as the only commission model.
 - **Platform fee concepts:** Additional **flat**, **percentage-of-trip**, or **category-based** platform fees may coexist as **separate configuration line items** for transparency—mutual exclusivity rules **Unresolved mechanics**.
 
 **Unresolved mechanics**
@@ -192,7 +191,7 @@
 
 **Agreed**
 
-- **Km mismatch:** Disagreement on distance used for extra km or extension eligibility—ties to §5.
+- **Km mismatch:** Disagreement on distance used for billable km or extension eligibility—ties to §5.
 - **Settlement disputes:** Supplier disagrees with **payout line** for a batch (missing trip, wrong commission application).
 - **Billing disputes:** Customer disagrees with **final bill composition** (toll validity, category mismatch pricing effect).
 
@@ -286,5 +285,6 @@
 | 2026-05-17 | **FOUNDATION:** billing/settlement philosophy, payment modes, platform fund flow, final billing workflow, km/toll confirmation, eligibility, payout, commission, refund, disputes, visibility, tax caution, edge cases, extensibility. |
 | 2026-05-18 | Related: **`billing-domain-model.md`** (entity architecture); default **24h** refund window documented there as **Planned**—ratify here when product confirms. |
 | 2026-05-18 | Entity doc expanded: variance, gateway refs, **7-day payout cycle** default, notification hooks—align §8 payout when ratified. |
+| 2026-07-11 | **Updated:** Billable km replaces extra-km framing; operational bundle line item replaces pass-through toll/parking at MVP. |
 
 When merchant-of-record, capture rules, and commission matrices are fixed, add dated rows and consider raising **Maturity** toward `MVP` for covered scope.

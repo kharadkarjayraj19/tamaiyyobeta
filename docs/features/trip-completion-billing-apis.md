@@ -11,9 +11,9 @@
 
 This document specifies the **trip completion and final billing APIs** for Tamaiyyo. These APIs handle:
 
-1. **Trip execution submission**: Supplier/driver submits actual km, odometer readings, tolls, and parking after trip completion.
+1. **Trip execution submission**: Supplier/driver submits actual km, odometer readings, tolls, and parking after trip completion (toll/parking captured for ops audit in MVP bundle model).
 2. **Customer km confirmation**: Optional workflow step where customer confirms or disputes km readings.
-3. **Final bill generation**: System calculates the final bill including base fare, extra km charges, tolls, parking, and platform fee.
+3. **Final bill generation**: System calculates the final bill including base distance fare, operational bundle, and platform fee.
 4. **Supplier earnings**: System calculates supplier earnings after deducting platform commission.
 5. **Billing retrieval**: Retrieve final bill details for customer and supplier visibility.
 
@@ -164,11 +164,9 @@ This document specifies the **trip completion and final billing APIs** for Tamai
 **Business Rules:**
 
 1. **Calculate bill line items:**
-   - Base fare: `category + age bucket rate × trip days`
-   - Extra km: `(actual km - included km) × extra km rate`
-   - Tolls: Pass-through from trip execution
-   - Parking: Pass-through from trip execution
-   - One-way surcharge: From pricing snapshot (if applicable)
+   - Base fare: `billable km × per-km rate` (billable km = max(actual, included))
+   - Operational bundle: single total line item (toll/parking/driver food/halting)
+   - One-way corridor fare: fixed base fare when product type is ONE_WAY
 
 2. **Calculate platform commission (MVP):**
    - Flat fee: ₹500
@@ -248,24 +246,17 @@ This document specifies the **trip completion and final billing APIs** for Tamai
     "varianceFromQuote": "200.00",
     "lineItems": [
       {
-        "lineType": "BASE_FARE",
-        "description": "SEDAN (AGE_0_3Y) - 3 day(s)",
-        "quantity": 3,
-        "rate": "3500.00",
-        "amount": "10500.00"
+        "lineType": "BASE_DISTANCE",
+        "description": "Billable distance (900 km)",
+        "quantity": 900,
+        "rate": "12.00",
+        "amount": "10800.00"
       },
       {
-        "lineType": "EXTRA_KM",
-        "description": "Extra km (50 km)",
-        "quantity": 50,
-        "rate": "10.00",
-        "amount": "500.00"
+        "lineType": "OPERATIONAL_BUNDLE",
+        "description": "Toll, parking, driver food & halting (bundled)",
+        "amount": "2700.00"
       },
-      {
-        "lineType": "TOLL",
-        "description": "Highway toll - NH48",
-        "amount": "150.00"
-      }
     ],
     "issuedAt": "2026-05-18T10:00:00Z",
     "createdAt": "2026-05-18T10:00:00Z"

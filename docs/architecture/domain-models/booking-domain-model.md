@@ -92,8 +92,10 @@
 - At **booking creation** (or at defined commit point—**Unresolved mechanics**), persist a **pricing snapshot** immutable for dispute resolution:
   - **Quoted** commercial **category** and **age bucket** (customer-facing selection)
   - **Included** kms/days/hours and **extension SKUs** purchased
+  - **Billable kms** and **per-km rate** used for the quote
+  - **Operational bundle** amount (toll/parking/driver food/halting) shown as a single line item
   - **Rate configuration reference** (version id or effective timestamp)—not live config at billing time
-  - **One-way vs round-trip** product flag and eligibility outcome
+  - **Product type** flag with one-way corridor context where applicable
 - **Historical pricing integrity:** Later admin edits to city rate cards do **not** rewrite snapshot; **final bill** uses snapshot + **actuals** (`pricing-engine.md`, `vehicle-domain-model.md` §13).
 - **Fulfillment snapshot** (vehicle category/bucket at assign) may **supplement** but not replace **sold** snapshot unless substitution policy applies—**Unresolved mechanics**.
 
@@ -113,7 +115,8 @@
 
 - **Source:** Pickup origin (city/location text + normalized geo when available)—**normalization** **Unresolved mechanics**.
 - **Destinations:** One or more destination stops for outstation intent; MVP likely **primary destination** + optional notes—**multi-stop** **Exploratory**.
-- **Estimated kms:** Planning distance for quote (maps estimate or rule table)—distinct from **final actual kms** (§10).
+- **Route kms:** Planning distance for quote (Google Maps estimate) stored separately from **billable kms** and **final actual kms** (§10).
+- **Return kms:** Optional return distance to origin used for **usable km** display in tours where the last stop is not the origin.
 - **Trip dates:** Start date (and return date for round-trip); **calendar vs rolling 24h** day boundaries **Unresolved mechanics** (align `pricing-engine.md` / `booking-lifecycle.md`).
 
 **Unresolved mechanics**
@@ -220,8 +223,8 @@
 **Planned**
 
 - **Estimated kms** live on **itinerary / quote** (§5); used for pricing expectation only.
-- **Final kms** (and time boundaries) live on **trip execution actuals**—feeds **extra km** per snapshot entitlements (`billing-settlement.md` §5).
-- **Final billing linkage:** Booking → **final bill** entity (line items: package, extra km, extensions used, toll/parking actuals, fees)—settlement and payout reference the same bill id.
+- **Final kms** (and time boundaries) live on **trip execution actuals**—feeds **billable km** per snapshot entitlements (`billing-settlement.md` §5).
+- **Final billing linkage:** Booking → **final bill** entity (line items: package, billable km, extensions used, operational bundle, fees)—settlement and payout reference the same bill id.
 
 **Unresolved mechanics**
 
@@ -328,5 +331,6 @@ Customer account
 | Date | Change |
 | --- | --- |
 | 2026-05-18 | **FOUNDATION:** booking vs trip execution, snapshots, itinerary, assignments, states, payments, cancellation, billing link, audit, integrity. |
+| 2026-07-11 | **Updated:** Route/return km in itinerary; pricing snapshot captures billable km, per-km rate, and operational bundle; one-way corridor context added. |
 
 When schema design starts, reconcile state names with `booking-lifecycle.md` and add MVP implementation note (single aggregate vs split tables).

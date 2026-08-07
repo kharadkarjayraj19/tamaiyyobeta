@@ -55,8 +55,13 @@ export const BookingQuoteRequestSchema = z.object({
     AgeBucket.THREE_TO_SEVEN,
     AgeBucket.SEVEN_TO_TWELVE,
   ]),
-  productType: z.enum([ProductType.ONE_WAY, ProductType.ROUND_TRIP]),
+  productType: z.enum([
+    ProductType.ONE_WAY,
+    ProductType.MULTI_CITY,
+    ProductType.ROUND_TRIP,
+  ]),
   estimatedKm: z.number().int().positive().optional(),
+  returnDistanceKm: z.number().int().positive().optional(),
 });
 
 export type BookingQuoteRequest = z.infer<typeof BookingQuoteRequestSchema>;
@@ -85,8 +90,13 @@ export const CreateBookingSchema = z.object({
     AgeBucket.THREE_TO_SEVEN,
     AgeBucket.SEVEN_TO_TWELVE,
   ]),
-  productType: z.enum([ProductType.ONE_WAY, ProductType.ROUND_TRIP]),
+  productType: z.enum([
+    ProductType.ONE_WAY,
+    ProductType.MULTI_CITY,
+    ProductType.ROUND_TRIP,
+  ]),
   estimatedKm: z.number().int().positive().optional(),
+  returnDistanceKm: z.number().int().positive().optional(),
 });
 
 export type CreateBooking = z.infer<typeof CreateBookingSchema>;

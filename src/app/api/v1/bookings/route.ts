@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
       ageBucket: validatedData.ageBucket,
       productType: validatedData.productType,
       estimatedKm: validatedData.estimatedKm,
+      returnDistanceKm: validatedData.returnDistanceKm,
     });
 
     return NextResponse.json(
@@ -114,7 +115,13 @@ export async function GET(request: NextRequest) {
     );
 
     // Build filters
-    const filters: any = {};
+    const filters: {
+      customerId?: string;
+      supplierId?: string;
+      status?: (typeof validatedFilters)["status"];
+      fromDate?: Date;
+      toDate?: Date;
+    } = {};
     if (validatedFilters.customerId) filters.customerId = validatedFilters.customerId;
     if (validatedFilters.supplierId) filters.supplierId = validatedFilters.supplierId;
     if (validatedFilters.status) filters.status = validatedFilters.status;
