@@ -4,7 +4,7 @@
  */
 export type AppRole = "customer" | "supplier" | "admin";
 
-export type NavIconKey = "layout-dashboard";
+export type NavIconKey = "layout-dashboard" | "calculator" | "route";
 
 export type NavItemConfig = {
   title: string;
@@ -19,9 +19,23 @@ const overview = (prefix: `/${string}`): NavItemConfig => ({
 });
 
 export const navigationByRole: Record<AppRole, NavItemConfig[]> = {
-  customer: [overview("/customer")],
+  customer: [
+    overview("/customer"),
+    {
+      title: "Quote Builder",
+      href: "/customer/booking-quote",
+      icon: "calculator",
+    },
+  ],
   supplier: [overview("/supplier")],
-  admin: [overview("/admin")],
+  admin: [
+    overview("/admin"),
+    {
+      title: "One-way Corridors",
+      href: "/admin/one-way-corridors",
+      icon: "route",
+    },
+  ],
 };
 
 export function getNavigationForRole(role: AppRole): NavItemConfig[] {

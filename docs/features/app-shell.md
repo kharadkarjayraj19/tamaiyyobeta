@@ -93,3 +93,4 @@ Behavioral and token-level parity for future Flutter work should follow `docs/fe
 | --- | --- |
 | 2026-05-13 | Initial shell: tokens, layouts, nav, cards, table shell, skeletons, empty states, role layouts wired. |
 | 2026-05-14 | Linked Better Auth foundation: `RoleDashboardWithAuth` wraps shell with `SessionBridgeProvider`; `/login` placeholder. |
+| 2026-08-07 | Navigation expanded with role-specific operational entries (`/customer/booking-quote`, `/admin/one-way-corridors`) to support pricing flow verification. |

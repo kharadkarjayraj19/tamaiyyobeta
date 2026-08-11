@@ -1,4 +1,5 @@
 import { Inbox } from "lucide-react";
+import Link from "next/link";
 
 import { DashboardCard } from "@/components/shared/dashboard/dashboard-card";
 import { DataTableShell } from "@/components/shared/data-display/data-table-shell";
@@ -10,7 +11,15 @@ export default function CustomerOverviewPage() {
     <div className="space-y-10">
       <SectionHeader
         title="Overview"
-        description="Customer dashboard placeholder. Booking and account flows will attach here once specified in feature documentation."
+        description="Customer dashboard overview. Use Quote Builder to test tour and one-way pricing flows."
+        actions={
+          <Link
+            href="/customer/booking-quote"
+            className="inline-flex rounded-md border border-border px-3 py-2 text-sm font-medium hover:bg-accent"
+          >
+            Open Quote Builder
+          </Link>
+        }
       />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <DashboardCard title="At a glance" description="Reserved for future KPIs.">

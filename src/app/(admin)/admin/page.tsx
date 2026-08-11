@@ -1,4 +1,5 @@
 import { Inbox } from "lucide-react";
+import Link from "next/link";
 
 import { DashboardCard } from "@/components/shared/dashboard/dashboard-card";
 import { DataTableShell } from "@/components/shared/data-display/data-table-shell";
@@ -10,7 +11,15 @@ export default function AdminOverviewPage() {
     <div className="space-y-10">
       <SectionHeader
         title="Overview"
-        description="Administration placeholder. Moderation and configuration tools will attach here per future specs."
+        description="Administration overview. Corridor pricing can now be configured from this role."
+        actions={
+          <Link
+            href="/admin/one-way-corridors"
+            className="inline-flex rounded-md border border-border px-3 py-2 text-sm font-medium hover:bg-accent"
+          >
+            Manage Corridors
+          </Link>
+        }
       />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <DashboardCard title="Platform health" description="Reserved for incident or queue counts.">
