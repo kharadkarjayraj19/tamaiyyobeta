@@ -101,6 +101,7 @@ Domain logic lives primarily under **`src/features/<domain>/`** (and supporting 
 **Implemented**
 
 - **`prisma/schema.prisma`** — PostgreSQL + Prisma schema foundation with 21 models for marketplace MVP.
+- **`prisma.config.ts`** — Prisma 7 CLI configuration for schema path, migration path, seed path, and datasource URL resolution.
 - **`src/lib/db/prisma.ts`** — Prisma Client singleton with PostgreSQL adapter (Prisma 7.x).
 - **`src/lib/db/types.ts`** — PrismaTransactionClient type for repository transaction support.
 - **`src/lib/db/transactions.ts`** — Transaction helper utilities (`withTransaction`, `withTransactionTimeout`).
@@ -166,7 +167,8 @@ Domain logic lives primarily under **`src/features/<domain>/`** (and supporting 
 
 **Unresolved mechanics**
 
-- Migration strategy (Prisma Migrate vs custom); **multi-tenant** row scoping (`supplier_id`) patterns—see **`prisma-data-architecture.md`** for soft-delete, UUID/refs, snapshots, audit defaults.
+- Local migration reset runbook for Prisma 7 environments where baseline state causes `P3005` on `migrate dev`; destructive reset (`migrate reset`) must be explicitly operator-approved and never run against production databases.
+- **Multi-tenant** row scoping (`supplier_id`) patterns—see **`prisma-data-architecture.md`** for soft-delete, UUID/refs, snapshots, audit defaults.
 
 **Exploratory**
 
@@ -355,5 +357,6 @@ Browser / RSC
 | Date | Change |
 | --- | --- |
 | 2026-05-18 | **FOUNDATION:** MVP backend blueprint—modular monolith, stack, domain modules, data/deploy/storage/API, auth, observability, async, scale, admin ops. |
+| 2026-08-11 | **Implemented/Planned sync:** Added Prisma 7 config seam (`prisma.config.ts`) to implemented backend data layer and documented local migration reset mechanics/safety requirements under unresolved mechanics. |
 
 When PostgreSQL/Prisma land in repo, add a dated row and update **`docs/project/current-state.md`** and **`docs/project/architecture-decisions.md`**.

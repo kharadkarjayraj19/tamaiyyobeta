@@ -47,6 +47,7 @@
 - **Services**: business logic orchestration (BookingService, QuoteService, AssignmentService, BillingService, PaymentService, RefundService, SettlementService, SupplierService, VehicleService).
 - **REST APIs**: supplier/vehicle onboarding, booking (quote, create, accept, reject, assign, reassign, complete, confirm-km, generate-bill, close), billing (final bill retrieval), payment (record, list), refund (create with 24h policy, list), settlement (mark eligible, create batch, list batches, supplier history).
 - **Operational UI slices**: customer **Quote Builder** (`/customer/booking-quote`) and admin **One-way Corridors** manager (`/admin/one-way-corridors`) wired to booking quote and corridor APIs for local verification.
+- **Prisma CLI config (v7)**: added root `prisma.config.ts` for datasource/migration configuration (schema path, migrations path, seed path, datasource URL).
 - **Domain events**: BOOKING_CREATED, QUOTE_GENERATED, BOOKING_ACCEPTED, BOOKING_REJECTED, ASSIGNMENT_CREATED, ASSIGNMENT_CHANGED, BOOKING_REASSIGNED, TRIP_COMPLETED, CUSTOMER_CONFIRMED, KM_MISMATCH_DETECTED, FINAL_BILL_GENERATED, PAYMENT_RECORDED, PAYMENT_COMPLETED, REFUND_CREATED, SETTLEMENT_ELIGIBLE, PAYOUT_BATCH_CREATED.
 - **Financial operations**: Payment recording (advance/partial/full), refund with 24h cancellation policy, supplier earning eligibility tracking, payout batch creation.
 - **MVP placeholders**: pricing rates (₹12-25/km by category, min 300 km/day, bundled ops charge computed in backend), commission (₹500 flat + ₹2/km), mocked identity (Better Auth pending), manual payment gateway integration, manual payout execution.
@@ -55,6 +56,7 @@
 
 - Razorpay payment gateway integration with webhooks, automatic bank payouts, GST invoice generation, live tracking, automated routing algorithms.
 - Better Auth with database-backed user accounts and actual authentication flows.
+- Pricing/corridor migration regeneration and apply verification on local PostgreSQL, with a clean local reset runbook for Prisma 7 workflows.
 
 **Exploratory**
 
@@ -93,3 +95,5 @@
 | 2026-05-31 | **Pricing & UX Architecture Review:** Deep analysis of pricing engine vs new business rules (corridor pricing for one-way, KM-based for multi-city, minimum billable KM, empty return costing, route vs billable KM distinction). Verdict: **CRITICAL ARCHITECTURAL GAPS** — current uniform day-rate model incompatible with three distinct pricing modes required. Provided comprehensive UX recommendations: vehicle card designs, fare terminology, KM disclosure strategies, billable-vs-route explanations, empty return messaging, conversion optimization tactics. See `docs/architecture/PRICING_UX_REVIEW_2026-05-31.md` for detailed gap analysis, UX templates, and 3-4 week implementation roadmap. Blockers: corridor configuration scope, minimum billable km policy, empty return handling strategy. |
 | 2026-07-11 | **Implemented:** Pricing model updated to per-km tour pricing (round trip + multi-city) with **min 300 km/day**, billable km = max(actual, included), operational bundle added as single line item; added one-way corridor admin API for fixed corridor fares. Pricing snapshot now captures billable km, per-km rate, and bundled ops amount; itinerary stores route and return distance. |
 | 2026-08-07 | **Implemented:** UI wiring for pricing verification — customer quote builder flow and admin corridor management screen added to role dashboards for local testing of updated pricing logic. |
+| 2026-08-11 | **Implemented:** Prisma 7 migration config added at `prisma.config.ts` (datasource + migrations + seed paths) so CLI commands use explicit config outside `schema.prisma`. |
+| 2026-08-11 | **Planned:** Run `prisma migrate reset` (local dev only) and regenerate/apply the pricing-corridor migration on a clean local database; migration execution is paused pending explicit destructive-action consent. |

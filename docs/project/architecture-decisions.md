@@ -77,6 +77,7 @@
 | ID | Decision | Tag |
 | --- | --- | --- |
 | ADR-T01 | `package.json` **overrides** for `postcss` minimum version per security advisory; document rationale in `docs/architecture.md`. | **Implemented** |
+| ADR-T02 | **Prisma 7 configuration split:** keep datasource URL config in root `prisma.config.ts` (not `schema.prisma`) for migrate/dev/reset workflows; treat local migrate reset as explicitly consented destructive operation only on development databases. | **Implemented** |
 
 ---
 
@@ -98,3 +99,4 @@
 | 2026-05-18 | **Implemented:** `prisma/schema.prisma` — 21 models implementing persistence architecture. |
 | 2026-05-18 | **Implemented:** Prisma backend foundation—client singleton, PostgreSQL adapter (Prisma 7.x), initial migration, seed structure. |
 | 2026-05-18 | **Implemented:** Backend application foundation—repositories, services, validation (Zod), operational errors, transaction helpers. |
+| 2026-08-11 | ADR-T02: Prisma 7 config and migration safety decision (`prisma.config.ts` as datasource source of truth for CLI; local destructive reset requires explicit operator consent). |
