@@ -79,6 +79,7 @@
 | ADR-T01 | `package.json` **overrides** for `postcss` minimum version per security advisory; document rationale in `docs/architecture.md`. | **Implemented** |
 | ADR-T02 | **Prisma 7 configuration split:** keep datasource URL config in root `prisma.config.ts` (not `schema.prisma`) for migrate/dev/reset workflows; treat local migrate reset as explicitly consented destructive operation only on development databases. | **Implemented** |
 | ADR-T03 | **PostHog foundation wiring:** initialize client analytics in root layout and capture selected server-side booking events using a non-blocking helper; observability failures must never break booking APIs. | **Implemented** |
+| ADR-T04 | **Distance resolution seam:** booking flows resolve route km server-side via Google Maps (when configured) with fallback behavior so pricing remains available if Maps is unavailable. | **Implemented** |
 
 ---
 
@@ -102,3 +103,4 @@
 | 2026-05-18 | **Implemented:** Backend application foundation—repositories, services, validation (Zod), operational errors, transaction helpers. |
 | 2026-08-11 | ADR-T02: Prisma 7 config and migration safety decision (`prisma.config.ts` as datasource source of truth for CLI; local destructive reset requires explicit operator consent). |
 | 2026-08-11 | ADR-T03: PostHog foundation wiring decision (root client provider + server event helper; non-blocking analytics on booking quote/create routes). |
+| 2026-08-11 | ADR-T04: Server-side distance resolution decision (Google Maps when configured; resilient fallback in booking quote/create flows). |

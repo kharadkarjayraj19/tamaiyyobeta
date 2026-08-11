@@ -264,5 +264,6 @@ Aligned with **`docs/features/booking-lifecycle.md` §6** (included envelopes); 
 | 2026-05-16 | Related: **`supplier-operations.md`** for supplier settlement and billing-input orchestration. |
 | 2026-05-17 | Related: **`billing-settlement.md`** for financial lifecycle beyond rate dimensions. |
 | 2026-07-11 | **Updated:** Round-trip and multi-city share tour pricing; one-way uses corridor pricing; billable km = max(actual, included); operational bundle added as a single line item; Google Maps route distance as input. |
+| 2026-08-11 | **Implemented (foundation):** server-side route distance resolver seam added in booking flow with Google Maps Directions API when configured and safe fallback to caller-provided distance when unavailable. |
 
 When rate-card RBAC, version drift rules, and surge policies are fixed, add dated rows and consider raising **Maturity** toward `MVP` for covered scope.

@@ -33,6 +33,7 @@ import {
   type CreateDomainEventData,
 } from "@/lib/repositories/event/domain-event-repository";
 import { quoteService, type PricingInput } from "./quote-service";
+import { distanceEstimationService } from "@/lib/services/pricing/distance-estimation-service";
 import prisma from "@/lib/db/prisma";
 import { withTransaction } from "@/lib/db/transactions";
 import { ValidationError, ConflictError } from "@/lib/errors";
@@ -105,6 +106,12 @@ export class BookingService {
     // Validate trip dates
     this.validateTripDates(request.tripStartDate, request.tripEndDate);
 
+    const resolvedRouteDistanceKm = await distanceEstimationService.resolveRouteDistanceKm({
+      pickupLocation: request.pickupLocation,
+      destinations: request.destinations,
+      estimatedKm: request.estimatedKm,
+    });
+
     // Calculate pricing
     const pricingInput: PricingInput = {
       category: request.category,
@@ -112,7 +119,7 @@ export class BookingService {
       productType: request.productType,
       tripStartDate: request.tripStartDate,
       tripEndDate: request.tripEndDate,
-      estimatedKm: request.estimatedKm,
+      estimatedKm: resolvedRouteDistanceKm,
       returnDistanceKm: request.returnDistanceKm,
       sourceCity: request.sourceCity,
       destinationCity: request.destinationCity,
@@ -149,6 +156,12 @@ export class BookingService {
     }
 
     return withTransaction(prisma, async (tx) => {
+      const resolvedRouteDistanceKm = await distanceEstimationService.resolveRouteDistanceKm({
+        pickupLocation: data.pickupLocation,
+        destinations: data.destinations,
+        estimatedKm: data.estimatedKm,
+      });
+
       // Generate unique booking reference
       const bookingRef = await this.generateBookingRef();
 
@@ -159,7 +172,7 @@ export class BookingService {
         productType: data.productType,
         tripStartDate: data.tripStartDate,
         tripEndDate: data.tripEndDate,
-        estimatedKm: data.estimatedKm,
+        estimatedKm: resolvedRouteDistanceKm,
         returnDistanceKm: data.returnDistanceKm,
         sourceCity: data.sourceCity,
         destinationCity: data.destinationCity,
@@ -186,7 +199,7 @@ export class BookingService {
         bookingId: booking.id,
         pickupLocation: data.pickupLocation,
         destinations: data.destinations,
-        routeDistanceKm: data.estimatedKm,
+        routeDistanceKm: resolvedRouteDistanceKm,
         returnDistanceKm: data.returnDistanceKm,
       };
 
