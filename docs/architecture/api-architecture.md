@@ -206,7 +206,9 @@
 
 **Implemented**
 
-- PostHog not wired.
+- PostHog foundation wired:
+  - Client pageview instrumentation at app root.
+  - Server analytics hooks on `POST /api/v1/bookings/quote` and `POST /api/v1/bookings` with non-PII booking funnel properties.
 
 **Exploratory**
 
@@ -306,5 +308,6 @@ Exact paths are **Planned**; behavior authority remains **`docs/features/*.md`**
 | Date | Change |
 | --- | --- |
 | 2026-05-18 | **FOUNDATION:** REST philosophy, `/api/v1/`, auth/RBAC, validation, responses, pagination, uploads, audit/notifications/analytics hooks, handler layering, admin APIs. |
+| 2026-08-11 | **Implemented:** PostHog foundation hooks in booking quote/create APIs; root-level client pageview instrumentation noted in analytics section. |
 
 When first `/api/v1/` handlers ship, add implementation notes and optional OpenAPI generation decision.

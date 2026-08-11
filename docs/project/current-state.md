@@ -48,6 +48,7 @@
 - **REST APIs**: supplier/vehicle onboarding, booking (quote, create, accept, reject, assign, reassign, complete, confirm-km, generate-bill, close), billing (final bill retrieval), payment (record, list), refund (create with 24h policy, list), settlement (mark eligible, create batch, list batches, supplier history).
 - **Operational UI slices**: customer **Quote Builder** (`/customer/booking-quote`) and admin **One-way Corridors** manager (`/admin/one-way-corridors`) wired to booking quote and corridor APIs for local verification.
 - **Prisma CLI config (v7)**: added root `prisma.config.ts` for datasource/migration configuration (schema path, migrations path, seed path, datasource URL).
+- **PostHog foundation wiring**: client pageview capture in root app layout plus server capture helpers for booking quote/booking-create API hooks.
 - **Domain events**: BOOKING_CREATED, QUOTE_GENERATED, BOOKING_ACCEPTED, BOOKING_REJECTED, ASSIGNMENT_CREATED, ASSIGNMENT_CHANGED, BOOKING_REASSIGNED, TRIP_COMPLETED, CUSTOMER_CONFIRMED, KM_MISMATCH_DETECTED, FINAL_BILL_GENERATED, PAYMENT_RECORDED, PAYMENT_COMPLETED, REFUND_CREATED, SETTLEMENT_ELIGIBLE, PAYOUT_BATCH_CREATED.
 - **Financial operations**: Payment recording (advance/partial/full), refund with 24h cancellation policy, supplier earning eligibility tracking, payout batch creation.
 - **MVP placeholders**: pricing rates (₹12-25/km by category, min 300 km/day, bundled ops charge computed in backend), commission (₹500 flat + ₹2/km), mocked identity (Better Auth pending), manual payment gateway integration, manual payout execution.
@@ -97,3 +98,4 @@
 | 2026-08-07 | **Implemented:** UI wiring for pricing verification — customer quote builder flow and admin corridor management screen added to role dashboards for local testing of updated pricing logic. |
 | 2026-08-11 | **Implemented:** Prisma 7 migration config added at `prisma.config.ts` (datasource + migrations + seed paths) so CLI commands use explicit config outside `schema.prisma`. |
 | 2026-08-11 | **Planned:** Run `prisma migrate reset` (local dev only) and regenerate/apply the pricing-corridor migration on a clean local database; migration execution is paused pending explicit destructive-action consent. |
+| 2026-08-11 | **Implemented:** PostHog wiring foundation added (client pageview instrumentation + server booking quote/create event hooks) with env scaffolding for host/project key configuration. |

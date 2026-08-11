@@ -13,6 +13,7 @@ import {
   BookingListFiltersSchema,
 } from "@/lib/validation/schemas/booking-schemas";
 import { isOperationalError } from "@/lib/errors";
+import { captureServerEvent } from "@/lib/observability/posthog-server";
 
 /**
  * POST /api/v1/bookings — Create booking
@@ -43,6 +44,19 @@ export async function POST(request: NextRequest) {
       estimatedKm: validatedData.estimatedKm,
       returnDistanceKm: validatedData.returnDistanceKm,
     });
+
+    captureServerEvent({
+      distinctId: customerId,
+      event: "booking_created",
+      properties: {
+        bookingId: result.booking.id,
+        bookingRef: result.booking.bookingRef,
+        productType: validatedData.productType,
+        category: validatedData.category,
+        sourceCity: validatedData.sourceCity,
+        destinationCity: validatedData.destinationCity ?? null,
+      },
+    }).catch(() => undefined);
 
     return NextResponse.json(
       {

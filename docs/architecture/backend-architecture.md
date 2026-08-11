@@ -263,7 +263,9 @@ Domain logic lives primarily under **`src/features/<domain>/`** (and supporting 
 
 **Implemented**
 
-- None of the above wired in repo yet.
+- **PostHog foundation wired**:
+  - Client initialization and pageview capture at app root (`src/features/analytics/posthog-provider.tsx` via `src/app/layout.tsx`).
+  - Server helper for non-blocking capture (`src/lib/observability/posthog-server.ts`) with initial hooks in booking quote/create APIs.
 
 **Exploratory**
 
@@ -358,5 +360,6 @@ Browser / RSC
 | --- | --- |
 | 2026-05-18 | **FOUNDATION:** MVP backend blueprint—modular monolith, stack, domain modules, data/deploy/storage/API, auth, observability, async, scale, admin ops. |
 | 2026-08-11 | **Implemented/Planned sync:** Added Prisma 7 config seam (`prisma.config.ts`) to implemented backend data layer and documented local migration reset mechanics/safety requirements under unresolved mechanics. |
+| 2026-08-11 | **Implemented:** PostHog observability foundation wired for root client pageviews and initial server booking-event capture hooks. |
 
 When PostgreSQL/Prisma land in repo, add a dated row and update **`docs/project/current-state.md`** and **`docs/project/architecture-decisions.md`**.

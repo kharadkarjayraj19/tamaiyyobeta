@@ -9,6 +9,7 @@ import { bookingService } from "@/lib/services/booking/booking-service";
 import { validateDto } from "@/lib/validation";
 import { BookingQuoteRequestSchema } from "@/lib/validation/schemas/booking-schemas";
 import { isOperationalError } from "@/lib/errors";
+import { captureServerEvent } from "@/lib/observability/posthog-server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,6 +38,18 @@ export async function POST(request: NextRequest) {
       estimatedKm: validatedData.estimatedKm,
       returnDistanceKm: validatedData.returnDistanceKm,
     });
+
+    captureServerEvent({
+      distinctId: customerId,
+      event: "booking_quote_generated",
+      properties: {
+        productType: validatedData.productType,
+        category: validatedData.category,
+        ageBucket: validatedData.ageBucket,
+        sourceCity: validatedData.sourceCity,
+        destinationCity: validatedData.destinationCity ?? null,
+      },
+    }).catch(() => undefined);
 
     return NextResponse.json(
       {
