@@ -3,6 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { buildLoginRedirect, isProtectedRolePath } from "@/lib/auth/guards";
 
 const authMiddlewareEnabled = process.env.AUTH_MIDDLEWARE_ENABLED !== "false";
+const devAuthBypassEnabled =
+  process.env.NODE_ENV === "development" && process.env.DEV_AUTH_BYPASS === "true";
 
 /**
  * Optimistic cookie presence check (Edge-safe): does not validate the session.
@@ -20,6 +22,10 @@ function hasLikelyBetterAuthSessionCookie(request: NextRequest): boolean {
  */
 export function middleware(request: NextRequest) {
   if (!authMiddlewareEnabled) {
+    return NextResponse.next();
+  }
+
+  if (devAuthBypassEnabled) {
     return NextResponse.next();
   }
 

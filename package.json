@@ -15,7 +15,8 @@
     "db:migrate:dev": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "db:bootstrap:local": "bash scripts/dev/bootstrap-local-db.sh"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

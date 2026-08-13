@@ -6,6 +6,8 @@ import "server-only";
  */
 export const serverEnv = {
   nodeEnv: process.env.NODE_ENV,
+  devAuthBypassEnabled:
+    process.env.NODE_ENV === "development" && process.env.DEV_AUTH_BYPASS === "true",
   betterAuthSecret: process.env.BETTER_AUTH_SECRET,
   betterAuthUrl: process.env.BETTER_AUTH_URL,
   authMiddlewareEnabled: process.env.AUTH_MIDDLEWARE_ENABLED,

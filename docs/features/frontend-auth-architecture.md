@@ -202,6 +202,7 @@ This section maps the **current repo** wiring (Better Auth ≥1.6, Next.js App R
 | Public vs role paths | `src/lib/auth/guards.ts` — `ROLE_PATH_PREFIXES`, `LOGIN_PATH`, `buildLoginRedirect` |
 | Server env | `src/config/env/auth.ts` — `BETTER_AUTH_SECRET` / `BETTER_AUTH_URL` (see `.env.example`) |
 | Edge middleware (optimistic) | `src/middleware.ts` — checks cookie **name prefix** `better-auth.session_token` (Edge-safe; **not** cryptographic validation) |
+| Local auth bypass toggle | `DEV_AUTH_BYPASS=true` (development only) skips middleware redirect + provides deterministic mock sessions in `require-session.ts` for role trees. |
 | Client session bridge | `src/features/auth/session-bridge-provider.tsx` — minimal context for future navbar UI |
 | Placeholder routes | `src/app/login/page.tsx`, `src/app/forbidden/page.tsx` |
 
@@ -219,5 +220,6 @@ This section maps the **current repo** wiring (Better Auth ≥1.6, Next.js App R
 | --- | --- |
 | 2026-05-13 | Initial DRAFT: frontend + Better Auth integration architecture (no code, no backend schema). |
 | 2026-05-14 | **FOUNDATION:** repo wiring — `instance`, `session`, API route, Edge middleware (cookie prefix), `RoleDashboardWithAuth`, `SessionBridgeProvider`, `/login` + `/forbidden` placeholders. |
+| 2026-08-12 | **Implemented (local-only):** `DEV_AUTH_BYPASS` toggle for deterministic mock sessions across `/customer`, `/supplier`, `/admin` during development without real sign-in flow. |
 
 As RBAC and providers land, extend the “Repository implementation” table and §20; move **Maturity** toward `MVP` when login flows are production-ready.

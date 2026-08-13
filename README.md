@@ -15,6 +15,7 @@ Production-oriented foundation for **Tamaiyyo**, a scalable outstation cab booki
 # Use Node 20+ (see package.json engines)
 npm install
 cp .env.example .env.local
+npm run db:bootstrap:local
 npm run dev
 ```
 
@@ -48,6 +49,7 @@ Open [http://localhost:3000](http://localhost:3000). Set `BETTER_AUTH_SECRET` (�
 - [docs/architecture.md](./docs/architecture.md) — Structural decisions and routing model
 - [docs/frontend-guidelines.md](./docs/frontend-guidelines.md) — Day-to-day frontend conventions
 - [docs/environment.md](./docs/environment.md) — Environment variables
+- [docs/project/local-dev-setup.md](./docs/project/local-dev-setup.md) — PostgreSQL + seed-data local bootstrap
 - [docs/features/frontend-auth-architecture.md](./docs/features/frontend-auth-architecture.md) — Better Auth + App Router integration
 
 ## shadcn/ui
