@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Payment validation schemas.
+ * Tamayo — Payment validation schemas.
  *
  * Architecture:
  * - Zod schemas for payment operations

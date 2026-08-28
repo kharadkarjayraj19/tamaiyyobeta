@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — SupplierEarning repository.
+ * Tamayo — SupplierEarning repository.
  *
  * Architecture:
  * - Prisma queries for supplier earnings

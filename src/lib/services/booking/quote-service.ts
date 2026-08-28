@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — QuoteService (pricing calculations).
+ * Tamayo — QuoteService (pricing calculations).
  *
  * Architecture:
  * - Quote generation logic

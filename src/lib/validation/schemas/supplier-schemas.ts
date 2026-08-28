@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Supplier onboarding validation schemas.
+ * Tamayo — Supplier onboarding validation schemas.
  *
  * Architecture:
  * - DTOs for supplier onboarding (draft, submission)

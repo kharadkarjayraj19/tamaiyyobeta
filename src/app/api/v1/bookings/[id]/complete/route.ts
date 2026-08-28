@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — POST /api/v1/bookings/[id]/complete
+ * Tamayo — POST /api/v1/bookings/[id]/complete
  *
  * Submit trip execution (supplier/driver submits actuals).
  */

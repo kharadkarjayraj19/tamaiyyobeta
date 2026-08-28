@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "🔧 Bootstrapping local database for Tamaiyyo..."
+echo "🔧 Bootstrapping local database for Tamayo..."
 
 if [[ -z "${DATABASE_URL:-}" ]]; then
   echo "❌ DATABASE_URL is not set. Please export it or add it to .env/.env.local."

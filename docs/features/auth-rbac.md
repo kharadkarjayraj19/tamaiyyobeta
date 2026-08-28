@@ -1,7 +1,7 @@
-# Tamaiyyo — authentication & RBAC architecture specification
+# Tamayo — authentication & RBAC architecture specification
 
 **Maturity:** DRAFT  
-**Purpose:** Define a **documentation-first**, scalable approach to authentication, sessions, roles, and authorization for Tamaiyyo’s multi-role web platform—without binding to a specific identity provider, token format, or legal/compliance regime.
+**Purpose:** Define a **documentation-first**, scalable approach to authentication, sessions, roles, and authorization for Tamayo’s multi-role web platform—without binding to a specific identity provider, token format, or legal/compliance regime.
 
 **Related docs:** `docs/architecture.md` (routing, repo boundaries), **`docs/architecture/domain-models/identity-domain-model.md`** (separate customer/supplier **identities**, account lifecycles), `docs/features/app-shell.md` (role-aware shell & navigation extension points), `docs/features/design-system.md` (trust-oriented UX, error/empty patterns), **`docs/features/frontend-auth-architecture.md`** (Better Auth + Next.js wiring in this repo), `docs/frontend-guidelines.md`, `.cursorrules`.
 
@@ -12,7 +12,7 @@
 ## 1. Authentication philosophy
 
 - **Identity is a platform concern, not a page concern:** authentication flows (credential capture, MFA, OAuth redirects, magic links—whatever is chosen later) should live behind clear boundaries so role dashboards do not each re-implement sign-in.
-- **Least surprise:** users should recognize a **single Tamaiyyo sign-in** entry, regardless of which role experience they ultimately use.
+- **Least surprise:** users should recognize a **single Tamayo sign-in** entry, regardless of which role experience they ultimately use.
 - **Defense in depth (conceptual):** authentication verifies *who* someone is; authorization (RBAC) verifies *what* they may do. The system should never confuse the two.
 - **Document before code:** when an auth provider or protocol is selected, record the decision in this file (or a linked ADR in `docs/`) and update **Maturity** when the design stabilizes.
 
@@ -38,7 +38,7 @@
 
 ## 4. Role architecture
 
-Tamaiyyo recognizes three **product roles** for the web platform:
+Tamayo recognizes three **product roles** for the web platform:
 
 | Role | Primary intent (product-level, not technical) |
 | --- | --- |

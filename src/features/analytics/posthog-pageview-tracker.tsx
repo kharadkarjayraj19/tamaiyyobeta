@@ -23,7 +23,7 @@ export function PostHogPageviewTracker() {
 
     posthog.capture("$pageview", {
       $current_url: currentUrl,
-      app: "tamaiyyo-web",
+      app: "tamayo-web",
     });
   }, [pathname, searchParams]);
 

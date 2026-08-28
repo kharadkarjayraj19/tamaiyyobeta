@@ -1,4 +1,4 @@
-# Tamaiyyo — Frontend design system specification
+# Tamayo — Frontend design system specification
 
 **Maturity:** FOUNDATION  
 **Stack:** Next.js App Router, TypeScript, Tailwind CSS, shadcn/ui  
@@ -6,7 +6,7 @@
 
 **Scope:** Cross-cutting UI specification; no product-specific business flows assumed.
 
-This document defines **how** Tamaiyyo’s web interface should look, feel, and scale. It intentionally avoids concrete business features (pricing engines, trip models, etc.); those belong in per-feature specs under `docs/features/` once defined.
+This document defines **how** Tamayo’s web interface should look, feel, and scale. It intentionally avoids concrete business features (pricing engines, trip models, etc.); those belong in per-feature specs under `docs/features/` once defined.
 
 ---
 

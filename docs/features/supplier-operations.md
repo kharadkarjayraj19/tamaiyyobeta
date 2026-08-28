@@ -1,4 +1,4 @@
-# Tamaiyyo — supplier operations (marketplace workflow architecture)
+# Tamayo — supplier operations (marketplace workflow architecture)
 
 **Maturity:** FOUNDATION  
 **Purpose:** Foundational **supplier operational workflow** architecture: onboarding, routing to suppliers, acceptance, assignment coordination, accountability, availability, payout/settlement posture, billing inputs, visibility, and support—**startup-friendly** and **server-truth aligned**, without dispatch algorithms, persistence schemas, or API contracts.
@@ -13,7 +13,7 @@
 
 | Label | Meaning |
 | --- | --- |
-| **Agreed** | Supplier-ops rule or structure **adopted here** for Tamaiyyo’s marketplace architecture. |
+| **Agreed** | Supplier-ops rule or structure **adopted here** for Tamayo’s marketplace architecture. |
 | **Unresolved mechanics** | Needs explicit product/legal/ops decision (or a later addendum) before implementation or promise. |
 | **Exploratory** | Optional later-phase idea; **not** mandatory until promoted. |
 

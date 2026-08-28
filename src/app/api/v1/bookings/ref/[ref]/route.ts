@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — GET /api/v1/bookings/ref/[ref]
+ * Tamayo — GET /api/v1/bookings/ref/[ref]
  *
  * Get booking details by booking reference (public-facing lookup).
  */

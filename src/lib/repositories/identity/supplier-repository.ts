@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — SupplierAccount repository.
+ * Tamayo — SupplierAccount repository.
  *
  * Architecture:
  * - Prisma queries for supplier accounts

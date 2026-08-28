@@ -37,6 +37,8 @@ export function RoleDashboardShell({ role, children }: RoleDashboardShellProps) 
   const pathname = usePathname();
   const items = useMemo(() => getNavigationForRole(role), [role]);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const hideSidebar = role === "customer" && pathname === "/customer";
+  const sidebar = <Sidebar role={role} items={items} pathname={pathname} />;
 
   return (
     <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
@@ -44,39 +46,50 @@ export function RoleDashboardShell({ role, children }: RoleDashboardShellProps) 
         <SkipToContent />
         <DashboardLayout
           topBar={
-            <TopNavbar role={role} onOpenSidebar={() => setMobileNavOpen(true)} />
+            <TopNavbar
+              role={role}
+              onOpenSidebar={() => setMobileNavOpen(true)}
+              showMenuButton={!hideSidebar}
+            />
           }
-          sidebar={<Sidebar role={role} items={items} pathname={pathname} />}
+          sidebar={hideSidebar ? undefined : sidebar}
         >
           <main
             id={MAIN_CONTENT_ID}
             tabIndex={-1}
             className={cn(uiLayout.mainScroll, "bg-background outline-none")}
           >
-            <PageContainer variant="wide">{children}</PageContainer>
+            <PageContainer
+              variant="wide"
+              className={hideSidebar ? "px-0 py-3 sm:px-0 lg:px-0" : undefined}
+            >
+              {children}
+            </PageContainer>
           </main>
         </DashboardLayout>
       </AppShell>
-      <SheetContent
-        side="left"
-        className="w-sidebar border-sidebar-border bg-sidebar p-0 text-sidebar-foreground"
-      >
-        <SheetHeader className="border-b border-sidebar-border px-4 py-4 text-left">
-          <SheetTitle className="text-base font-semibold text-sidebar-foreground">
-            Navigation
-          </SheetTitle>
-          <SheetDescription className="text-xs text-muted-foreground">
-            Primary links for this area of the product.
-          </SheetDescription>
-        </SheetHeader>
-        <Sidebar
-          role={role}
-          items={items}
-          pathname={pathname}
-          onNavigate={() => setMobileNavOpen(false)}
-          className="border-0 bg-transparent pt-2"
-        />
-      </SheetContent>
+      {hideSidebar ? null : (
+        <SheetContent
+          side="left"
+          className="w-sidebar border-sidebar-border bg-sidebar p-0 text-sidebar-foreground"
+        >
+          <SheetHeader className="border-b border-sidebar-border px-4 py-4 text-left">
+            <SheetTitle className="text-base font-semibold text-sidebar-foreground">
+              Navigation
+            </SheetTitle>
+            <SheetDescription className="text-xs text-muted-foreground">
+              Primary links for this area of the product.
+            </SheetDescription>
+          </SheetHeader>
+          <Sidebar
+            role={role}
+            items={items}
+            pathname={pathname}
+            onNavigate={() => setMobileNavOpen(false)}
+            className="border-0 bg-transparent pt-2"
+          />
+        </SheetContent>
+      )}
     </Sheet>
   );
 }

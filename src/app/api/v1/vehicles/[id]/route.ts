@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Vehicle detail API routes.
+ * Tamayo — Vehicle detail API routes.
  *
  * GET /api/v1/vehicles/[id] — Get vehicle details
  * PATCH /api/v1/vehicles/[id] — Update vehicle

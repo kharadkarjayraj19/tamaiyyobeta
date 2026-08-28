@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — POST /api/v1/admin/vehicles/[id]/verify
+ * Tamayo — POST /api/v1/admin/vehicles/[id]/verify
  *
  * Admin verification of vehicles (approve/reject with optional corrections).
  */

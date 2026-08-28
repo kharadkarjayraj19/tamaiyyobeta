@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — CustomerAccount repository (example implementation).
+ * Tamayo — CustomerAccount repository (example implementation).
  *
  * Architecture:
  * - Repositories own Prisma queries only

@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Operational error classes for backend application layer.
+ * Tamayo — Operational error classes for backend application layer.
  *
  * Architecture:
  * - Use these errors in services and repositories for operational failures

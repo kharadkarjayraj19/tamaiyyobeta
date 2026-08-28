@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — TripExecution repository.
+ * Tamayo — TripExecution repository.
  *
  * Architecture:
  * - Prisma queries for trip execution records

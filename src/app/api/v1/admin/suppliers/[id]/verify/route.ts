@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — POST /api/v1/admin/suppliers/[id]/verify
+ * Tamayo — POST /api/v1/admin/suppliers/[id]/verify
  *
  * Admin verification of supplier accounts (approve/reject).
  */

@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Booking repository (example implementation).
+ * Tamayo — Booking repository (example implementation).
  *
  * Architecture:
  * - Query-only data access for bookings

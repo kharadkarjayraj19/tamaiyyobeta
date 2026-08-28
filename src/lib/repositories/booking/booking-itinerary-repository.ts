@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — BookingItinerary repository.
+ * Tamayo — BookingItinerary repository.
  *
  * Architecture:
  * - Prisma queries for booking itineraries

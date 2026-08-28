@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — POST /api/v1/suppliers/onboarding/draft
+ * Tamayo — POST /api/v1/suppliers/onboarding/draft
  *
  * Save supplier onboarding draft (partial data).
  */

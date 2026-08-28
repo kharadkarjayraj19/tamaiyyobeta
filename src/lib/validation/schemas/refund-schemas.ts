@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Refund validation schemas.
+ * Tamayo — Refund validation schemas.
  *
  * Architecture:
  * - Zod schemas for refund operations

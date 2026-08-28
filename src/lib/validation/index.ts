@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Validation helpers using Zod.
+ * Tamayo — Validation helpers using Zod.
  *
  * Architecture:
  * - API handlers validate request DTOs using Zod schemas

@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Refund repository.
+ * Tamayo — Refund repository.
  *
  * Architecture:
  * - Prisma queries for refund records

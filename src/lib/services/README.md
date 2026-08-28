@@ -1,4 +1,4 @@
-# Tamaiyyo — Service Layer
+# Tamayo — Service Layer
 
 **Purpose:** Service modules own **business logic** and **workflow orchestration**—coordinate repositories, validate business rules, manage transactions.
 

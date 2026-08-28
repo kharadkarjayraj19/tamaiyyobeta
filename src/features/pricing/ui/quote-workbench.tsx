@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 
@@ -92,12 +93,51 @@ function parseDestinationStops(raw: string) {
 }
 
 export function QuoteWorkbench() {
+  const searchParams = useSearchParams();
   const [form, setForm] = useState<FormState>(defaultFormState);
   const [loadingQuote, setLoadingQuote] = useState(false);
   const [loadingBooking, setLoadingBooking] = useState(false);
   const [quote, setQuote] = useState<QuoteResponse | null>(null);
   const [booking, setBooking] = useState<BookingResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const productType = searchParams.get("productType");
+    const sourceCity = searchParams.get("sourceCity");
+    const destinationCity = searchParams.get("destinationCity");
+    const pickupLocation = searchParams.get("pickupLocation");
+    const estimatedKm = searchParams.get("estimatedKm");
+    const dropLocations = searchParams
+      .getAll("drop")
+      .map((location) => location.trim())
+      .filter(Boolean);
+
+    const hasRoutePreset =
+      Boolean(productType) ||
+      Boolean(sourceCity) ||
+      Boolean(destinationCity) ||
+      Boolean(pickupLocation) ||
+      Boolean(estimatedKm) ||
+      dropLocations.length > 0;
+
+    if (!hasRoutePreset) {
+      return;
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      productType:
+        productType === "ONE_WAY" || productType === "MULTI_CITY" || productType === "ROUND_TRIP"
+          ? productType
+          : prev.productType,
+      sourceCity: sourceCity?.trim() || prev.sourceCity,
+      destinationCity: destinationCity?.trim() || prev.destinationCity,
+      pickupLocation: pickupLocation?.trim() || prev.pickupLocation,
+      destinationStops:
+        dropLocations.length > 0 ? dropLocations.join(", ") : prev.destinationStops,
+      estimatedKm: estimatedKm?.trim() || prev.estimatedKm,
+    }));
+  }, [searchParams]);
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));

@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — POST /api/v1/bookings/[id]/confirm-km
+ * Tamayo — POST /api/v1/bookings/[id]/confirm-km
  *
  * Customer confirms km (optional workflow step).
  */

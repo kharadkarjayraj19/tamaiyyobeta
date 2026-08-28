@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Driver repository.
+ * Tamayo — Driver repository.
  *
  * Architecture:
  * - Prisma queries for driver records

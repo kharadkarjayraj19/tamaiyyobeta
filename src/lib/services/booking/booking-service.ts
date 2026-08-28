@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — BookingService.
+ * Tamayo — BookingService.
  *
  * Architecture:
  * - Orchestrates booking workflows (quote generation, booking creation)

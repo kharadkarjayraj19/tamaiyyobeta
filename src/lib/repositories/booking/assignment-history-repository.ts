@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — AssignmentHistory repository.
+ * Tamayo — AssignmentHistory repository.
  *
  * Architecture:
  * - Prisma queries for assignment history

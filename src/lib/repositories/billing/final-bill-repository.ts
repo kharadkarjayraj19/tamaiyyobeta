@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — FinalBill repository.
+ * Tamayo — FinalBill repository.
  *
  * Architecture:
  * - Prisma queries for final bills

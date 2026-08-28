@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — VehicleService.
+ * Tamayo — VehicleService.
  *
  * Architecture:
  * - Orchestrates vehicle inventory workflows

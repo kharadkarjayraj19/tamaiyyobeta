@@ -1,4 +1,4 @@
-# Tamaiyyo — frontend authentication integration architecture
+# Tamayo — frontend authentication integration architecture
 
 **Maturity:** FOUNDATION  
 **Purpose:** Describe how the **Next.js App Router frontend** integrates with **Better Auth** for unified login, session handling, and **role-aware** dashboards. **Foundation code** lives under `src/lib/auth/**` (see “Repository implementation”); full login UX, OTP/Google, and persistence are phased in later.
@@ -12,7 +12,7 @@
 ## 1. Frontend auth philosophy
 
 - **Thin presentation, thick server checks:** the browser renders auth UI and reflects session state, but **every sensitive read and mutation** is validated with Better Auth / server session on the **server** (see `docs/features/auth-rbac.md` §5–6).
-- **Unified entry:** one Tamaiyyo sign-in experience drives all roles; the frontend does not fork unrelated login UIs per role unless product explicitly requires it later.
+- **Unified entry:** one Tamayo sign-in experience drives all roles; the frontend does not fork unrelated login UIs per role unless product explicitly requires it later.
 - **Progressive enhancement:** prefer rendering **public** shells immediately and **upgrading** to authenticated chrome once session is known—avoid long blank screens except where security demands a hard block.
 - **Documentation-first:** when Better Auth configuration choices are made (cookie names, session shape exposure, OAuth providers), record them here or in a short ADR and bump **Maturity**.
 

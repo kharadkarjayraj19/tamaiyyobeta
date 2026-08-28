@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — GET /api/v1/suppliers
+ * Tamayo — GET /api/v1/suppliers
  *
  * List supplier accounts with filters.
  */

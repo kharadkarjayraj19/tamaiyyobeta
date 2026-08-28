@@ -1,16 +1,16 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: tamaiyyo-postgres-dev
+    container_name: tamayo-postgres-dev
     restart: unless-stopped
     environment:
-      POSTGRES_DB: tamaiyyo_dev
-      POSTGRES_USER: tamaiyyo
-      POSTGRES_PASSWORD: tamaiyyo
+      POSTGRES_DB: tamayo_dev
+      POSTGRES_USER: tamayo
+      POSTGRES_PASSWORD: tamayo
     ports:
       - "5432:5432"
     volumes:
-      - tamaiyyo_postgres_data:/var/lib/postgresql/data
+      - tamayo_postgres_data:/var/lib/postgresql/data
 
 volumes:
-  tamaiyyo_postgres_data:
+  tamayo_postgres_data:

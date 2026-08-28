@@ -1,7 +1,7 @@
-# Tamaiyyo — Supplier assignment and booking fulfillment APIs
+# Tamayo — Supplier assignment and booking fulfillment APIs
 
 **Maturity:** MVP  
-**Purpose:** Operational REST API implementation for supplier booking assignment, acceptance/rejection, vehicle/driver assignment, and admin reassignment workflows. Implements booking fulfillment lifecycle for Tamaiyyo marketplace.
+**Purpose:** Operational REST API implementation for supplier booking assignment, acceptance/rejection, vehicle/driver assignment, and admin reassignment workflows. Implements booking fulfillment lifecycle for Tamayo marketplace.
 
 **Related docs:** [`docs/features/supplier-operations.md`](./supplier-operations.md) (supplier workflows), [`docs/features/booking-lifecycle.md`](./booking-lifecycle.md) (lifecycle states), [`docs/features/vehicle-management.md`](./vehicle-management.md) (vehicle compatibility), [`docs/architecture/domain-models/booking-domain-model.md`](../architecture/domain-models/booking-domain-model.md) (assignment history), [`docs/architecture/backend-foundation.md`](../architecture/backend-foundation.md) (architecture patterns).
 

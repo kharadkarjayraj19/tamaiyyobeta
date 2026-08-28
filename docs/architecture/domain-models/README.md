@@ -1,6 +1,6 @@
 # Domain models
 
-**Purpose:** Foundational **entity and relationship** architecture for Tamaiyyo implementation—complements **`docs/features/*.md`** (behavior) and **`docs/architecture/backend-architecture.md`** (stack/modules). These documents describe **what exists** in the domain, not SQL or REST contracts.
+**Purpose:** Foundational **entity and relationship** architecture for Tamayo implementation—complements **`docs/features/*.md`** (behavior) and **`docs/architecture/backend-architecture.md`** (stack/modules). These documents describe **what exists** in the domain, not SQL or REST contracts.
 
 | Document | Scope |
 | --- | --- |

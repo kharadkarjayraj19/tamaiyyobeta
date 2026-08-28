@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Booking validation schemas.
+ * Tamayo — Booking validation schemas.
  *
  * Architecture:
  * - DTOs for booking quote requests

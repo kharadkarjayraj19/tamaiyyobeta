@@ -1,4 +1,4 @@
-# Tamaiyyo — future initiatives
+# Tamayo — future initiatives
 
 **Purpose:** Capture **non-committed** directions and placeholders so agents do not confuse them with implemented behavior or finalized product rules. Promote items to `docs/features/*`, `docs/project/roadmap.md`, or `architecture-decisions.md` when they become **Planned** or **Implemented**.
 

@@ -1,4 +1,4 @@
-# Tamaiyyo — vehicle management (inventory & compatibility)
+# Tamayo — vehicle management (inventory & compatibility)
 
 **Maturity:** FOUNDATION  
 **Purpose:** Foundational **vehicle inventory** and **compatibility** architecture: how suppliers expose **capacity** to the marketplace, how **physical vehicles** map to **commercial categories** and **age buckets** used in pricing and booking, and how **assignment** respects those rules—without prescribing storage schemas, APIs, or dispatch algorithms.
@@ -13,7 +13,7 @@
 
 | Label | Meaning |
 | --- | --- |
-| **Agreed** | Inventory or compatibility rule **adopted here** for Tamaiyyo’s marketplace architecture. |
+| **Agreed** | Inventory or compatibility rule **adopted here** for Tamayo’s marketplace architecture. |
 | **Unresolved mechanics** | Requires explicit product/ops decision (or a later addendum) before implementation or customer promise. |
 | **Exploratory** | Optional later-phase idea; **not** mandatory until promoted. |
 

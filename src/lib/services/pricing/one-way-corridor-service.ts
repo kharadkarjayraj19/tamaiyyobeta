@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — OneWayCorridorService.
+ * Tamayo — OneWayCorridorService.
  *
  * Architecture:
  * - Orchestrates admin corridor creation and listing

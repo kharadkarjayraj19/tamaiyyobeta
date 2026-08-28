@@ -1,7 +1,7 @@
-# Tamaiyyo — billing & settlement (financial workflow architecture)
+# Tamayo — billing & settlement (financial workflow architecture)
 
 **Maturity:** FOUNDATION  
-**Purpose:** Foundational **billing, settlement, payout, and financial workflow** architecture for Tamaiyyo: how money **moves** relative to trips, who **confirms** operational inputs, how **final bills** are produced, and how **suppliers** are paid—**startup-friendly**, **configuration-friendly**, and **server-truth** aligned. Does **not** define legal relationships, tax filings, or payment-processor contracts.
+**Purpose:** Foundational **billing, settlement, payout, and financial workflow** architecture for Tamayo: how money **moves** relative to trips, who **confirms** operational inputs, how **final bills** are produced, and how **suppliers** are paid—**startup-friendly**, **configuration-friendly**, and **server-truth** aligned. Does **not** define legal relationships, tax filings, or payment-processor contracts.
 
 **Related docs:** [`docs/features/booking-lifecycle.md`](./booking-lifecycle.md) (final bill **composition** philosophy, cancellation/refund posture), **[`docs/architecture/domain-models/billing-domain-model.md`](../architecture/domain-models/billing-domain-model.md)** (financial **entities**: quote, bill, payment, settlement, refund), **[`docs/architecture/domain-models/booking-domain-model.md`](../architecture/domain-models/booking-domain-model.md)** (booking linkage, estimated vs actual kms), [`docs/features/pricing-engine.md`](./pricing-engine.md) (quoted dimensions, rate configuration), [`docs/features/supplier-operations.md`](./supplier-operations.md) (supplier billing inputs, payout cadence posture, disputes escalation), [`docs/features/vehicle-management.md`](./vehicle-management.md) (fulfillment compatibility affecting billing outcomes), [`docs/features/auth-rbac.md`](./auth-rbac.md) (admin authority, audit), [`docs/architecture.md`](../architecture.md), [`docs/project/current-state.md`](../project/current-state.md).
 
@@ -62,7 +62,7 @@
 **Agreed**
 
 - **Customer payment collection:** Platform (or designated payment entity) **collects** or **secures authorization** for customer obligations per published payment modes (§2).
-- **Tamaiyyo-held funds:** Architecture assumes a **pooling posture** where customer funds for active and recently completed trips may be **held** by the platform (or regulated partner) **until settlement events** clear—**legal characterization** (escrow, nodal, etc.) is **Unresolved mechanics** and requires **professional review** (§13).
+- **Tamayo-held funds:** Architecture assumes a **pooling posture** where customer funds for active and recently completed trips may be **held** by the platform (or regulated partner) **until settlement events** clear—**legal characterization** (escrow, nodal, etc.) is **Unresolved mechanics** and requires **professional review** (§13).
 - **Supplier payout lifecycle:** **Eligible** trip economics (after commission/fees and holds) move to **payout batches** on **configurable cycles** with **admin controls**—detailed state machine **Unresolved mechanics**; high-level stages: **earned → eligible → batched → paid / held**.
 
 **Exploratory**

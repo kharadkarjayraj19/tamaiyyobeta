@@ -1,4 +1,4 @@
-# Tamaiyyo — project roadmap
+# Tamayo — project roadmap
 
 **Purpose:** Durable, high-level sequencing for humans and AI agents. **Not** a substitute for per-feature specs in `docs/features/*.md` or for unfinalized product rules.
 
@@ -31,6 +31,7 @@ For the **primary onboarding snapshot** (read order and doc map), see **[current
 | Keep `docs/architecture.md` and `docs/project/*` aligned with repo reality | **Planned** | Ongoing; global arch describes structure, project docs describe phase and direction. |
 | Add or extend `docs/features/<domain>.md` for each major marketplace module | **Planned** | Source of truth for workflows and rules when product defines them. |
 | Resolve auth/RBAC open questions into dated decisions or explicit deferrals | **Planned** | See `docs/features/auth-rbac.md` §20; avoid silent assumptions in implementation. |
+| Execute dev-to-prod transition checklist | **Planned** | Track in `docs/project/dev-to-prod-shift-plan.md` (auth hardening, env/secrets, migration safety, tests, observability, rollout gates). |
 
 ---
 
@@ -59,3 +60,4 @@ For the **primary onboarding snapshot** (read order and doc map), see **[current
 | --- | --- |
 | 2026-05-14 | Initial project-memory roadmap (implemented / planned / exploratory). |
 | 2026-05-14 | Current position defers onboarding detail to `current-state.md`; doc governance alignment. |
+| 2026-08-28 | Added planned dev-to-prod transition track and linked checklist document. |

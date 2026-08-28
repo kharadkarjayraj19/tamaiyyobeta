@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Billing service.
+ * Tamayo — Billing service.
  *
  * Architecture:
  * - Orchestrates trip completion, final billing, and settlement

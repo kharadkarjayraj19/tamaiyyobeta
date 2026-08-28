@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — SettlementService.
+ * Tamayo — SettlementService.
  *
  * Architecture:
  * - Orchestrates supplier settlement workflows

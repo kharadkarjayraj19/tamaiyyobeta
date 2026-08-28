@@ -1,4 +1,4 @@
-# Tamaiyyo — Repository Layer
+# Tamayo — Repository Layer
 
 **Purpose:** Repository modules own **Prisma queries** and map between Prisma models and domain types—**no business logic** in repositories.
 

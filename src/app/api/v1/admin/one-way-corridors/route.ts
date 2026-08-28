@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — One-way corridor admin API.
+ * Tamayo — One-way corridor admin API.
  *
  * POST /api/v1/admin/one-way-corridors — Create corridor
  * GET /api/v1/admin/one-way-corridors — List corridors

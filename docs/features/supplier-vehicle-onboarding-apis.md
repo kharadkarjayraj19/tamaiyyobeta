@@ -1,7 +1,7 @@
-# Tamaiyyo — Supplier and vehicle onboarding APIs
+# Tamayo — Supplier and vehicle onboarding APIs
 
 **Maturity:** MVP  
-**Purpose:** Operational REST API implementation for supplier and vehicle onboarding, verification, and status management. Provides the first operational backend workflows for Tamaiyyo marketplace.
+**Purpose:** Operational REST API implementation for supplier and vehicle onboarding, verification, and status management. Provides the first operational backend workflows for Tamayo marketplace.
 
 **Related docs:** [`docs/features/supplier-operations.md`](./supplier-operations.md) (operational workflows), [`docs/features/vehicle-management.md`](./vehicle-management.md) (inventory rules), [`docs/architecture/backend-foundation.md`](../architecture/backend-foundation.md) (repository/service patterns), [`docs/architecture/api-architecture.md`](../architecture/api-architecture.md) (REST philosophy), [`docs/architecture/domain-models/identity-domain-model.md`](../architecture/domain-models/identity-domain-model.md) (supplier entity), [`docs/architecture/domain-models/vehicle-domain-model.md`](../architecture/domain-models/vehicle-domain-model.md) (vehicle entity).
 

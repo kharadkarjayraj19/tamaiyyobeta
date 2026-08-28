@@ -1,7 +1,7 @@
-# Tamaiyyo — pricing engine (architecture & philosophy)
+# Tamayo — pricing engine (architecture & philosophy)
 
 **Maturity:** FOUNDATION  
-**Purpose:** Foundational **pricing engine architecture** and **pricing philosophy** for Tamaiyyo’s outstation marketplace: how quotes and final charges are **derived** from **configuration** (not hardcoded app logic), which **dimensions** participate, and how this ties to **booking & billing** (`docs/features/booking-lifecycle.md`). Audience: product, ops, engineering, AI agents.
+**Purpose:** Foundational **pricing engine architecture** and **pricing philosophy** for Tamayo’s outstation marketplace: how quotes and final charges are **derived** from **configuration** (not hardcoded app logic), which **dimensions** participate, and how this ties to **booking & billing** (`docs/features/booking-lifecycle.md`). Audience: product, ops, engineering, AI agents.
 
 **Related docs:** `docs/features/booking-lifecycle.md` (extensions, billable km, operational bundle), [`docs/features/vehicle-management.md`](./vehicle-management.md) (fleet inventory, category/age mapping for fulfillment), [`docs/features/supplier-operations.md`](./supplier-operations.md) (supplier billing inputs, payout cadence posture), **[`docs/features/billing-settlement.md`](./billing-settlement.md)** (capture, settlement, commission, refunds), `docs/architecture.md`, `docs/features/auth-rbac.md` (admin change audit philosophy), `docs/project/current-state.md`.
 
@@ -13,7 +13,7 @@
 
 | Label | Meaning |
 | --- | --- |
-| **Agreed** | Rule or structural choice **adopted here** for Tamaiyyo’s pricing approach. |
+| **Agreed** | Rule or structural choice **adopted here** for Tamayo’s pricing approach. |
 | **Unresolved mechanics** | Needs an explicit product/ops decision or a future addendum before implementation or customer promise. |
 | **Exploratory** | Optional idea; **not** mandatory without promotion to **Agreed**. |
 
@@ -164,6 +164,7 @@ Aligned with **`docs/features/booking-lifecycle.md` §6** (included envelopes); 
 | Extension SKU | Included envelope (commercial, same as booking spec) | Pricing posture |
 | --- | --- | --- |
 | **8 hr / 80 km** | Adds up to **8 hours** and **80 km** of **included** usage to the extension-eligible portion of the itinerary | Priced as a **named configuration SKU** (amounts in admin config, not code constants). |
+| **12 hr / 120 km** | Adds up to **12 hours** and **120 km** of **included** usage for local/city-tour style bookings | Priced as a **named configuration SKU** (amounts in admin config, not code constants). |
 | **1 day / 300 km** | Adds **one day** of included usage and up to **300 km** for that extension window | Same: **configuration SKU**; clocking aligned with booking spec once **Unresolved** there is closed. |
 
 **Unresolved mechanics**
@@ -248,6 +249,7 @@ Aligned with **`docs/features/booking-lifecycle.md` §6** (included envelopes); 
 
 - Customer sees **package + included km + extension SKUs** before pay/hold; **billable km** logic shown as a **variable** component explanation, not a hidden footnote.
 - Operational bundle is displayed as a **single total line item** (no per-km rate shown in UI).
+- Multi-city route capture should preserve sequence semantics (**Pickup → Stop(s) → Final Dropoff**) so round-trip billing context remains explainable to customers.
 
 **Technical notes**
 
@@ -265,5 +267,6 @@ Aligned with **`docs/features/booking-lifecycle.md` §6** (included envelopes); 
 | 2026-05-17 | Related: **`billing-settlement.md`** for financial lifecycle beyond rate dimensions. |
 | 2026-07-11 | **Updated:** Round-trip and multi-city share tour pricing; one-way uses corridor pricing; billable km = max(actual, included); operational bundle added as a single line item; Google Maps route distance as input. |
 | 2026-08-11 | **Implemented (foundation):** server-side route distance resolver seam added in booking flow with Google Maps Directions API when configured and safe fallback to caller-provided distance when unavailable. |
+| 2026-08-28 | **Updated UX-aligned pricing notes:** added 12 hr / 120 km city-tour extension SKU and clarified ordered multi-city stop semantics for route capture and round-trip explanation. |
 
 When rate-card RBAC, version drift rules, and surge policies are fixed, add dated rows and consider raising **Maturity** toward `MVP` for covered scope.

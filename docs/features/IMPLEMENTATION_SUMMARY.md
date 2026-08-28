@@ -1,4 +1,4 @@
-# Tamaiyyo Backend Implementation Summary
+# Tamayo Backend Implementation Summary
 
 **Date:** 2026-05-18  
 **Updated:** 2026-07-11  
@@ -9,7 +9,7 @@
 
 ## Overview
 
-This document summarizes the complete backend implementation for Tamaiyyo, covering:
+This document summarizes the complete backend implementation for Tamayo, covering:
 
 1. **Supplier & Vehicle Onboarding** — Draft, submission, admin verification
 2. **Booking Lifecycle** — Quote generation, creation, assignment, fulfillment

@@ -1,4 +1,4 @@
-# Tamaiyyo — Prisma & data architecture (persistence blueprint)
+# Tamayo — Prisma & data architecture (persistence blueprint)
 
 **Maturity:** FOUNDATION  
 **Purpose:** Foundational **PostgreSQL + Prisma** persistence architecture: identities, references, soft-delete, timestamps, snapshots, relationships, audit events, indexing, uploads, and repository boundaries—**without** Prisma schema files, migrations, or infrastructure beyond what `backend-architecture.md` already defers.

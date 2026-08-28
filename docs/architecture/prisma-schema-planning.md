@@ -1,7 +1,7 @@
-# Tamaiyyo — Prisma schema planning (implementation blueprint)
+# Tamayo — Prisma schema planning (implementation blueprint)
 
 **Maturity:** FOUNDATION  
-**Purpose:** Implementation-grade **Prisma schema planning blueprint** for Tamaiyyo—defines the **concrete model groups**, **field strategies**, **relationship patterns**, and **transaction boundaries** before generating `schema.prisma`—**without** writing the schema file itself.
+**Purpose:** Implementation-grade **Prisma schema planning blueprint** for Tamayo—defines the **concrete model groups**, **field strategies**, **relationship patterns**, and **transaction boundaries** before generating `schema.prisma`—**without** writing the schema file itself.
 
 **Related docs:** **[`docs/architecture/prisma-data-architecture.md`](./prisma-data-architecture.md)** (foundational persistence philosophy), **[`docs/architecture/backend-architecture.md`](./backend-architecture.md)** (modules, stack), **[`docs/architecture/api-architecture.md`](./api-architecture.md)** (handler → repository), **[`docs/architecture/domain-models/`](./domain-models/README.md)** (entity blueprints: identity, vehicle, booking, billing), [`docs/features/booking-lifecycle.md`](../features/booking-lifecycle.md), [`docs/features/billing-settlement.md`](../features/billing-settlement.md), [`docs/features/supplier-operations.md`](../features/supplier-operations.md), [`docs/features/pricing-engine.md`](../features/pricing-engine.md).
 
@@ -422,7 +422,7 @@ interface BookingRepository {
 **Planned**
 
 - Better Auth uses its own Prisma adapter; coordinate table names to avoid collisions.
-- **Identity model** in Tamaiyyo schema references `betterAuthUserId` (String FK to Better Auth `user` table).
+- **Identity model** in Tamayo schema references `betterAuthUserId` (String FK to Better Auth `user` table).
 - Better Auth tables: `user`, `session`, `account`, `verification`—may live in same schema or separate namespace.
 
 **Unresolved mechanics**
@@ -431,7 +431,7 @@ interface BookingRepository {
 
 **Exploratory**
 
-- Unified Prisma client with Better Auth + Tamaiyyo models; Better Auth table prefix (`ba_user`, `ba_session`).
+- Unified Prisma client with Better Auth + Tamayo models; Better Auth table prefix (`ba_user`, `ba_session`).
 
 ---
 

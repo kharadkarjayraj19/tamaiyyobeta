@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Payment repository.
+ * Tamayo — Payment repository.
  *
  * Architecture:
  * - Prisma queries for payment records

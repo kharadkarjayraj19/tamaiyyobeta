@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Vehicle onboarding validation schemas.
+ * Tamayo — Vehicle onboarding validation schemas.
  *
  * Architecture:
  * - DTOs for vehicle creation

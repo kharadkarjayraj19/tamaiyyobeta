@@ -1,4 +1,4 @@
-# Tamaiyyo — vehicle domain model (inventory entity architecture)
+# Tamayo — vehicle domain model (inventory entity architecture)
 
 **Maturity:** FOUNDATION  
 **Purpose:** Foundational **vehicle inventory** entity architecture: how **vehicles** exist on the platform, how they relate to **suppliers** and **drivers**, and how **booking-time assignment** works—**without** permanent vehicle–driver linkage, database schemas, APIs, or dispatch algorithms.

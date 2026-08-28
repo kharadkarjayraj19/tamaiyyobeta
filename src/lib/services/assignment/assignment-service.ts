@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — AssignmentService.
+ * Tamayo — AssignmentService.
  *
  * Architecture:
  * - Orchestrates supplier assignment workflows

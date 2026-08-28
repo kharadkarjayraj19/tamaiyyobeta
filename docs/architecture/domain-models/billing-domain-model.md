@@ -1,7 +1,7 @@
-# Tamaiyyo — billing domain model (financial entity architecture)
+# Tamayo — billing domain model (financial entity architecture)
 
 **Maturity:** FOUNDATION  
-**Purpose:** Foundational **billing, payment, settlement, refund, and financial** entity architecture for Tamaiyyo: quotes, bills, payments, supplier earnings, commission, refunds, notifications hooks, and audit—aligned with bookings and **without** schemas, APIs, enterprise ledgers, or tax/legal prescriptions.
+**Purpose:** Foundational **billing, payment, settlement, refund, and financial** entity architecture for Tamayo: quotes, bills, payments, supplier earnings, commission, refunds, notifications hooks, and audit—aligned with bookings and **without** schemas, APIs, enterprise ledgers, or tax/legal prescriptions.
 
 **Related docs:** [`docs/features/billing-settlement.md`](../../features/billing-settlement.md) (financial workflow philosophy), [`docs/features/pricing-engine.md`](../../features/pricing-engine.md) (rate dimensions), [`docs/architecture/domain-models/booking-domain-model.md`](./booking-domain-model.md) (booking link, pricing snapshot), [`docs/features/booking-lifecycle.md`](../../features/booking-lifecycle.md) (cancellation posture), [`docs/features/supplier-operations.md`](../../features/supplier-operations.md) (payout cadence, billing inputs), [`docs/architecture/backend-architecture.md`](../backend-architecture.md) (`billing` module).
 

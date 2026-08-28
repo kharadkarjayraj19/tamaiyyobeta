@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Vehicle repository.
+ * Tamayo — Vehicle repository.
  *
  * Architecture:
  * - Prisma queries for vehicle inventory

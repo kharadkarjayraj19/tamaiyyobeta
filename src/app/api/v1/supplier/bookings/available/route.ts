@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — GET /api/v1/supplier/bookings/available
+ * Tamayo — GET /api/v1/supplier/bookings/available
  *
  * Get available bookings for supplier (queue view).
  */

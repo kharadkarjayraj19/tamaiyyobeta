@@ -1,7 +1,7 @@
-# Tamaiyyo — backend architecture (MVP implementation blueprint)
+# Tamayo — backend architecture (MVP implementation blueprint)
 
 **Maturity:** FOUNDATION  
-**Purpose:** Define the **MVP backend implementation architecture** for Tamaiyyo: how server-side logic, data, APIs, auth, and operations are structured in this repository—**startup-friendly**, **modular**, and **extractable later** without premature microservices.
+**Purpose:** Define the **MVP backend implementation architecture** for Tamayo: how server-side logic, data, APIs, auth, and operations are structured in this repository—**startup-friendly**, **modular**, and **extractable later** without premature microservices.
 
 **Related docs:** [`docs/architecture.md`](../architecture.md) (global repo layout), **[`docs/architecture/api-architecture.md`](./api-architecture.md)** (REST routes, responses, handler layering), **[`docs/architecture/prisma-data-architecture.md`](./prisma-data-architecture.md)** (Postgres, Prisma, snapshots, audit persistence), **[`docs/architecture/prisma-schema-planning.md`](./prisma-schema-planning.md)** (schema planning blueprint), [`docs/features/frontend-auth-architecture.md`](../features/frontend-auth-architecture.md) (current Better Auth wiring), [`docs/features/auth-rbac.md`](../features/auth-rbac.md) (RBAC philosophy), **[`docs/architecture/domain-models/`](./domain-models/README.md)** (entity blueprints), marketplace domain specs under `docs/features/`, [`docs/project/current-state.md`](../project/current-state.md).
 

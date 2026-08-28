@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Assignment validation schemas.
+ * Tamayo — Assignment validation schemas.
  *
  * Architecture:
  * - DTOs for supplier booking acceptance/rejection

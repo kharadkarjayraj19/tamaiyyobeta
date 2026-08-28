@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — One-way corridor repository.
+ * Tamayo — One-way corridor repository.
  *
  * Architecture:
  * - Prisma queries for admin-configured one-way corridors

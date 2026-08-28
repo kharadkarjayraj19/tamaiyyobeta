@@ -2,7 +2,7 @@
 
 ## Overview
 
-Implemented complete payment recording, refund processing, and supplier settlement operations for Tamaiyyo MVP. This provides the financial backbone for the booking lifecycle, enabling customers to pay, request refunds, and suppliers to receive payouts.
+Implemented complete payment recording, refund processing, and supplier settlement operations for Tamayo MVP. This provides the financial backbone for the booking lifecycle, enabling customers to pay, request refunds, and suppliers to receive payouts.
 
 ---
 

@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — POST /api/v1/admin/bookings/[id]/reassign
+ * Tamayo — POST /api/v1/admin/bookings/[id]/reassign
  *
  * Admin reassigns booking to different supplier.
  */

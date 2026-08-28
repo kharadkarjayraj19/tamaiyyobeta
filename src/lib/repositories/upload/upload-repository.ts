@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Upload repository (placeholder implementation).
+ * Tamayo — Upload repository (placeholder implementation).
  *
  * Architecture:
  * - Prisma queries for upload metadata

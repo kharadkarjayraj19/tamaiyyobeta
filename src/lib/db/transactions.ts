@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Transaction helper utilities.
+ * Tamayo — Transaction helper utilities.
  *
  * Architecture:
  * - Services orchestrate transactions via prisma.$transaction

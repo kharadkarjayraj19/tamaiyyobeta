@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Shared backend types.
+ * Tamayo — Shared backend types.
  *
  * Architecture:
  * - Common types used across services and repositories

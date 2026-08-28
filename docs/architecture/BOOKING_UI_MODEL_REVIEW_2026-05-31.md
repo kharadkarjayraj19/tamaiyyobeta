@@ -1,4 +1,4 @@
-# Tamaiyyo — Booking Architecture Review: UI Trip Types
+# Tamayo — Booking Architecture Review: UI Trip Types
 
 **Date:** 2026-05-31  
 **Status:** Architecture Review  

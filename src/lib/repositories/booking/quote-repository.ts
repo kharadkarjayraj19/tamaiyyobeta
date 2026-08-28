@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Quote repository.
+ * Tamayo — Quote repository.
  *
  * Architecture:
  * - Prisma queries for booking quotes

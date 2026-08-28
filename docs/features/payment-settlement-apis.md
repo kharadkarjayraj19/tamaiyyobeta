@@ -1,4 +1,4 @@
-# Tamaiyyo — Payment & Settlement APIs (MVP implementation)
+# Tamayo — Payment & Settlement APIs (MVP implementation)
 
 **Maturity:** MVP  
 **Purpose:** Operational specification for payment recording, refund processing, and supplier settlement APIs—MVP-ready for manual operations before gateway integration.

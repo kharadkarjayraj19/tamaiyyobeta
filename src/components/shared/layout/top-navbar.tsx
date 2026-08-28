@@ -19,6 +19,7 @@ const ROLE_TITLE: Record<AppRole, string> = {
 type TopNavbarProps = {
   role: AppRole;
   onOpenSidebar: () => void;
+  showMenuButton?: boolean;
   trailing?: ReactNode;
   className?: string;
 };
@@ -26,19 +27,27 @@ type TopNavbarProps = {
 /**
  * Sticky top bar: mobile menu, home link, role context. No auth controls (by design).
  */
-export function TopNavbar({ role, onOpenSidebar, trailing, className }: TopNavbarProps) {
+export function TopNavbar({
+  role,
+  onOpenSidebar,
+  showMenuButton = true,
+  trailing,
+  className,
+}: TopNavbarProps) {
   return (
     <header className={cn(uiLayout.topBar, className)}>
-      <Button
-        type="button"
-        variant="outline"
-        size="icon"
-        className="shrink-0 lg:hidden"
-        onClick={onOpenSidebar}
-        aria-label="Open navigation menu"
-      >
-        <Menu className="h-5 w-5" aria-hidden />
-      </Button>
+      {showMenuButton ? (
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="shrink-0 lg:hidden"
+          onClick={onOpenSidebar}
+          aria-label="Open navigation menu"
+        >
+          <Menu className="h-5 w-5" aria-hidden />
+        </Button>
+      ) : null}
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <Link
           href="/"

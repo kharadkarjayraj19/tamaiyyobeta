@@ -1,7 +1,7 @@
-# Tamaiyyo — booking domain model (order & trip execution architecture)
+# Tamayo — booking domain model (order & trip execution architecture)
 
 **Maturity:** FOUNDATION  
-**Purpose:** Foundational **booking and trip execution** entity architecture—the **central operational object** for Tamaiyyo: commercial order, itinerary, assignments, execution milestones, payment/billing linkage, cancellation, and audit—without schemas, APIs, or dispatch algorithms.
+**Purpose:** Foundational **booking and trip execution** entity architecture—the **central operational object** for Tamayo: commercial order, itinerary, assignments, execution milestones, payment/billing linkage, cancellation, and audit—without schemas, APIs, or dispatch algorithms.
 
 **Related docs:** [`docs/features/booking-lifecycle.md`](../../features/booking-lifecycle.md) (lifecycle groups & philosophy), [`docs/features/pricing-engine.md`](../../features/pricing-engine.md) (quote dimensions), [`docs/features/supplier-operations.md`](../../features/supplier-operations.md) (routing, acceptance), [`docs/features/billing-settlement.md`](../../features/billing-settlement.md) (payments, final bill workflow), **[`docs/architecture/domain-models/billing-domain-model.md`](./billing-domain-model.md)** (quote, bill, payment, settlement entities), [`docs/architecture/domain-models/identity-domain-model.md`](./identity-domain-model.md) (actors), [`docs/architecture/domain-models/vehicle-domain-model.md`](./vehicle-domain-model.md) (booking-time vehicle+driver assignment), [`docs/architecture/backend-architecture.md`](../backend-architecture.md) (`booking` module).
 

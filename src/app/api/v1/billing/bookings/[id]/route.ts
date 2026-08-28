@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — GET /api/v1/billing/bookings/[id]
+ * Tamayo — GET /api/v1/billing/bookings/[id]
  *
  * Get final bill by booking ID.
  */

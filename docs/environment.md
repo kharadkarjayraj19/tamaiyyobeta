@@ -1,4 +1,4 @@
-# Tamaiyyo — environment variables
+# Tamayo — environment variables
 
 Copy `.env.example` to `.env.local` for local development. Next.js loads `.env.local` automatically (and never commits it).
 

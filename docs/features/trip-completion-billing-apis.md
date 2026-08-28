@@ -1,4 +1,4 @@
-# Tamaiyyo — Trip Completion, Final Billing, and Settlement Foundation APIs
+# Tamayo — Trip Completion, Final Billing, and Settlement Foundation APIs
 
 **Maturity:** MVP  
 **Purpose:** RESTful APIs for trip completion, final bill generation, and settlement foundation. Handles trip execution submission (supplier/driver submits actuals), customer km confirmation (optional), final bill calculation, and supplier earning tracking.
@@ -9,7 +9,7 @@
 
 ## 1. Overview
 
-This document specifies the **trip completion and final billing APIs** for Tamaiyyo. These APIs handle:
+This document specifies the **trip completion and final billing APIs** for Tamayo. These APIs handle:
 
 1. **Trip execution submission**: Supplier/driver submits actual km, odometer readings, tolls, and parking after trip completion (toll/parking captured for ops audit in MVP bundle model).
 2. **Customer km confirmation**: Optional workflow step where customer confirms or disputes km readings.
@@ -46,7 +46,7 @@ This document specifies the **trip completion and final billing APIs** for Tamai
     {
       "description": "Highway toll - NH48",
       "amount": "150.00",
-      "receiptUrl": "https://uploads.tamaiyyo.in/..."
+      "receiptUrl": "https://uploads.tamayo.in/..."
     }
   ],
   "parkingLines": [

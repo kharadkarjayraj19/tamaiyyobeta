@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — One-way corridor validation schemas.
+ * Tamayo — One-way corridor validation schemas.
  *
  * Architecture:
  * - DTOs for admin-managed one-way corridors

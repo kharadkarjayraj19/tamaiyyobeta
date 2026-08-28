@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — POST /api/v1/bookings/[id]/generate-bill
+ * Tamayo — POST /api/v1/bookings/[id]/generate-bill
  *
  * Generate final bill (admin or automated after completion/confirmation).
  */

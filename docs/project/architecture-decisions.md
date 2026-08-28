@@ -1,4 +1,4 @@
-# Tamaiyyo — architecture decisions (project memory)
+# Tamayo — architecture decisions (project memory)
 
 **Purpose:** Short, durable record of **structural** choices for AI onboarding and reviews. **Behavioral and business rules** belong in `docs/features/*.md`. Deep auth philosophy: `docs/features/auth-rbac.md`; Better Auth wiring: `docs/features/frontend-auth-architecture.md`; MVP backend blueprint: `docs/architecture/backend-architecture.md`.
 
@@ -24,6 +24,7 @@
 | ADR-S02 | **Role URLs** via route groups: `(customer)/customer`, etc., yielding prefixes `/customer`, `/supplier`, `/admin`. | **Implemented** |
 | ADR-S03 | **Configuration** centralized in `src/config`; env via `src/config/env/client.ts` and `src/config/env/server.ts` — **no** barrel that mixes client and server env. | **Implemented** |
 | ADR-S04 | Cross-role shell and nav: **one** dashboard shell implementation parameterized by role (`docs/features/app-shell.md`). | **Implemented** |
+| ADR-S05 | **Route-aware customer shell:** `/customer` may run hero-first full-width without sidebar/drawer while retaining standard dashboard navigation for `/customer/*` operational pages. | **Implemented** |
 
 ---
 
@@ -80,6 +81,7 @@
 | ADR-T02 | **Prisma 7 configuration split:** keep datasource URL config in root `prisma.config.ts` (not `schema.prisma`) for migrate/dev/reset workflows; treat local migrate reset as explicitly consented destructive operation only on development databases. | **Implemented** |
 | ADR-T03 | **PostHog foundation wiring:** initialize client analytics in root layout and capture selected server-side booking events using a non-blocking helper; observability failures must never break booking APIs. | **Implemented** |
 | ADR-T04 | **Distance resolution seam:** booking flows resolve route km server-side via Google Maps (when configured) with fallback behavior so pricing remains available if Maps is unavailable. | **Implemented** |
+| ADR-T05 | **Hero-to-quote route handoff:** customer hero interactions pass ride-mode and route context to `/customer/booking-quote` via query params for deterministic prefill without adding new API endpoints. | **Implemented** |
 
 ---
 
@@ -104,3 +106,5 @@
 | 2026-08-11 | ADR-T02: Prisma 7 config and migration safety decision (`prisma.config.ts` as datasource source of truth for CLI; local destructive reset requires explicit operator consent). |
 | 2026-08-11 | ADR-T03: PostHog foundation wiring decision (root client provider + server event helper; non-blocking analytics on booking quote/create routes). |
 | 2026-08-11 | ADR-T04: Server-side distance resolution decision (Google Maps when configured; resilient fallback in booking quote/create flows). |
+| 2026-08-28 | ADR-S05: route-aware customer shell mode (full-width `/customer`, standard nav on `/customer/*`). |
+| 2026-08-28 | ADR-T05: customer hero query-param handoff to quote workbench for ride-mode and route-sequence prefill. |

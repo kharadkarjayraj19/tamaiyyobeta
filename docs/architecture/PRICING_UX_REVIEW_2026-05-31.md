@@ -1,4 +1,4 @@
-# Tamaiyyo — Pricing Engine vs UI Model: UX & Terminology Review
+# Tamayo — Pricing Engine vs UI Model: UX & Terminology Review
 
 **Date:** 2026-05-31  
 **Status:** UX Architecture Review  

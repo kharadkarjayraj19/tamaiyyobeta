@@ -1,6 +1,8 @@
-# Tamaiyyo — local development environment setup
+# Tamayo — local development environment setup
 
-**Purpose:** practical setup guide for running Tamaiyyo locally with PostgreSQL and seeded test data.
+**Purpose:** practical setup guide for running Tamayo locally with PostgreSQL and seeded test data.
+
+For production-readiness sequencing (auth hardening, secrets, migration safety, rollout gates), see `docs/project/dev-to-prod-shift-plan.md`.
 
 ---
 
@@ -31,9 +33,9 @@ This starts:
 
 - host: `localhost`
 - port: `5432`
-- db: `tamaiyyo_dev`
-- user: `tamaiyyo`
-- password: `tamaiyyo`
+- db: `tamayo_dev`
+- user: `tamayo`
+- password: `tamayo`
 
 ---
 
@@ -47,8 +49,8 @@ cp .env.example .env.local
 
 Required local DB env values:
 
-- `DATABASE_URL=postgresql://tamaiyyo:tamaiyyo@localhost:5432/tamaiyyo_dev`
-- `SHADOW_DATABASE_URL=postgresql://tamaiyyo:tamaiyyo@localhost:5432/tamaiyyo_shadow`
+- `DATABASE_URL=postgresql://tamayo:tamayo@localhost:5432/tamayo_dev`
+- `SHADOW_DATABASE_URL=postgresql://tamayo:tamayo@localhost:5432/tamayo_shadow`
 
 Optional local auth shortcut:
 
@@ -61,7 +63,7 @@ Optional local auth shortcut:
 Create the shadow DB once:
 
 ```sql
-CREATE DATABASE tamaiyyo_shadow;
+CREATE DATABASE tamayo_shadow;
 ```
 
 ---

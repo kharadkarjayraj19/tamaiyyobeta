@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — POST /api/v1/suppliers/onboarding/submit
+ * Tamayo — POST /api/v1/suppliers/onboarding/submit
  *
  * Submit supplier onboarding for admin verification.
  */

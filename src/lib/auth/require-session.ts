@@ -24,7 +24,7 @@ function buildDevBypassSession(callbackUrlPath: string): DevBypassSession {
     return {
       user: {
         id: "mock-supplier-1",
-        email: "supplier.dev@tamaiyyo.local",
+        email: "supplier.dev@tamayo.local",
         name: "Dev Supplier User",
       },
       session: {
@@ -39,7 +39,7 @@ function buildDevBypassSession(callbackUrlPath: string): DevBypassSession {
     return {
       user: {
         id: "mock-admin-1",
-        email: "admin.dev@tamaiyyo.local",
+        email: "admin.dev@tamayo.local",
         name: "Dev Admin User",
       },
       session: {
@@ -53,7 +53,7 @@ function buildDevBypassSession(callbackUrlPath: string): DevBypassSession {
   return {
     user: {
       id: "mock-customer-1",
-      email: "customer.dev@tamaiyyo.local",
+      email: "customer.dev@tamayo.local",
       name: "Dev Customer User",
     },
     session: {
@@ -69,18 +69,15 @@ function buildDevBypassSession(callbackUrlPath: string): DevBypassSession {
  * Complements optimistic `middleware` cookie checks with a server session read.
  */
 export async function requireSession(callbackUrlPath: string) {
+  if (serverEnv.devAuthBypassEnabled) {
+    return buildDevBypassSession(callbackUrlPath);
+  }
+
   const session = await getSession();
   if (session) {
     return session;
   }
 
-  if (serverEnv.devAuthBypassEnabled) {
-    return buildDevBypassSession(callbackUrlPath);
-  }
-
-  if (!session) {
-    const search = new URLSearchParams({ callbackUrl: callbackUrlPath });
-    redirect(`${LOGIN_PATH}?${search.toString()}`);
-  }
-  return session;
+  const search = new URLSearchParams({ callbackUrl: callbackUrlPath });
+  redirect(`${LOGIN_PATH}?${search.toString()}`);
 }

@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — POST /api/v1/bookings/[id]/close
+ * Tamayo — POST /api/v1/bookings/[id]/close
  *
  * Close booking after billing is complete (operational closure).
  * 

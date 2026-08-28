@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Settlement validation schemas.
+ * Tamayo — Settlement validation schemas.
  *
  * Architecture:
  * - Zod schemas for settlement and payout operations

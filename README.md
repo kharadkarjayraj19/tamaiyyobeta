@@ -1,6 +1,6 @@
-# Tamaiyyo
+# Tamayo
 
-Production-oriented foundation for **Tamaiyyo**, a scalable outstation cab booking marketplace for India. This repository currently contains **web-first** scaffolding only—no booking, payments, or fleet logic yet.
+Production-oriented foundation for **Tamayo**, a scalable outstation cab booking marketplace for India. This repository currently contains **web-first** scaffolding only—no booking, payments, or fleet logic yet.
 
 ## Stack
 

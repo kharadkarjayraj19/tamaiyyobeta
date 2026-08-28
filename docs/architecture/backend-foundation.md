@@ -1,7 +1,7 @@
-# Tamaiyyo — Backend Foundation (Application Layer)
+# Tamayo — Backend Foundation (Application Layer)
 
 **Maturity:** FOUNDATION  
-**Purpose:** Established **repository**, **service**, **validation**, and **error handling** patterns for Tamaiyyo backend application layer—ready for API implementation.
+**Purpose:** Established **repository**, **service**, **validation**, and **error handling** patterns for Tamayo backend application layer—ready for API implementation.
 
 **Related docs:** [`backend-architecture.md`](./backend-architecture.md) (stack), [`api-architecture.md`](./api-architecture.md) (handler → service → repository), [`prisma-data-architecture.md`](./prisma-data-architecture.md) (persistence), [`prisma-schema-planning.md`](./prisma-schema-planning.md) (schema).
 

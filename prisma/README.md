@@ -1,6 +1,6 @@
-# Tamaiyyo — Prisma directory
+# Tamayo — Prisma directory
 
-**Purpose:** Prisma schema, migrations, configuration, and seed scripts for Tamaiyyo marketplace database.
+**Purpose:** Prisma schema, migrations, configuration, and seed scripts for Tamayo marketplace database.
 
 **Architecture:** See `docs/architecture/prisma-data-architecture.md` and `docs/architecture/prisma-schema-planning.md`.
 
@@ -104,7 +104,7 @@ See `docs/deployment/database-setup.md` for full guide.
 
 Better Auth tables (user, session, account, verification) are managed separately by Better Auth adapter.
 
-`Identity.betterAuthUserId` field links Tamaiyyo identities to Better Auth users when OTP/login is implemented.
+`Identity.betterAuthUserId` field links Tamayo identities to Better Auth users when OTP/login is implemented.
 
 **Coordination strategy:** TBD — same schema or separate (see `prisma-schema-planning.md` §16).
 

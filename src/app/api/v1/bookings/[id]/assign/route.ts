@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — POST /api/v1/bookings/[id]/assign
+ * Tamayo — POST /api/v1/bookings/[id]/assign
  *
  * Assign vehicle and driver to booking (supplier action).
  */

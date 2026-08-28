@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — SupplierService.
+ * Tamayo — SupplierService.
  *
  * Architecture:
  * - Orchestrates supplier onboarding workflows

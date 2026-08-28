@@ -1,7 +1,7 @@
-# Tamaiyyo — Booking quote and creation APIs
+# Tamayo — Booking quote and creation APIs
 
 **Maturity:** MVP  
-**Purpose:** Operational REST API implementation for booking quote generation and booking creation with full transactional integrity. Implements the first customer-facing booking workflows for Tamaiyyo marketplace.
+**Purpose:** Operational REST API implementation for booking quote generation and booking creation with full transactional integrity. Implements the first customer-facing booking workflows for Tamayo marketplace.
 
 **Related docs:** [`docs/features/booking-lifecycle.md`](./booking-lifecycle.md) (lifecycle philosophy), [`docs/features/pricing-engine.md`](./pricing-engine.md) (pricing dimensions), [`docs/architecture/domain-models/booking-domain-model.md`](../architecture/domain-models/booking-domain-model.md) (booking entity architecture), [`docs/architecture/backend-foundation.md`](../architecture/backend-foundation.md) (repository/service patterns), [`docs/architecture/api-architecture.md`](../architecture/api-architecture.md) (REST philosophy).
 

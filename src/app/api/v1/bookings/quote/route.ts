@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — POST /api/v1/bookings/quote
+ * Tamayo — POST /api/v1/bookings/quote
  *
  * Generate a booking quote (no booking created).
  */

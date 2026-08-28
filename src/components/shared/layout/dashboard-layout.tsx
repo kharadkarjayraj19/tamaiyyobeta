@@ -6,7 +6,7 @@ type DashboardLayoutProps = {
   /** Sticky top region (navbar) */
   topBar: ReactNode;
   /** Desktop sidebar column (hidden below `lg` — pair with mobile `Sheet`) */
-  sidebar: ReactNode;
+  sidebar?: ReactNode;
   /** Primary content (typically wraps `PageContainer`) */
   children: ReactNode;
   className?: string;
@@ -26,11 +26,13 @@ export function DashboardLayout({
     <div className={cn("flex min-h-0 flex-1 flex-col", className)}>
       {topBar}
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        <aside
-          className="hidden w-sidebar shrink-0 border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex lg:flex-col"
-        >
-          {sidebar}
-        </aside>
+        {sidebar ? (
+          <aside
+            className="hidden w-sidebar shrink-0 border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex lg:flex-col"
+          >
+            {sidebar}
+          </aside>
+        ) : null}
         {children}
       </div>
     </div>

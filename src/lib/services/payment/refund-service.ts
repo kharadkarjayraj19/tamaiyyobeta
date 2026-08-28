@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — RefundService.
+ * Tamayo — RefundService.
  *
  * Architecture:
  * - Orchestrates refund workflows

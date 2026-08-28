@@ -1,7 +1,7 @@
-# Tamaiyyo — API architecture (executable contract philosophy)
+# Tamayo — API architecture (executable contract philosophy)
 
 **Maturity:** FOUNDATION  
-**Purpose:** Define **executable API architecture** for Tamaiyyo: REST contract structure, route organization, auth enforcement, validation, responses, and how route handlers interact with domain modules—**without** OpenAPI files, handler implementations, or database schemas.
+**Purpose:** Define **executable API architecture** for Tamayo: REST contract structure, route organization, auth enforcement, validation, responses, and how route handlers interact with domain modules—**without** OpenAPI files, handler implementations, or database schemas.
 
 **Related docs:** [`docs/architecture/backend-architecture.md`](./backend-architecture.md) (modular monolith, stack), **[`docs/architecture/prisma-data-architecture.md`](./prisma-data-architecture.md)** (repositories, transactions), **[`docs/architecture/prisma-schema-planning.md`](./prisma-schema-planning.md)** (schema blueprint), [`docs/features/frontend-auth-architecture.md`](../features/frontend-auth-architecture.md) (Better Auth), [`docs/features/auth-rbac.md`](../features/auth-rbac.md) (RBAC, ownership), [`docs/architecture/domain-models/`](./domain-models/README.md) (entities), marketplace **`docs/features/*.md`**, [`docs/architecture.md`](../architecture.md).
 

@@ -1,4 +1,4 @@
-# Tamaiyyo — Customer post-login UI implementation plan
+# Tamayo — Customer post-login UI implementation plan
 
 **Maturity:** DRAFT  
 **Purpose:** Step-by-step implementation plan for the customer post-login screen based on `TamayoUIMockupPostCustomerLogin.png`, with strict chunking so agents can execute without hallucinating scope, APIs, or behavior.
@@ -14,9 +14,9 @@
 ### In scope
 
 - Customer dashboard UI after login for `/customer`.
-- Hero block with primary CTA and trust indicators.
+- Hero block with primary CTA, ride-mode selection, and trust indicators.
 - Action cards row (Outstation, Plan Itinerary, One Way, My Trips, Offers).
-- Inspiration section with sample itinerary cards (Parth/Hyderabad and Abhisek/Kerala).
+- Inspiration section with sample itinerary cards (Parth/Hyderabad and Yash/Maharashtra).
 - Bottom trust stats strip.
 - Responsive behavior for desktop and mobile.
 
@@ -111,10 +111,10 @@ Build in small chunks. After each chunk:
 - Build hero with:
   - heading,
   - short supporting text,
-  - primary CTA (`Book Now`),
-  - secondary CTA (`Plan Itinerary`),
-  - right-side "Why choose" list.
-- Add trust chips below hero CTA row (verified, transparent pricing, included km/day, support).
+  - primary CTA (`See prices`),
+  - ride-mode tabs (`One way`, `Multi city / Round trip`, `City tour`, `Airport only`),
+  - right-side fleet sticker visual.
+- Add trust points beside CTA row (easy cancellation, new cars guaranteed, best price + best drivers).
 - Use tokenized gradients and contrast-safe text.
 
 **Notes**
@@ -163,7 +163,7 @@ Build in small chunks. After each chunk:
 - Add section title/subtitle (e.g. "See how others planned their trips").
 - Render 2 static cards from local constants:
   - Parth 3-day Hyderabad tour,
-  - Abhisek 5-day Kerala tour.
+  - Yash 5-day Maharashtra tour.
 - Include:
   - trip pill (`3 Days Trip`, `5 Days Trip`),
   - short destination chips,
@@ -231,6 +231,10 @@ Build in small chunks. After each chunk:
   - one-way corridor fare concept,
   - tour fare concept,
   - billable km explanation (where suitable).
+- Add contextual tooltip copy for ride-mode clarity:
+  - one-way limited to hotspot routes,
+  - multi-city uses round-trip charging posture,
+  - city tour package meaning and overage note.
 - Keep language simple and non-technical.
 
 **Acceptance criteria**
@@ -270,6 +274,7 @@ Build in small chunks. After each chunk:
 - "My Trips" card -> real customer bookings count from existing booking APIs.
 - Inspiration cards -> CMS/config or curated data source.
 - Hero greeting -> real user name from session bridge.
+- Hero ride form -> post-to-quote API directly from `/customer` (current flow navigates to quote workbench with query-param prefill).
 
 **Rule**
 
@@ -279,18 +284,19 @@ Build in small chunks. After each chunk:
 
 ## 5) Implementation checklist for agent handoff
 
-- [ ] Chunk 0 complete
-- [ ] Chunk 1 complete
-- [ ] Chunk 2 complete
-- [ ] Chunk 3 complete
-- [ ] Chunk 4 complete
-- [ ] Chunk 5 complete
+- [x] Chunk 0 complete
+- [x] Chunk 1 complete
+- [x] Chunk 2 complete
+- [x] Chunk 3 complete
+- [x] Chunk 4 complete
+- [x] Chunk 5 complete
 - [ ] Chunk 6 complete
-- [ ] Chunk 7 complete
-- [ ] Chunk 8 complete
-- [ ] Lint/typecheck pass on touched files
-- [ ] Visual QA against `TamayoUIMockupPostCustomerLogin.png`
-- [ ] Docs updated if scope changed
+- [x] Chunk 7 complete
+- [x] Chunk 8 complete
+- [x] Lint/typecheck pass on touched files
+- [x] Visual QA against `TamayoUIMockupPostCustomerLogin.png`
+- [x] Docs updated if scope changed
+- [x] Multi-city stop builder supports up to 10 intermediate stops (`Stop 1..10`) between pickup and final dropoff
 
 ---
 
@@ -309,3 +315,4 @@ This keeps reviews focused and lowers hallucination/regression risk.
 | Date | Change |
 | --- | --- |
 | 2026-08-13 | Initial chunked implementation plan from customer post-login mockup (`TamayoUIMockupPostCustomerLogin.png`). |
+| 2026-08-28 | Updated plan to match implemented customer hero interactions: ride-mode tabs, city-tour package presets, tooltips, query-prefill handoff, and multi-city stop-builder constraints. |

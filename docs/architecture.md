@@ -1,10 +1,10 @@
-# Tamaiyyo web architecture
+# Tamayo web architecture
 
-This document records **foundation-level** decisions for the Tamaiyyo web app. Update it whenever you change structural conventions.
+This document records **foundation-level** decisions for the Tamayo web app. Update it whenever you change structural conventions.
 
 ## Product context
 
-Tamaiyyo is an outstation cab booking marketplace for India. The web app serves multiple roles: **Customer**, **Supplier**, and **Admin**. Mobile apps are out of scope for this repository phase.
+Tamayo is an outstation cab booking marketplace for India. The web app serves multiple roles: **Customer**, **Supplier**, and **Admin**. Mobile apps are out of scope for this repository phase.
 
 ## Stack
 
@@ -43,6 +43,7 @@ src/
 - **`docs/architecture/PRICING_UX_REVIEW_2026-05-31.md`:** Comprehensive pricing engine vs UX model review analyzing corridor pricing, KM-based pricing, minimum billable km, empty return costing, and route vs billable km distinction—includes vehicle card designs, fare terminology recommendations, KM disclosure strategies, final bill templates, conversion optimization tactics, and critical architectural gap analysis.
 - **`docs/architecture/domain-models/*.md`:** foundational **entity** architecture (e.g. [identity-domain-model.md](./architecture/domain-models/identity-domain-model.md), [vehicle-domain-model.md](./architecture/domain-models/vehicle-domain-model.md), [booking-domain-model.md](./architecture/domain-models/booking-domain-model.md), [billing-domain-model.md](./architecture/domain-models/billing-domain-model.md))—not SQL or API contracts.
 - **`docs/project/*.md`:** durable **project memory** for onboarding—**start with [project/current-state.md](./project/current-state.md)** (primary snapshot), then roadmap, development phases, architecture decision index, and future initiatives (**not** feature-level business rules).
+- **`docs/project/dev-to-prod-shift-plan.md`:** production transition checklist (auth hardening, env/secrets, migration safety, rollout gates).
 - **`docs/features/*.md`:** one markdown file per major feature or module—source of truth for business rules, workflows, RBAC, lifecycle states, and feature-scoped technical decisions. Each file declares a **Maturity** (`DRAFT` → `SCALING`); see **`.cursorrules`** for definitions and AI behavior. Cross-cutting specs (e.g. **[features/design-system.md](./features/design-system.md)**, **[features/app-shell.md](./features/app-shell.md)**, **[features/auth-rbac.md](./features/auth-rbac.md)**, **[features/frontend-auth-architecture.md](./features/frontend-auth-architecture.md)**) and domain specs (e.g. **[features/booking-lifecycle.md](./features/booking-lifecycle.md)**, **[features/pricing-engine.md](./features/pricing-engine.md)**, **[features/vehicle-management.md](./features/vehicle-management.md)**, **[features/supplier-operations.md](./features/supplier-operations.md)**, **[features/billing-settlement.md](./features/billing-settlement.md)**) live here too. Workflow for authors and agents is defined in **`.cursorrules`**; see **`docs/features/README.md`** for where to add new specs.
 
 ## Routing and roles
@@ -58,6 +59,8 @@ Role surfaces use **route groups** so URLs stay clean while layouts can diverge 
 Route groups (parentheses) do **not** appear in the URL. The first segment (`customer`, `supplier`, `admin`) is the public path prefix.
 
 The app root (`/`) is reserved for marketing or global entry; it currently links into the three role placeholders.
+
+Route-level shell variance is allowed when intentional and documented: `/customer` now uses a hero-first full-width composition with hidden sidebar/drawer, while `/customer/*` operational pages continue to use the standard dashboard shell.
 
 ## Environment configuration
 

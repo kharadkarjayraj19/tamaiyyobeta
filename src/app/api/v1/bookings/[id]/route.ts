@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Booking detail API routes.
+ * Tamayo — Booking detail API routes.
  *
  * GET /api/v1/bookings/[id] — Get booking details
  */

@@ -11,7 +11,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
 /**
- * Tamaiyyo database seed script.
+ * Tamayo database seed script.
  *
  * Run: npx prisma db seed
  *
@@ -28,18 +28,18 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log("🌱 Seeding Tamaiyyo database...");
+  console.log("🌱 Seeding Tamayo database...");
 
   const customerIdentity = await prisma.identity.upsert({
     where: { phone: "+919900000001" },
     update: {
-      email: "customer.dev@tamaiyyo.local",
+      email: "customer.dev@tamayo.local",
       verifiedAt: new Date(),
     },
     create: {
       id: "seed-identity-customer-1",
       phone: "+919900000001",
-      email: "customer.dev@tamaiyyo.local",
+      email: "customer.dev@tamayo.local",
       verifiedAt: new Date(),
     },
   });
@@ -47,13 +47,13 @@ async function main() {
   const supplierIdentity = await prisma.identity.upsert({
     where: { phone: "+919900000002" },
     update: {
-      email: "supplier.dev@tamaiyyo.local",
+      email: "supplier.dev@tamayo.local",
       verifiedAt: new Date(),
     },
     create: {
       id: "seed-identity-supplier-1",
       phone: "+919900000002",
-      email: "supplier.dev@tamaiyyo.local",
+      email: "supplier.dev@tamayo.local",
       verifiedAt: new Date(),
     },
   });
@@ -61,13 +61,13 @@ async function main() {
   const adminIdentity = await prisma.identity.upsert({
     where: { phone: "+919900000003" },
     update: {
-      email: "admin.dev@tamaiyyo.local",
+      email: "admin.dev@tamayo.local",
       verifiedAt: new Date(),
     },
     create: {
       id: "seed-identity-admin-1",
       phone: "+919900000003",
-      email: "admin.dev@tamaiyyo.local",
+      email: "admin.dev@tamayo.local",
       verifiedAt: new Date(),
     },
   });

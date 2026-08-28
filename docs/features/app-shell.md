@@ -1,4 +1,4 @@
-# Tamaiyyo — application shell & dashboard UI foundation
+# Tamayo — application shell & dashboard UI foundation
 
 **Maturity:** FOUNDATION  
 **Purpose:** Document the **cross-role application shell** (navigation chrome, layout primitives, table/card wrappers, loading/empty patterns) so implementation stays aligned with `docs/features/design-system.md` and `.cursorrules`.
@@ -16,6 +16,8 @@ The web app uses a single **role-aware dashboard shell** (`RoleDashboardShell`) 
 - **Navigation data** lives in `src/config/navigation.ts` (serializable items + `AppRole`). Icons are mapped client-side in `nav-icon.tsx` so config stays free of React components.
 
 Customer, supplier, and admin route layouts each render the same shell with a different `role` prop—**one implementation, three surfaces**, reducing drift.
+
+Customer home (`/customer`) now uses a route-aware shell variant: sidebar and mobile menu drawer are intentionally hidden on that path so the booking hero can use full-width composition, while other customer routes (for example `/customer/booking-quote`) still render standard dashboard navigation.
 
 ---
 
@@ -95,3 +97,4 @@ Behavioral and token-level parity for future Flutter work should follow `docs/fe
 | 2026-05-14 | Linked Better Auth foundation: `RoleDashboardWithAuth` wraps shell with `SessionBridgeProvider`; `/login` placeholder. |
 | 2026-08-07 | Navigation expanded with role-specific operational entries (`/customer/booking-quote`, `/admin/one-way-corridors`) to support pricing flow verification. |
 | 2026-08-11 | Root layout now wraps shell/pages with PostHog provider for cross-role pageview instrumentation; shell composition unchanged. |
+| 2026-08-28 | Added pathname-aware customer-home shell mode: hide sidebar + drawer menu on `/customer`, keep standard role navigation on other customer routes. |

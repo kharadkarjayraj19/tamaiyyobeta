@@ -1,6 +1,6 @@
-# Tamaiyyo — Cursor agent rules
+# Tamayo — Cursor agent rules
 
-You are working on Tamaiyyo, an outstation cab booking marketplace for India (web-first).
+You are working on Tamayo, an outstation cab booking marketplace for India (web-first).
 
 ## Product stance
 
@@ -24,7 +24,7 @@ You are working on Tamaiyyo, an outstation cab booking marketplace for India (we
 
 ## Cross-role UI & platform changes
 
-Tamaiyyo is **multi-role** (customer, supplier, admin). Shared layers are high leverage: small mistakes propagate everywhere.
+Tamayo is **multi-role** (customer, supplier, admin). Shared layers are high leverage: small mistakes propagate everywhere.
 
 **Before modifying** shared components, primitives (`components/ui`), shared composites, **root or role layouts**, **design tokens** (CSS variables / Tailwind theme), **navigation systems**, or **route / App Router architecture**:
 

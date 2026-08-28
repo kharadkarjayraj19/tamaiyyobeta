@@ -1,4 +1,4 @@
-# Tamaiyyo — booking lifecycle (marketplace operations)
+# Tamayo — booking lifecycle (marketplace operations)
 
 **Maturity:** FOUNDATION  
 **Purpose:** First **authoritative operational specification** for how an outstation cab **booking** moves from intent through assignment, execution, billing, and closure—including extensions, operational bundles, and cancellation/refund **philosophy**. Audience: product, operations, engineering, and AI agents implementing marketplace behavior.
@@ -15,7 +15,7 @@ Throughout this file, rules and statements are labeled:
 
 | Label | Meaning |
 | --- | --- |
-| **Agreed** | Operational rule or structure **adopted in this specification** for Tamaiyyo’s marketplace lifecycle. |
+| **Agreed** | Operational rule or structure **adopted in this specification** for Tamayo’s marketplace lifecycle. |
 | **Planned but unresolved** | Direction is acknowledged; **specific mechanics, thresholds, or ownership** must be decided before implementation or customer-facing promise. |
 | **Exploratory** | Optional later-phase idea; **do not implement** as mandatory behavior without promoting to **Agreed** or **Planned**. |
 
@@ -45,7 +45,7 @@ Throughout this file, rules and statements are labeled:
 | --- | --- |
 | **Customer** | Creates and manages **their** booking intent (dates, route class, package selection, extensions where offered); receives trip and billing outcomes; initiates or requests cancellation per policy. |
 | **Supplier** | Marketplace **partner** who accepts or declines assignment, supplies vehicle/driver capacity, and is accountable for **operational delivery** against the agreed booking contract. |
-| **Driver** | Executes the **on-ground trip** (vehicle movement, customer contact on trip, odometer/time discipline). May be employed/contracted by the supplier; not assumed to be a separate Tamaiyyo **product role** in the web app on day one. |
+| **Driver** | Executes the **on-ground trip** (vehicle movement, customer contact on trip, odometer/time discipline). May be employed/contracted by the supplier; not assumed to be a separate Tamayo **product role** in the web app on day one. |
 | **Admin** | Platform operator for **exception handling**, policy enforcement, dispute support, and configuration that affects lifecycle rules—within RBAC yet to be mapped to this feature. |
 
 **Planned but unresolved**
@@ -117,13 +117,14 @@ State **groups** are stable buckets; **fine-grained states** inside each group (
 
 ## 6. Extension concepts
 
-Extensions consume **additional time and/or distance** beyond the base package. Two **named extension packages** are part of Tamaiyyo’s **commercial vocabulary**:
+Extensions consume **additional time and/or distance** beyond the base package. Three **named extension packages** are part of Tamayo’s **commercial vocabulary**:
 
 **Agreed**
 
 | Extension type | Included envelope (operational definition) |
 | --- | --- |
 | **8hr / 80 km extension** | Adds up to **8 hours** and **80 km** of included usage to the booking’s extension-eligible portion, subject to the same **actual vs included** reconciliation philosophy as the base package (§7). |
+| **12hr / 120 km extension** | Adds up to **12 hours** and **120 km** of included usage for local/city-tour style plans; overage is charged per configured pricing rules. |
 | **1 day / 300 km extension** | Adds **one calendar-day equivalent** of included usage and up to **300 km** of included distance for that extension window—exact clocking (calendar day vs rolling 24h) is **Planned but unresolved**. |
 
 **Planned but unresolved**
@@ -249,5 +250,6 @@ Extensions consume **additional time and/or distance** beyond the base package. 
 | 2026-05-17 | Related: **`billing-settlement.md`**; non-goals defer detailed financial state machines. |
 | 2026-05-18 | Related: **`docs/architecture/domain-models/booking-domain-model.md`** (entity architecture). |
 | 2026-07-11 | **Updated:** Billable km rule = max(actual, included); operational bundle replaces pass-through toll/parking for MVP. |
+| 2026-08-28 | **Updated:** Added 12hr/120km city-tour extension vocabulary and aligned wording with interactive customer ride-mode guidance. |
 
 When numeric policies, RBAC matrices, or payment integration land, add dated rows and consider raising **Maturity** toward `MVP` for covered scope.

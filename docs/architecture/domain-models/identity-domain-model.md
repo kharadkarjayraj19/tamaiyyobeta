@@ -1,4 +1,4 @@
-# Tamaiyyo — identity domain model (entity architecture)
+# Tamayo — identity domain model (entity architecture)
 
 **Maturity:** FOUNDATION  
 **Purpose:** Foundational **identity and account entity** architecture: who exists on the platform, how **customer**, **supplier**, and **admin/support** actors relate to **authentication**, **verification**, **vehicles**, and **historical data**—without database schemas, APIs, or permission matrices.
@@ -25,7 +25,7 @@
 
 - **Identity is durable:** A platform **identity** (authenticated subject) outlives any single session, device, or UI role surface.
 - **Accounts are typed:** Marketplace actors are modeled as **distinct account kinds** with different lifecycle rules—not one generic “user” blob with ad-hoc flags.
-- **Authentication ≠ authorization:** Better Auth proves **who** is signed in; Tamaiyyo domain logic decides **which account** and **what** they may do (`auth-rbac.md`).
+- **Authentication ≠ authorization:** Better Auth proves **who** is signed in; Tamayo domain logic decides **which account** and **what** they may do (`auth-rbac.md`).
 - **Operational realism:** MVP favors **phone-first** sign-in, **manual supplier verification**, and a **single admin role** before fine-grained RBAC.
 
 **Implemented**

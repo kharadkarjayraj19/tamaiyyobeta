@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — PayoutBatch repository.
+ * Tamayo — PayoutBatch repository.
  *
  * Architecture:
  * - Prisma queries for payout batches

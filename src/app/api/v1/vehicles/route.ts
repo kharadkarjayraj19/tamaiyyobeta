@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Vehicle API routes.
+ * Tamayo — Vehicle API routes.
  *
  * POST /api/v1/vehicles — Create vehicle
  * GET /api/v1/vehicles — List vehicles

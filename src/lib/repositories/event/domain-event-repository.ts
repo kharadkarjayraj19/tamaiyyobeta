@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — DomainEvent repository.
+ * Tamayo — DomainEvent repository.
  *
  * Architecture:
  * - Append-only event log for audit/timeline

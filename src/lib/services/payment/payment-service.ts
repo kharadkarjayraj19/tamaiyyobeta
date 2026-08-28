@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — PaymentService.
+ * Tamayo — PaymentService.
  *
  * Architecture:
  * - Orchestrates payment workflows

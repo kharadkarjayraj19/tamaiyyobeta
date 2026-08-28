@@ -1,6 +1,6 @@
 # Frontend guidelines
 
-Practical conventions for Tamaiyyo’s Next.js + TypeScript + Tailwind + shadcn/ui codebase.
+Practical conventions for Tamayo’s Next.js + TypeScript + Tailwind + shadcn/ui codebase.
 
 ## General principles
 

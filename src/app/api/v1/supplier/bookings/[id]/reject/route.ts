@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — POST /api/v1/supplier/bookings/[id]/reject
+ * Tamayo — POST /api/v1/supplier/bookings/[id]/reject
  *
  * Supplier rejects a booking.
  */

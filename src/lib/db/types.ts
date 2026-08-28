@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Database and Prisma type utilities.
+ * Tamayo — Database and Prisma type utilities.
  *
  * Architecture:
  * - PrismaTransactionClient for transaction-aware repositories

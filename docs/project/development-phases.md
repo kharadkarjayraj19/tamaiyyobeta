@@ -1,4 +1,4 @@
-# Tamaiyyo — development phases
+# Tamayo — development phases
 
 **Purpose:** Phase-style view of repository evolution for onboarding. Phases overlap in practice; tags indicate **stability of the outcome in repo**, not calendar dates.
 
@@ -64,10 +64,11 @@
 
 | Outcome | Tag |
 | --- | --- |
-| Observability, feature flags, deployment-specific notes | **Exploratory** |
-| Systematic automated testing | **Exploratory** (convention TBD; see `docs/frontend-guidelines.md`) |
+| Dev-to-prod transition checklist (auth, env, migration, rollout gates) | **Planned** |
+| Observability, feature flags, deployment-specific notes | **Planned** |
+| Systematic automated testing | **Planned** (scope prioritized for pricing + booking critical paths) |
 
-**Reference:** `docs/architecture.md` (previously listed as not included; revisit when requirements are known)
+**Reference:** `docs/project/dev-to-prod-shift-plan.md`, `docs/architecture.md`, `docs/frontend-guidelines.md`
 
 ---
 
@@ -76,3 +77,4 @@
 | Date | Change |
 | --- | --- |
 | 2026-05-14 | Initial phased view aligned with current repository. |
+| 2026-08-28 | Phase E promoted from exploratory framing to planned hardening track; linked explicit dev-to-prod transition checklist. |

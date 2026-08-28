@@ -1,4 +1,4 @@
-# Tamaiyyo — current state (onboarding)
+# Tamayo — current state (onboarding)
 
 **Purpose:** **Primary onboarding context** for humans and AI agents: where the repo is now, what to read next, and how project vs feature vs global docs relate. For sequencing and tags in depth, see [roadmap.md](./roadmap.md) and [development-phases.md](./development-phases.md).
 
@@ -51,6 +51,8 @@
 - **PostHog foundation wiring**: client pageview capture in root app layout plus server capture helpers for booking quote/booking-create API hooks.
 - **Distance estimation seam**: booking quote/create now resolve route distance server-side via Google Maps Directions API when configured, with fallback to provided estimate.
 - **Local auth bypass toggle**: development-only `DEV_AUTH_BYPASS=true` enables deterministic mock sessions for protected role trees until full login flow is wired.
+- **Customer home UI (interactive)**: `/customer` now runs as a full-width hero-first experience with ride-mode tabs (`One way`, `Multi city / Round trip`, `City tour`, `Airport only`), contextual fare guidance tooltips, and multi-city route input that supports up to 10 intermediate stops between pickup and final dropoff.
+- **Quote handoff prefill**: customer hero selections now pass route context into `/customer/booking-quote` through query params so quote workbench defaults reflect selected ride mode, route sequence, and city-tour package presets.
 - **Domain events**: BOOKING_CREATED, QUOTE_GENERATED, BOOKING_ACCEPTED, BOOKING_REJECTED, ASSIGNMENT_CREATED, ASSIGNMENT_CHANGED, BOOKING_REASSIGNED, TRIP_COMPLETED, CUSTOMER_CONFIRMED, KM_MISMATCH_DETECTED, FINAL_BILL_GENERATED, PAYMENT_RECORDED, PAYMENT_COMPLETED, REFUND_CREATED, SETTLEMENT_ELIGIBLE, PAYOUT_BATCH_CREATED.
 - **Financial operations**: Payment recording (advance/partial/full), refund with 24h cancellation policy, supplier earning eligibility tracking, payout batch creation.
 - **MVP placeholders**: pricing rates (₹12-25/km by category, min 300 km/day, bundled ops charge computed in backend), commission (₹500 flat + ₹2/km), mocked identity (Better Auth pending), manual payment gateway integration, manual payout execution.
@@ -60,6 +62,7 @@
 - Razorpay payment gateway integration with webhooks, automatic bank payouts, GST invoice generation, live tracking, automated routing algorithms.
 - Better Auth with database-backed user accounts and actual authentication flows.
 - Pricing/corridor migration regeneration and apply verification on local PostgreSQL, with a clean local reset runbook for Prisma 7 workflows.
+- Dev-to-prod hardening and rollout checklist for auth, config, data, observability, security, and go-live gates (see `docs/project/dev-to-prod-shift-plan.md`).
 
 **Exploratory**
 
@@ -103,3 +106,6 @@
 | 2026-08-11 | **Implemented:** PostHog wiring foundation added (client pageview instrumentation + server booking quote/create event hooks) with env scaffolding for host/project key configuration. |
 | 2026-08-11 | **Implemented:** Server-side distance estimation seam wired into booking quote/create using Google Maps Directions API when key is present, with fallback to provided estimated km. |
 | 2026-08-12 | **Implemented (local-only):** `DEV_AUTH_BYPASS` development switch added for deterministic role mock sessions while login flows remain in foundation state. |
+| 2026-08-28 | **Implemented:** `/customer` redesigned as hero-first booking surface; customer sidebar hidden on this route; ride-mode tabs now include contextual tooltips and interactive state. |
+| 2026-08-28 | **Implemented:** Multi-city flow supports pickup + final dropoff with up to 10 intermediate stops (`Stop 1..10`) and query-param handoff into quote workbench for prefilled route context. |
+| 2026-08-28 | **Planned:** Added explicit dev-to-prod transition checklist document at `docs/project/dev-to-prod-shift-plan.md`. |

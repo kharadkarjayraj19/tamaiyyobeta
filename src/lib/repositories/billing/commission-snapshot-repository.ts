@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — CommissionSnapshot repository.
+ * Tamayo — CommissionSnapshot repository.
  *
  * Architecture:
  * - Prisma queries for commission snapshots

@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — Billing validation schemas.
+ * Tamayo — Billing validation schemas.
  *
  * Architecture:
  * - DTOs for trip execution submission

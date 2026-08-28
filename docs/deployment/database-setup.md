@@ -1,6 +1,6 @@
-# Tamaiyyo — Database setup guide
+# Tamayo — Database setup guide
 
-**Purpose:** Guide for setting up PostgreSQL database and running Prisma migrations for Tamaiyyo.
+**Purpose:** Guide for setting up PostgreSQL database and running Prisma migrations for Tamayo.
 
 **Prerequisites:**
 
@@ -16,11 +16,11 @@
 
 ```bash
 # Using psql
-createdb tamaiyyo_dev
+createdb tamayo_dev
 
 # Or via PostgreSQL client
 psql -U postgres
-CREATE DATABASE tamaiyyo_dev;
+CREATE DATABASE tamayo_dev;
 \q
 ```
 
@@ -35,7 +35,7 @@ cp .env.example .env
 Edit `.env`:
 
 ```env
-DATABASE_URL=postgresql://postgres:your_password@localhost:5432/tamaiyyo_dev
+DATABASE_URL=postgresql://postgres:your_password@localhost:5432/tamayo_dev
 ```
 
 **Connection string format:**
@@ -101,7 +101,7 @@ Use a managed PostgreSQL service:
 Set `DATABASE_URL` environment variable in your deployment platform (Vercel, Railway, etc.):
 
 ```env
-DATABASE_URL=postgresql://user:password@host:5432/tamaiyyo_production
+DATABASE_URL=postgresql://user:password@host:5432/tamayo_production
 ```
 
 **Security notes:**
@@ -198,7 +198,7 @@ npx prisma migrate diff \
 **Local development:**
 
 ```bash
-pg_dump tamaiyyo_dev > backup_$(date +%Y%m%d).sql
+pg_dump tamayo_dev > backup_$(date +%Y%m%d).sql
 ```
 
 **Production:** Use managed service automated backups (daily recommended).

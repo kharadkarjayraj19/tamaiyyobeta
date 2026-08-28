@@ -1,5 +1,5 @@
 /**
- * Tamaiyyo — BookingPricingSnapshot repository.
+ * Tamayo — BookingPricingSnapshot repository.
  *
  * Architecture:
  * - Prisma queries for immutable pricing snapshots
