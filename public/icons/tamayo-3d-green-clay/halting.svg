@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Green clay halting icon">
+  <defs><linearGradient id="bgHaTop" x1="6" y1="4" x2="26" y2="28"><stop stop-color="#C1F7B3"/><stop offset="1" stop-color="#79D692"/></linearGradient><linearGradient id="bgHaSide" x1="8" y1="8" x2="24" y2="28"><stop stop-color="#2D7A54"/><stop offset="1" stop-color="#164D33"/></linearGradient><linearGradient id="haG" x1="10" y1="10" x2="22" y2="22"><stop stop-color="#2FA867"/><stop offset="1" stop-color="#124D34"/></linearGradient></defs>
+  <ellipse cx="16" cy="27.2" rx="9.8" ry="2.2" fill="#1A4D34" opacity=".2"/><rect x="4.5" y="5.4" width="23" height="23" rx="6.6" fill="url(#bgHaSide)"/><rect x="4.5" y="3.6" width="23" height="22" rx="6.6" fill="url(#bgHaTop)"/>
+  <circle cx="16" cy="16" r="7.1" fill="url(#haG)"/><path d="M16 12.1v4.1l2.7 1.7" stroke="#ECFFF2" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

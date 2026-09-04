@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Green 3D halting icon">
+  <defs>
+    <linearGradient id="bgHaltingG" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse"><stop stop-color="#F0FDF4"/><stop offset="1" stop-color="#A7F3D0"/></linearGradient>
+    <linearGradient id="glyphHaltingG" x1="10" y1="10" x2="22" y2="22" gradientUnits="userSpaceOnUse"><stop stop-color="#34D399"/><stop offset="1" stop-color="#047857"/></linearGradient>
+  </defs>
+  <circle cx="16" cy="16" r="13.5" fill="url(#bgHaltingG)"/>
+  <circle cx="16" cy="16" r="7.1" fill="url(#glyphHaltingG)"/>
+  <path d="M16 12.1v4l2.7 1.8" stroke="#ECFDF5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

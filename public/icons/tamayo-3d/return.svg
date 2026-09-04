@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="3D return icon">
+  <defs>
+    <linearGradient id="bgReturn" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EEF3FF" />
+      <stop offset="1" stop-color="#9BB7FF" />
+    </linearGradient>
+    <filter id="shadowReturn" x="0" y="0" width="32" height="32" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#1E3A8A" flood-opacity="0.3" />
+    </filter>
+  </defs>
+  <circle cx="16" cy="16" r="13.5" fill="url(#bgReturn)" stroke="#304EA5" stroke-width="1.6" filter="url(#shadowReturn)" />
+  <path d="M12 10.5H8.5V7" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M8.5 10.5a8 8 0 0 1 14-2.1" stroke="#16A34A" stroke-width="2.1" stroke-linecap="round" />
+  <path d="M20 21.5h3.5V25" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M23.5 21.5a8 8 0 0 1-14 2.1" stroke="#2563EB" stroke-width="2.1" stroke-linecap="round" />
+</svg>

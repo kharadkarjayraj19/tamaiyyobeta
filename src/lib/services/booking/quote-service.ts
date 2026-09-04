@@ -19,7 +19,7 @@
  * 
  * Current MVP rates (see method implementations):
  * - Minimum km/day: 300km/day (fixed)
- * - Per-km rates: ₹12-25/km by category
+ * - Per-km rates: age-bucketed by category/preset (₹12-36/km)
  * - Operational bundle: ₹3/km (computed in backend, shown as total)
  * - One-way corridor fare: admin-configured fixed price
  */
@@ -37,6 +37,7 @@ export interface PricingInput {
   category: VehicleCategory;
   ageBucket: AgeBucket;
   productType: ProductType;
+  vehiclePresetId?: string;
   tripStartDate: Date;
   tripEndDate?: Date;
   estimatedKm?: number;
@@ -85,7 +86,9 @@ export class QuoteService {
 
     const includedKmPerDay = MINIMUM_KM_PER_DAY;
     const totalIncludedKm = includedKmPerDay * tripDays;
-    const perKmRate = new Prisma.Decimal(this.getPerKmRate(input.category));
+    const perKmRate = new Prisma.Decimal(
+      this.getPerKmRate(input.category, input.ageBucket, input.vehiclePresetId)
+    );
     const routeDistanceKm = input.estimatedKm ?? null;
     const returnDistanceKm = input.returnDistanceKm ?? null;
     const usableDistanceKm =
@@ -98,11 +101,19 @@ export class QuoteService {
         throw new ValidationError("Destination city is required for one-way pricing");
       }
 
-      const corridor = await oneWayCorridorRepository.findActiveByRoute({
-        sourceCity: input.sourceCity,
-        destinationCity: input.destinationCity,
-        vehicleCategory: input.category,
-      });
+      let corridor: Awaited<ReturnType<typeof oneWayCorridorRepository.findActiveByRoute>>;
+      try {
+        corridor = await oneWayCorridorRepository.findActiveByRoute({
+          sourceCity: input.sourceCity,
+          destinationCity: input.destinationCity,
+          vehicleCategory: input.category,
+        });
+      } catch (error) {
+        console.error("One-way corridor lookup failed:", error);
+        throw new ValidationError(
+          "One-way fares are temporarily unavailable. Please choose Multi city / Round trip."
+        );
+      }
 
       if (!corridor) {
         throw new ValidationError("One-way pricing is not available for this route");
@@ -151,6 +162,7 @@ export class QuoteService {
           pricingMode: "CORRIDOR",
           category: input.category,
           ageBucket: input.ageBucket,
+          vehiclePresetId: input.vehiclePresetId,
           productType: input.productType,
           sourceCity: input.sourceCity,
           destinationCity: input.destinationCity,
@@ -205,6 +217,7 @@ export class QuoteService {
         pricingMode: "TOUR",
         category: input.category,
         ageBucket: input.ageBucket,
+        vehiclePresetId: input.vehiclePresetId,
         productType: input.productType,
         sourceCity: input.sourceCity,
         routeDistanceKm,
@@ -241,16 +254,39 @@ export class QuoteService {
    * Get per-km rate per category.
    * MVP placeholder rates — real configuration TBD per pricing-engine.md.
    */
-  private getPerKmRate(category: VehicleCategory): number {
-    const extraKmRates: Record<VehicleCategory, number> = {
-      SEDAN: 12,
-      ERTIGA: 14,
-      KIA_CARENS: 15,
-      INNOVA_CRYSTA: 18,
-      TEMPO_TRAVELLER: 25,
-    };
+  private getPerKmRate(
+    category: VehicleCategory,
+    ageBucket: AgeBucket,
+    vehiclePresetId?: string
+  ): number {
+    const isNewAge =
+      ageBucket === AgeBucket.ZERO_TO_THREE;
 
-    return extraKmRates[category];
+    if (category === VehicleCategory.SEDAN) {
+      return isNewAge ? 13 : 12;
+    }
+
+    if (category === VehicleCategory.ERTIGA) {
+      return isNewAge ? 15 : 14;
+    }
+
+    if (category === VehicleCategory.KIA_CARENS) {
+      return isNewAge ? 16 : 15;
+    }
+
+    if (category === VehicleCategory.INNOVA_CRYSTA) {
+      return isNewAge ? 20 : 19;
+    }
+
+    if (category === VehicleCategory.TEMPO_TRAVELLER) {
+      if (vehiclePresetId === "urbania16") {
+        return isNewAge ? 36 : 35;
+      }
+
+      return isNewAge ? 28 : 26;
+    }
+
+    throw new ValidationError("Unsupported vehicle category");
   }
 }
 

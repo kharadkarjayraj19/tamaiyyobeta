@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Purple 3D rate icon">
+  <defs>
+    <linearGradient id="bgRatePurple" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5F1FF" />
+      <stop offset="1" stop-color="#C1A9F7" />
+    </linearGradient>
+    <linearGradient id="glyphRatePurple" x1="9" y1="11" x2="23" y2="22" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A684EF" />
+      <stop offset="1" stop-color="#6D4FD4" />
+    </linearGradient>
+  </defs>
+  <circle cx="16" cy="16" r="13.5" fill="url(#bgRatePurple)" />
+  <path d="M9.1 18a6.9 6.9 0 1 1 13.8 0" stroke="url(#glyphRatePurple)" stroke-width="2.1" stroke-linecap="round" />
+  <path d="M16 17.2l3.8-3.7" stroke="#FFFFFF" stroke-opacity="0.9" stroke-width="2.2" stroke-linecap="round" />
+  <circle cx="16" cy="17.2" r="1.4" fill="url(#glyphRatePurple)" />
+</svg>

@@ -316,3 +316,9 @@ This keeps reviews focused and lowers hallucination/regression risk.
 | --- | --- |
 | 2026-08-13 | Initial chunked implementation plan from customer post-login mockup (`TamayoUIMockupPostCustomerLogin.png`). |
 | 2026-08-28 | Updated plan to match implemented customer hero interactions: ride-mode tabs, city-tour package presets, tooltips, query-prefill handoff, and multi-city stop-builder constraints. |
+| 2026-08-29 | Implemented follow-up enhancement: pickup/drop/stop route inputs on `/customer` now use debounced Google Places suggestions through a server-side autocomplete proxy endpoint. |
+| 2026-08-29 | Implemented schedule controls enhancement: one-way/airport pickup date now uses a working date picker and route flows use AM/PM 30-minute time dropdowns. |
+| 2026-08-29 | Updated schedule controls with future-time guard: when selected date is today, past time slots are disabled and selected values auto-adjust to the next valid slot. |
+| 2026-08-29 | Implemented post-CTA results enhancement: `/customer/booking-quote` now shows a modern fare-result card with total amount, included km context, and reserve (`₹499`) call-to-action aligned to customer flow. |
+| 2026-08-29 | Implemented quote UX enrichment: interactive vehicle presets, age toggle (`0-3` / `4-7`), duration/included-km cards, fuel tags, and petrol/CNG queue advisory copy on the quote results surface. |
+| 2026-09-04 | Implemented post-reserve handoff: reserve CTA now routes to `/customer/reserve` with booking reference, route snapshot, and reserve amount summary as the next-page placeholder until payment gateway integration lands. |

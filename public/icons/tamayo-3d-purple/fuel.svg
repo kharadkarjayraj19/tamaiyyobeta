@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Purple 3D fuel icon">
+  <defs>
+    <linearGradient id="bgFuelPurple" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5F1FF" />
+      <stop offset="1" stop-color="#C0A8F7" />
+    </linearGradient>
+    <linearGradient id="glyphFuelPurple" x1="10" y1="10" x2="22" y2="23" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#AA8AF0" />
+      <stop offset="1" stop-color="#6C4ED4" />
+    </linearGradient>
+  </defs>
+  <circle cx="16" cy="16" r="13.5" fill="url(#bgFuelPurple)" />
+  <path d="M10 22V12a1.6 1.6 0 0 1 1.6-1.6h4.5a1.6 1.6 0 0 1 1.6 1.6v10" fill="url(#glyphFuelPurple)" />
+  <path d="M10 22h7.7M17.7 12.3h1.7l1.8 2v5.1a1.5 1.5 0 0 0 3 0V15.2" stroke="#EEE7FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="13.7" cy="13.8" r="0.9" fill="#EEE7FF" />
+</svg>

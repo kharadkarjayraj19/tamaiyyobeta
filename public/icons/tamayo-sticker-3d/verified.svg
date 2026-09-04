@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Sticker verified fare icon">
+  <defs><filter id="s" x="0" y="0" width="32" height="32"><feDropShadow dx="0" dy="1.2" stdDeviation="1" flood-color="#0B2A63" flood-opacity=".3"/></filter></defs>
+  <g filter="url(#s)">
+    <path d="M16 5.9l7 2.8v4.8c0 4.9-3 8.9-7 10.3-4-1.4-7-5.4-7-10.3V8.7z" fill="#37C973" stroke="#0B2A63" stroke-width="1.8"/>
+    <path d="M12.7 14.7l2.3 2.3 4.5-4.5" stroke="#ECFDF5" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

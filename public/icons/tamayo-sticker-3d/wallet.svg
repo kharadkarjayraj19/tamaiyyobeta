@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Sticker wallet icon">
+  <defs><filter id="s" x="0" y="0" width="32" height="32"><feDropShadow dx="0" dy="1.2" stdDeviation="1" flood-color="#0B2A63" flood-opacity=".3"/></filter></defs>
+  <g filter="url(#s)">
+    <rect x="5.4" y="8.6" width="21.2" height="14.8" rx="3" fill="#16A34A" stroke="#0B2A63" stroke-width="1.8"/>
+    <rect x="17.2" y="12.2" width="9.4" height="7.5" rx="1.8" fill="#34D399" stroke="#0B2A63" stroke-width="1.5"/>
+    <circle cx="20.8" cy="15.9" r="1.1" fill="#FACC15"/>
+  </g>
+</svg>

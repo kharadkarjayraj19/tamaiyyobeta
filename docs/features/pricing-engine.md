@@ -143,6 +143,7 @@ Dimensions are **inputs** to a quote or final reconciliation. The engine compose
 - **Round-trip and multi-city** share the same **tour pricing** model (included km/day, billable km = max(actual, included)).
 - **Round-trip fallback:** When one-way is **ineligible** for the selected city/category/route pattern, the customer journey falls back to **tour pricing** and included-km rules **transparently** (clear messaging that product is round trip).
 - **Eligibility** is a **first-class output** of the pricing engine (boolean + reason code for ops), not an ad-hoc UI check.
+- **Launch hub dispatch rule (MVP):** For the launch service area (`Mumbai`, `Pune`, `Chhatrapati Sambhajinagar`/`Aurangabad`, `Nashik`), pricing evaluates each hub as a closed loop (`hub -> pickup -> stops -> final drop -> same hub`) and selects the hub with the lowest total km; dispatch overhead is included in route-distance calculation.
 
 **Unresolved mechanics**
 
@@ -268,5 +269,6 @@ Aligned with **`docs/features/booking-lifecycle.md` §6** (included envelopes); 
 | 2026-07-11 | **Updated:** Round-trip and multi-city share tour pricing; one-way uses corridor pricing; billable km = max(actual, included); operational bundle added as a single line item; Google Maps route distance as input. |
 | 2026-08-11 | **Implemented (foundation):** server-side route distance resolver seam added in booking flow with Google Maps Directions API when configured and safe fallback to caller-provided distance when unavailable. |
 | 2026-08-28 | **Updated UX-aligned pricing notes:** added 12 hr / 120 km city-tour extension SKU and clarified ordered multi-city stop semantics for route capture and round-trip explanation. |
+| 2026-09-04 | **Implemented (MVP launch-ops rule):** hub selection now uses lowest closed-loop km across launch hubs (`hub -> pickup -> stops -> final drop -> same hub`); route distance includes dispatch and return overhead when Google Maps Directions is available. |
 
 When rate-card RBAC, version drift rules, and surge policies are fixed, add dated rows and consider raising **Maturity** toward `MVP` for covered scope.

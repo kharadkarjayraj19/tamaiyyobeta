@@ -9,7 +9,7 @@
  */
 
 import { z } from "zod";
-import { commonSchemas } from "../index";
+import { commonSchemas } from "../primitives";
 
 /**
  * Toll line item schema.

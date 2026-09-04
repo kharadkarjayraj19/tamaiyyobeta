@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Sticker route icon">
+  <defs><filter id="s" x="0" y="0" width="32" height="32"><feDropShadow dx="0" dy="1.2" stdDeviation="1" flood-color="#0B2A63" flood-opacity=".3"/></filter></defs>
+  <g filter="url(#s)">
+    <path d="M9.2 27V8.2L11.7 5.6h8.6l2.5 2.6V27" fill="#1F7D52" stroke="#0B2A63" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M16 7.1V27" stroke="#9AE6B4" stroke-width="1.6" stroke-dasharray="2.2 2.2" stroke-linecap="round"/>
+    <circle cx="16" cy="13.6" r="1.1" fill="#FACC15"/><circle cx="16" cy="19.4" r="1.1" fill="#60A5FA"/>
+  </g>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Sticker fuel icon">
+  <defs><filter id="s" x="0" y="0" width="32" height="32"><feDropShadow dx="0" dy="1.2" stdDeviation="1" flood-color="#0B2A63" flood-opacity=".3"/></filter></defs>
+  <g filter="url(#s)">
+    <path d="M9.1 24.1V11a1.6 1.6 0 0 1 1.6-1.6h4.9a1.6 1.6 0 0 1 1.6 1.6v13.1" fill="#42CB79" stroke="#0B2A63" stroke-width="1.8"/>
+    <path d="M9.1 24.1h8M17.1 11.6h1.8l1.8 2.2v6a1.8 1.8 0 1 0 3.6 0v-4.8" stroke="#0B2A63" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="12.9" cy="13.9" r="1" fill="#FACC15"/>
+  </g>
+</svg>

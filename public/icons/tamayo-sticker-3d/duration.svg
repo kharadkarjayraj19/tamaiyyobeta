@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Sticker duration icon">
+  <defs><filter id="s" x="0" y="0" width="32" height="32"><feDropShadow dx="0" dy="1.2" stdDeviation="1" flood-color="#0B2A63" flood-opacity=".3"/></filter></defs>
+  <g filter="url(#s)">
+    <rect x="6.1" y="7" width="19.8" height="17.9" rx="3" fill="#7EE19E" stroke="#0B2A63" stroke-width="1.8"/>
+    <path d="M10.4 5v4.1M21.6 5v4.1M6.1 12h19.8" stroke="#0B2A63" stroke-width="1.8" stroke-linecap="round"/>
+    <circle cx="16" cy="17.6" r="1.8" fill="#60A5FA" stroke="#0B2A63" stroke-width="1.2"/>
+  </g>
+</svg>

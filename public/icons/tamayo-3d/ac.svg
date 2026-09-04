@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="3D AC icon">
+  <defs>
+    <linearGradient id="bgAc" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E8FCFF" />
+      <stop offset="1" stop-color="#9DEAFF" />
+    </linearGradient>
+    <filter id="shadowAc" x="0" y="0" width="32" height="32" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#0E7490" flood-opacity="0.3" />
+    </filter>
+  </defs>
+  <circle cx="16" cy="16" r="13.5" fill="url(#bgAc)" stroke="#0EA5C6" stroke-width="1.6" filter="url(#shadowAc)" />
+  <path d="M16 9.2v13.6M11.2 11.2l9.6 9.6M20.8 11.2l-9.6 9.6" stroke="#0369A1" stroke-width="2.2" stroke-linecap="round" />
+</svg>

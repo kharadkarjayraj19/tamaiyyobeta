@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="3D verified icon">
+  <defs>
+    <linearGradient id="bgVerified" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E7FFF1" />
+      <stop offset="1" stop-color="#98E8BE" />
+    </linearGradient>
+    <filter id="shadowVerified" x="0" y="0" width="32" height="32" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#166534" flood-opacity="0.32" />
+    </filter>
+  </defs>
+  <circle cx="16" cy="16" r="13.5" fill="url(#bgVerified)" stroke="#0F8B57" stroke-width="1.6" filter="url(#shadowVerified)" />
+  <path d="M16 9l5.4 2.2v3.7c0 3.7-2.3 6.8-5.4 7.9-3.1-1.1-5.4-4.2-5.4-7.9v-3.7z" fill="#BBF7D0" stroke="#166534" stroke-width="2" />
+  <path d="M13.3 15.5l1.8 1.8 3.7-3.7" stroke="#15803D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

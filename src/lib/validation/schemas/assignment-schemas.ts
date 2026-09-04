@@ -9,7 +9,7 @@
  */
 
 import { z } from "zod";
-import { commonSchemas } from "../index";
+import { commonSchemas } from "../primitives";
 import { BookingStatus } from "@prisma/client";
 
 /**

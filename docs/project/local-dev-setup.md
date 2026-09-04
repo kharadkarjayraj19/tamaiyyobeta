@@ -16,8 +16,11 @@ For production-readiness sequencing (auth hardening, secrets, migration safety, 
 
 Optional for feature testing:
 
-- **Google Maps API key** (`GOOGLE_MAPS_API_KEY`) for server-side route distance estimation
+- **Google Maps API key(s)** for server-side maps features:
+  - `GOOGLE_MAPS_API_KEY` (single-key fallback), or
+  - `GOOGLE_MAPS_DIRECTIONS_API_KEY` + `GOOGLE_MAPS_PLACES_API_KEY` (recommended split)
 - **PostHog keys** for analytics verification (`NEXT_PUBLIC_POSTHOG_KEY`, `POSTHOG_PROJECT_API_KEY`)
+- **MSG91 OTP keys** for real SMS OTP (`MSG91_AUTH_KEY`, `MSG91_TEMPLATE_ID`)
 
 ---
 
@@ -122,4 +125,8 @@ Useful local pages:
 - If migrations fail with schema-history mismatch, verify:
   - `DATABASE_URL` points to the intended local DB
   - `SHADOW_DATABASE_URL` exists and is reachable
-- If route distance does not auto-resolve, ensure `GOOGLE_MAPS_API_KEY` is set; flow falls back to provided estimated km.
+- If route distance does not auto-resolve, ensure `GOOGLE_MAPS_DIRECTIONS_API_KEY` (or fallback `GOOGLE_MAPS_API_KEY`) is set; flow falls back to provided estimated km.
+- If location suggestions do not appear on `/customer`, ensure `GOOGLE_MAPS_PLACES_API_KEY` (or fallback `GOOGLE_MAPS_API_KEY`) is set and Places API is enabled.
+- If OTP verify fails with DB auth errors, confirm local `DATABASE_URL` credentials are valid because OTP verification upserts `Identity` + `CustomerAccount`.
+- If OTP SMS is not delivered, verify `MSG91_AUTH_KEY`, `MSG91_TEMPLATE_ID`, and approved DLT template mapping in MSG91. Without keys, dev mode falls back to debug OTP in API response.
+- If you have not completed DLT registration yet, keep `MSG91_AUTH_KEY`/`MSG91_TEMPLATE_ID` unset for local development and use the debug OTP from `/api/v1/auth/otp/request` response; production OTP rollout must wait for approved DLT entity/header/template.

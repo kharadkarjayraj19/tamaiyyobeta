@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Green clay fuel icon">
+  <defs><linearGradient id="bgFuTop" x1="6" y1="4" x2="26" y2="28"><stop stop-color="#C1F7B3"/><stop offset="1" stop-color="#79D692"/></linearGradient><linearGradient id="bgFuSide" x1="8" y1="8" x2="24" y2="28"><stop stop-color="#2D7A54"/><stop offset="1" stop-color="#164D33"/></linearGradient><linearGradient id="fuG" x1="10" y1="10" x2="22" y2="23"><stop stop-color="#2FA867"/><stop offset="1" stop-color="#124D34"/></linearGradient></defs>
+  <ellipse cx="16" cy="27.2" rx="9.8" ry="2.2" fill="#1A4D34" opacity=".2"/><rect x="4.5" y="5.4" width="23" height="23" rx="6.6" fill="url(#bgFuSide)"/><rect x="4.5" y="3.6" width="23" height="22" rx="6.6" fill="url(#bgFuTop)"/>
+  <path d="M10.1 22V12a1.6 1.6 0 0 1 1.6-1.6h4.4a1.6 1.6 0 0 1 1.6 1.6v10" fill="url(#fuG)"/>
+  <path d="M10.1 22h7.6M17.7 12.3h1.6l1.8 2v5.1a1.5 1.5 0 0 0 3 0V15.2" stroke="#E9FFF1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="13.7" cy="13.8" r=".9" fill="#F5D48B"/>
+</svg>

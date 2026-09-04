@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Green clay rate icon">
+  <defs><linearGradient id="bgRaTop" x1="6" y1="4" x2="26" y2="28"><stop stop-color="#C1F7B3"/><stop offset="1" stop-color="#79D692"/></linearGradient><linearGradient id="bgRaSide" x1="8" y1="8" x2="24" y2="28"><stop stop-color="#2D7A54"/><stop offset="1" stop-color="#164D33"/></linearGradient><linearGradient id="gaRa" x1="9" y1="11" x2="23" y2="22"><stop stop-color="#2FA867"/><stop offset="1" stop-color="#124D34"/></linearGradient></defs>
+  <ellipse cx="16" cy="27.2" rx="9.8" ry="2.2" fill="#1A4D34" opacity=".2"/><rect x="4.5" y="5.4" width="23" height="23" rx="6.6" fill="url(#bgRaSide)"/><rect x="4.5" y="3.6" width="23" height="22" rx="6.6" fill="url(#bgRaTop)"/>
+  <path d="M9.2 18a6.8 6.8 0 0 1 13.6 0" stroke="url(#gaRa)" stroke-width="2.1" stroke-linecap="round"/>
+  <path d="M16 17.3l3.7-3.5" stroke="#60A5FA" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="16" cy="17.3" r="1.3" fill="#F59E0B"/>
+</svg>

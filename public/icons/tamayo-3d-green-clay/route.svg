@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Green clay route icon">
+  <defs>
+    <linearGradient id="bgRtTop" x1="6" y1="4" x2="26" y2="28"><stop stop-color="#C1F7B3"/><stop offset="1" stop-color="#79D692"/></linearGradient>
+    <linearGradient id="bgRtSide" x1="8" y1="8" x2="24" y2="28"><stop stop-color="#2D7A54"/><stop offset="1" stop-color="#164D33"/></linearGradient>
+    <linearGradient id="roadRt" x1="11" y1="9" x2="21" y2="23"><stop stop-color="#1F6748"/><stop offset="1" stop-color="#0D3A28"/></linearGradient>
+  </defs>
+  <ellipse cx="16" cy="27.2" rx="9.8" ry="2.2" fill="#1A4D34" opacity=".2"/><rect x="4.5" y="5.4" width="23" height="23" rx="6.6" fill="url(#bgRtSide)"/><rect x="4.5" y="3.6" width="23" height="22" rx="6.6" fill="url(#bgRtTop)"/>
+  <path d="M11.2 22.4V12.4L13.8 10H18.2l2.6 2.4v10z" fill="url(#roadRt)"/>
+  <path d="M16 11v11.4" stroke="#98E8AA" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2.1 2.1"/>
+</svg>

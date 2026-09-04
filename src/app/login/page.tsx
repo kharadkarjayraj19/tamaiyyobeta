@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { PhoneLoginForm } from "@/features/auth/ui/phone-login-form";
 
 type LoginPageProps = {
   searchParams?: Promise<{ callbackUrl?: string }>;
@@ -18,8 +19,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       <div className="space-y-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
         <p className="text-sm text-muted-foreground">
-          Authentication is being wired. Email/password, OTP, and Google sign-in will connect
-          here per product specs—no flows are active in this milestone.
+          Continue with mobile OTP to access your dashboard.
         </p>
       </div>
       {callbackUrl ? (
@@ -28,6 +28,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <span className="font-mono text-foreground">{callbackUrl}</span>
         </p>
       ) : null}
+      <PhoneLoginForm callbackUrl={callbackUrl} />
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
         <Button asChild variant="secondary">
           <Link href="/">Back to home</Link>

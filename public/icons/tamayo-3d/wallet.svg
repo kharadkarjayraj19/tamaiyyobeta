@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="3D wallet icon">
+  <defs>
+    <linearGradient id="bgWallet" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EBFFF4" />
+      <stop offset="1" stop-color="#8BE8BC" />
+    </linearGradient>
+    <filter id="shadowWallet" x="0" y="0" width="32" height="32" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#166534" flood-opacity="0.32" />
+    </filter>
+  </defs>
+  <circle cx="16" cy="16" r="13.5" fill="url(#bgWallet)" stroke="#0F8B57" stroke-width="1.6" filter="url(#shadowWallet)" />
+  <rect x="9" y="10.5" width="14" height="11" rx="2.4" fill="#D1FAE5" stroke="#0F172A" stroke-width="2" />
+  <path d="M18.8 16h4.2" stroke="#0F172A" stroke-width="2" stroke-linecap="round" />
+  <circle cx="20.4" cy="16" r="1" fill="#22C55E" />
+</svg>

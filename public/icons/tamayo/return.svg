@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-label="Return trip icon">
+  <path d="M8 7H4V3" stroke="#1E293B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M4 7a8 8 0 0 1 14-2" stroke="#16A34A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M16 17h4v4" stroke="#1E293B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M20 17a8 8 0 0 1-14 2" stroke="#2563EB" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

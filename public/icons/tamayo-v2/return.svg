@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Return icon interactive">
+  <circle cx="16" cy="16" r="14" fill="#EEF2FF" stroke="#1E3A8A" stroke-width="1.8" />
+  <path d="M12 11H8V7" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M8 11a8.2 8.2 0 0 1 14.3-2.2" stroke="#16A34A" stroke-width="2" stroke-linecap="round" />
+  <path d="M20 21h4v4" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M24 21a8.2 8.2 0 0 1-14.3 2.2" stroke="#2563EB" stroke-width="2" stroke-linecap="round" />
+</svg>

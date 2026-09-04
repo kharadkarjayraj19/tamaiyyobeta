@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Green clay wallet icon">
+  <defs><linearGradient id="bgWaTop" x1="6" y1="4" x2="26" y2="28"><stop stop-color="#C1F7B3"/><stop offset="1" stop-color="#79D692"/></linearGradient><linearGradient id="bgWaSide" x1="8" y1="8" x2="24" y2="28"><stop stop-color="#2D7A54"/><stop offset="1" stop-color="#164D33"/></linearGradient><linearGradient id="waG" x1="9" y1="10" x2="23" y2="22"><stop stop-color="#2FA867"/><stop offset="1" stop-color="#124D34"/></linearGradient></defs>
+  <ellipse cx="16" cy="27.2" rx="9.8" ry="2.2" fill="#1A4D34" opacity=".2"/><rect x="4.5" y="5.4" width="23" height="23" rx="6.6" fill="url(#bgWaSide)"/><rect x="4.5" y="3.6" width="23" height="22" rx="6.6" fill="url(#bgWaTop)"/>
+  <rect x="9.1" y="10.9" width="13.8" height="10.2" rx="2.5" fill="url(#waG)"/>
+  <path d="M18.8 16h4.1" stroke="#E8FFF0" stroke-width="2" stroke-linecap="round"/><circle cx="20.4" cy="16" r="1" fill="#F5D48B"/>
+</svg>

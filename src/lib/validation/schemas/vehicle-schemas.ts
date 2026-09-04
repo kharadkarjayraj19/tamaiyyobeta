@@ -8,10 +8,9 @@
  */
 
 import { z } from "zod";
-import { commonSchemas } from "../index";
+import { commonSchemas } from "../primitives";
 import {
   VehicleCategory,
-  AgeBucket,
   FuelType,
   VehicleStatus,
 } from "@prisma/client";

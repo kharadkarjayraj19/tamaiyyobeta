@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { buildLoginRedirect, isProtectedRolePath } from "@/lib/auth/guards";
+import { TAMAYO_SESSION_COOKIE } from "@/lib/auth/constants";
 
 const authMiddlewareEnabled = process.env.AUTH_MIDDLEWARE_ENABLED !== "false";
 const devAuthBypassEnabled =
@@ -13,7 +14,12 @@ const devAuthBypassEnabled =
  * @see https://www.better-auth.com/docs/integrations/next
  */
 function hasLikelyBetterAuthSessionCookie(request: NextRequest): boolean {
-  return request.cookies.getAll().some(({ name }) => name.startsWith("better-auth.session_token"));
+  return request.cookies.getAll().some(({ name }) => {
+    return (
+      name.startsWith("better-auth.session_token") ||
+      name === TAMAYO_SESSION_COOKIE
+    );
+  });
 }
 
 /**

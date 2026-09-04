@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Green clay platform fee icon">
+  <defs>
+    <linearGradient id="bgPfTop" x1="6" y1="4" x2="26" y2="28"><stop stop-color="#B8F0B9"/><stop offset="1" stop-color="#73CF8E"/></linearGradient>
+    <linearGradient id="bgPfSide" x1="8" y1="8" x2="24" y2="28"><stop stop-color="#2F7F58"/><stop offset="1" stop-color="#1B5A3D"/></linearGradient>
+    <linearGradient id="tagPf" x1="9" y1="8" x2="22" y2="22"><stop stop-color="#9CE7A9"/><stop offset="1" stop-color="#2A7A4E"/></linearGradient>
+    <linearGradient id="ringPf" x1="17" y1="9" x2="22" y2="14"><stop stop-color="#F5D48B"/><stop offset="1" stop-color="#B97A1A"/></linearGradient>
+  </defs>
+  <ellipse cx="16" cy="27.2" rx="9.8" ry="2.2" fill="#1A4D34" opacity=".2"/>
+  <rect x="4.5" y="5.4" width="23" height="23" rx="6.6" fill="url(#bgPfSide)"/>
+  <rect x="4.5" y="3.6" width="23" height="22" rx="6.6" fill="url(#bgPfTop)"/>
+  <path d="M13.8 8.7h7.7a1.8 1.8 0 0 1 1.8 1.8v6.2l-7.4 7.4a1.8 1.8 0 0 1-2.5 0l-5.5-5.5a1.8 1.8 0 0 1 0-2.5z" fill="url(#tagPf)"/>
+  <circle cx="19.1" cy="12.1" r="1.35" fill="url(#ringPf)"/>
+  <path d="M8.3 8.6c2.1-2.1 4.4-2.8 7.4-2.8" stroke="#E8FFF0" stroke-linecap="round" stroke-opacity=".6" stroke-width="1.3"/>
+</svg>

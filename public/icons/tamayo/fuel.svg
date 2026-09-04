@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-label="Fuel icon">
+  <path d="M5 20V6.5A1.5 1.5 0 0 1 6.5 5h5A1.5 1.5 0 0 1 13 6.5V20" fill="#DCFCE7" stroke="#166534" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M5 20h9" stroke="#1E293B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="9" cy="9" r="0.8" fill="#F59E0B" />
+  <path d="M13 8h2l2 2v7a2 2 0 0 0 4 0v-5" stroke="#1E293B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M19 7h2" stroke="#1E293B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

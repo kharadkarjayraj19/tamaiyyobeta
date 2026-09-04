@@ -8,7 +8,7 @@
 
 import { z } from "zod";
 import { VehicleCategory } from "@prisma/client";
-import { commonSchemas } from "../index";
+import { commonSchemas } from "../primitives";
 
 export const CreateOneWayCorridorSchema = z.object({
   sourceCity: z.string().min(1).max(100),

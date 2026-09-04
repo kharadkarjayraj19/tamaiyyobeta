@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Purple 3D route icon">
+  <defs>
+    <linearGradient id="bgRoutePurple" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F3EEFF" />
+      <stop offset="1" stop-color="#B89AF5" />
+    </linearGradient>
+    <linearGradient id="glyphRoutePurple" x1="10" y1="9" x2="22" y2="23" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9F7AEA" />
+      <stop offset="1" stop-color="#6D4ED6" />
+    </linearGradient>
+  </defs>
+  <circle cx="16" cy="16" r="13.5" fill="url(#bgRoutePurple)" />
+  <path d="M11 22V12.5L13.4 10.1H18.6L21 12.5V22" stroke="url(#glyphRoutePurple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M16 11.1V22" stroke="url(#glyphRoutePurple)" stroke-width="2" stroke-linecap="round" />
+  <circle cx="16" cy="15" r="1" fill="#ECE3FF" />
+  <circle cx="16" cy="18.4" r="1" fill="#ECE3FF" />
+</svg>

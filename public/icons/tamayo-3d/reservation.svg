@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="3D reservation icon">
+  <defs>
+    <linearGradient id="bgReserve" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E5FFF1" />
+      <stop offset="1" stop-color="#8DE6B8" />
+    </linearGradient>
+    <filter id="shadowReserve" x="0" y="0" width="32" height="32" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#166534" flood-opacity="0.32" />
+    </filter>
+  </defs>
+  <circle cx="16" cy="16" r="13.5" fill="url(#bgReserve)" stroke="#0F8B57" stroke-width="1.6" filter="url(#shadowReserve)" />
+  <path d="M9.8 12.4a2 2 0 0 1 2-2h8.4a2 2 0 0 1 2 2V14a1.8 1.8 0 0 0 0 3.6v1.6a2 2 0 0 1-2 2h-8.4a2 2 0 0 1-2-2v-1.6a1.8 1.8 0 0 0 0-3.6z" fill="#22C55E" stroke="#065F46" stroke-width="2" />
+  <path d="M16 13.6v4.8M13.6 16h4.8" stroke="#ECFDF5" stroke-width="2.2" stroke-linecap="round" />
+</svg>

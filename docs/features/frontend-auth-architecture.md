@@ -202,6 +202,8 @@ This section maps the **current repo** wiring (Better Auth ≥1.6, Next.js App R
 | Public vs role paths | `src/lib/auth/guards.ts` — `ROLE_PATH_PREFIXES`, `LOGIN_PATH`, `buildLoginRedirect` |
 | Server env | `src/config/env/auth.ts` — `BETTER_AUTH_SECRET` / `BETTER_AUTH_URL` (see `.env.example`) |
 | Edge middleware (optimistic) | `src/middleware.ts` — checks cookie **name prefix** `better-auth.session_token` (Edge-safe; **not** cryptographic validation) |
+| OTP login APIs (MVP) | `src/app/api/v1/auth/otp/request/route.ts`, `src/app/api/v1/auth/otp/verify/route.ts`, `src/app/api/v1/auth/logout/route.ts` |
+| OTP/session fallback | `src/lib/auth/phone-session.ts` + `src/lib/auth/session.ts` fallback lookup via `tamayo.session_token`; request cooldown 30s and max 3 verify attempts |
 | Local auth bypass toggle | `DEV_AUTH_BYPASS=true` (development only) skips middleware redirect + provides deterministic mock sessions in `require-session.ts` for role trees. |
 | Client session bridge | `src/features/auth/session-bridge-provider.tsx` — minimal context for future navbar UI |
 | Placeholder routes | `src/app/login/page.tsx`, `src/app/forbidden/page.tsx` |
@@ -221,5 +223,7 @@ This section maps the **current repo** wiring (Better Auth ≥1.6, Next.js App R
 | 2026-05-13 | Initial DRAFT: frontend + Better Auth integration architecture (no code, no backend schema). |
 | 2026-05-14 | **FOUNDATION:** repo wiring — `instance`, `session`, API route, Edge middleware (cookie prefix), `RoleDashboardWithAuth`, `SessionBridgeProvider`, `/login` + `/forbidden` placeholders. |
 | 2026-08-12 | **Implemented (local-only):** `DEV_AUTH_BYPASS` toggle for deterministic mock sessions across `/customer`, `/supplier`, `/admin` during development without real sign-in flow. |
+| 2026-09-04 | **Implemented (MVP):** phone OTP login flow added with request/verify/logout routes, `tamayo.session_token` cookie sessions, and `/login` UI for callback-based role-route access. |
+| 2026-09-04 | **Implemented (MVP hardening):** MSG91 OTP provider integration seam with local debug fallback, resend cooldown (30s), max verify attempts (3), and PostHog auth funnel events (`otp_requested`, `otp_request_failed`, `otp_verified`, `otp_verify_failed`). |
 
 As RBAC and providers land, extend the “Repository implementation” table and §20; move **Maturity** toward `MVP` when login flows are production-ready.

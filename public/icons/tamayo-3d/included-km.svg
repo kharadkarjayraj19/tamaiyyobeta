@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="3D included km icon">
+  <defs>
+    <linearGradient id="bgPin" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EDF6FF" />
+      <stop offset="1" stop-color="#A9CBFF" />
+    </linearGradient>
+    <filter id="shadowPin" x="0" y="0" width="32" height="32" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#1E3A8A" flood-opacity="0.3" />
+    </filter>
+  </defs>
+  <circle cx="16" cy="16" r="13.5" fill="url(#bgPin)" stroke="#325FB6" stroke-width="1.6" filter="url(#shadowPin)" />
+  <path d="M16 24.2s5.5-5 5.5-8.8a5.5 5.5 0 1 0-11 0c0 3.8 5.5 8.8 5.5 8.8z" fill="#DBEAFE" stroke="#0F172A" stroke-width="2" stroke-linejoin="round" />
+  <circle cx="16" cy="15.4" r="1.8" fill="#2563EB" />
+</svg>

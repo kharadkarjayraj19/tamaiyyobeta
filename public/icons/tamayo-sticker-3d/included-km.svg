@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Sticker included kilometer icon">
+  <defs><filter id="s" x="0" y="0" width="32" height="32"><feDropShadow dx="0" dy="1.2" stdDeviation="1" flood-color="#0B2A63" flood-opacity=".3"/></filter></defs>
+  <g filter="url(#s)">
+    <path d="M16 27.3s6.5-6 6.5-10.4a6.5 6.5 0 1 0-13 0c0 4.4 6.5 10.4 6.5 10.4z" fill="#3EC977" stroke="#0B2A63" stroke-width="1.8"/>
+    <circle cx="16" cy="16.7" r="2.1" fill="#60A5FA" stroke="#0B2A63" stroke-width="1.2"/>
+  </g>
+</svg>

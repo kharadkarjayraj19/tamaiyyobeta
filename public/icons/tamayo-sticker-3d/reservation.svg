@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Sticker reservation icon">
+  <defs>
+    <filter id="s" x="0" y="0" width="32" height="32"><feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#0B2A63" flood-opacity=".45"/></filter>
+    <linearGradient id="g1" x1="4" y1="6" x2="28" y2="26"><stop stop-color="#0F3870"/><stop offset="1" stop-color="#2B6CB0"/></linearGradient>
+    <linearGradient id="g2" x1="4" y1="6" x2="28" y2="26"><stop stop-color="#81F4B9"/><stop offset=".5" stop-color="#53D98A"/><stop offset="1" stop-color="#16C56E"/></linearGradient>
+  </defs>
+  <g filter="url(#s)">
+    <rect x="4.6" y="4.7" width="22.8" height="9.3" rx="2.3" fill="#0F3870" opacity=".6"/>
+    <rect x="4.6" y="3.7" width="22.8" height="9.3" rx="2.3" fill="url(#g2)" stroke="#0B2A63" stroke-width="1.8"/>
+    <text x="16" y="10.4" text-anchor="middle" font-size="4.2" font-family="Arial, sans-serif" fill="#ECFDF5" font-weight="700">RESERVE</text>
+    <path d="M16.2 13.6c1.7 0 2.9 1.1 2.9 2.7v3.2c0 1.4-1.2 2.5-2.5 2.5h-2.6c-1.8 0-3.2-1.4-3.2-3.2v-2.4c0-1.6 1.1-2.8 2.8-2.8 1.4 0 2.1.8 2.6 1.8z" fill="#FFD89D" stroke="#0B2A63" stroke-width="1.8" stroke-linejoin="round"/>
+    <rect x="14.9" y="9.4" width="2.3" height="7" rx="1.1" fill="#FFD89D" stroke="#0B2A63" stroke-width="1.8"/>
+  </g>
+</svg>

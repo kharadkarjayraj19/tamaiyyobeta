@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="3D platform fee icon">
+  <defs>
+    <linearGradient id="bgTag" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFBE8" />
+      <stop offset="1" stop-color="#FFE39E" />
+    </linearGradient>
+    <filter id="shadowTag" x="0" y="0" width="32" height="32" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#A16207" flood-opacity="0.32" />
+    </filter>
+  </defs>
+  <circle cx="16" cy="16" r="13.5" fill="url(#bgTag)" stroke="#B57A00" stroke-width="1.6" filter="url(#shadowTag)" />
+  <path d="M14 9h8a2 2 0 0 1 2 2v6.5L16.2 25a2 2 0 0 1-2.8 0l-5.9-5.9a2 2 0 0 1 0-2.8z" fill="#FEF3C7" stroke="#0F172A" stroke-width="2" stroke-linejoin="round" />
+  <circle cx="19.7" cy="12.5" r="1.2" fill="#F59E0B" />
+</svg>

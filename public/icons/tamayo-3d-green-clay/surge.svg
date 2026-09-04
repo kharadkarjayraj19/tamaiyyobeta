@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Green clay surge icon">
+  <defs><linearGradient id="bgSuTop" x1="6" y1="4" x2="26" y2="28"><stop stop-color="#C1F7B3"/><stop offset="1" stop-color="#79D692"/></linearGradient><linearGradient id="bgSuSide" x1="8" y1="8" x2="24" y2="28"><stop stop-color="#2D7A54"/><stop offset="1" stop-color="#164D33"/></linearGradient><linearGradient id="suG" x1="11" y1="8" x2="22" y2="24"><stop stop-color="#2FA867"/><stop offset="1" stop-color="#124D34"/></linearGradient></defs>
+  <ellipse cx="16" cy="27.2" rx="9.8" ry="2.2" fill="#1A4D34" opacity=".2"/><rect x="4.5" y="5.4" width="23" height="23" rx="6.6" fill="url(#bgSuSide)"/><rect x="4.5" y="3.6" width="23" height="22" rx="6.6" fill="url(#bgSuTop)"/>
+  <path d="M17.1 7.8L10.8 17h4.7l-.8 7.2 7.4-10.2h-4.7z" fill="url(#suG)"/><circle cx="15.9" cy="15.4" r="1" fill="#F5D48B"/>
+</svg>

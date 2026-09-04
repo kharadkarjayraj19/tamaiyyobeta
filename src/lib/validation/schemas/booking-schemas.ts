@@ -9,7 +9,7 @@
  */
 
 import { z } from "zod";
-import { commonSchemas } from "../index";
+import { commonSchemas } from "../primitives";
 import {
   VehicleCategory,
   AgeBucket,
@@ -60,6 +60,7 @@ export const BookingQuoteRequestSchema = z.object({
     ProductType.MULTI_CITY,
     ProductType.ROUND_TRIP,
   ]),
+  vehiclePresetId: z.string().min(1).max(50).optional(),
   estimatedKm: z.number().int().positive().optional(),
   returnDistanceKm: z.number().int().positive().optional(),
 });
@@ -95,6 +96,7 @@ export const CreateBookingSchema = z.object({
     ProductType.MULTI_CITY,
     ProductType.ROUND_TRIP,
   ]),
+  vehiclePresetId: z.string().min(1).max(50).optional(),
   estimatedKm: z.number().int().positive().optional(),
   returnDistanceKm: z.number().int().positive().optional(),
 });

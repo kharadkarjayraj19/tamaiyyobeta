@@ -52,6 +52,7 @@ export interface BookingQuoteRequest {
   category: VehicleCategory;
   ageBucket: AgeBucket;
   productType: ProductType;
+  vehiclePresetId?: string;
   estimatedKm?: number;
   returnDistanceKm?: number;
 }
@@ -70,6 +71,7 @@ export interface CreateBooking {
   category: VehicleCategory;
   ageBucket: AgeBucket;
   productType: ProductType;
+  vehiclePresetId?: string;
   estimatedKm?: number;
   returnDistanceKm?: number;
 }
@@ -102,15 +104,20 @@ export class BookingService {
     routeDistanceKm: number | null;
     returnDistanceKm: number | null;
     usableDistanceKm: number | null;
+    dispatchHubCity: string | null;
   }> {
     // Validate trip dates
     this.validateTripDates(request.tripStartDate, request.tripEndDate);
 
-    const resolvedRouteDistanceKm = await distanceEstimationService.resolveRouteDistanceKm({
+    const distanceEstimation = await distanceEstimationService.resolveRouteDistanceDetails({
+      sourceCity: request.sourceCity,
       pickupLocation: request.pickupLocation,
       destinations: request.destinations,
       estimatedKm: request.estimatedKm,
     });
+    const resolvedRouteDistanceKm = distanceEstimation.routeDistanceKm;
+    const resolvedReturnDistanceKm =
+      request.returnDistanceKm ?? distanceEstimation.returnDistanceKm;
 
     // Calculate pricing
     const pricingInput: PricingInput = {
@@ -120,7 +127,8 @@ export class BookingService {
       tripStartDate: request.tripStartDate,
       tripEndDate: request.tripEndDate,
       estimatedKm: resolvedRouteDistanceKm,
-      returnDistanceKm: request.returnDistanceKm,
+      returnDistanceKm: resolvedReturnDistanceKm,
+      vehiclePresetId: request.vehiclePresetId,
       sourceCity: request.sourceCity,
       destinationCity: request.destinationCity,
     };
@@ -139,6 +147,7 @@ export class BookingService {
       routeDistanceKm: pricing.routeDistanceKm,
       returnDistanceKm: pricing.returnDistanceKm,
       usableDistanceKm: pricing.usableDistanceKm,
+      dispatchHubCity: distanceEstimation.dispatchHubCity ?? null,
     };
   }
 
@@ -156,11 +165,15 @@ export class BookingService {
     }
 
     return withTransaction(prisma, async (tx) => {
-      const resolvedRouteDistanceKm = await distanceEstimationService.resolveRouteDistanceKm({
+      const distanceEstimation = await distanceEstimationService.resolveRouteDistanceDetails({
+        sourceCity: data.sourceCity,
         pickupLocation: data.pickupLocation,
         destinations: data.destinations,
         estimatedKm: data.estimatedKm,
       });
+      const resolvedRouteDistanceKm = distanceEstimation.routeDistanceKm;
+      const resolvedReturnDistanceKm =
+        data.returnDistanceKm ?? distanceEstimation.returnDistanceKm;
 
       // Generate unique booking reference
       const bookingRef = await this.generateBookingRef();
@@ -173,7 +186,8 @@ export class BookingService {
         tripStartDate: data.tripStartDate,
         tripEndDate: data.tripEndDate,
         estimatedKm: resolvedRouteDistanceKm,
-        returnDistanceKm: data.returnDistanceKm,
+        returnDistanceKm: resolvedReturnDistanceKm,
+        vehiclePresetId: data.vehiclePresetId,
         sourceCity: data.sourceCity,
         destinationCity: data.destinationCity,
       };
@@ -200,7 +214,7 @@ export class BookingService {
         pickupLocation: data.pickupLocation,
         destinations: data.destinations,
         routeDistanceKm: resolvedRouteDistanceKm,
-        returnDistanceKm: data.returnDistanceKm,
+        returnDistanceKm: resolvedReturnDistanceKm,
       };
 
       await bookingItineraryRepository.create(itineraryData, tx);

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Rate icon interactive">
+  <circle cx="16" cy="16" r="14" fill="#FFFBEB" stroke="#A16207" stroke-width="1.8" />
+  <path d="M8.5 18a7.5 7.5 0 1 1 15 0" stroke="#0F172A" stroke-width="2" stroke-linecap="round" />
+  <path d="M16 17.2l3.9-3.9" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" />
+  <circle cx="16" cy="17.2" r="1.6" fill="#1D4ED8" />
+  <circle cx="11.1" cy="18" r="0.9" fill="#64748B" />
+  <circle cx="20.9" cy="18" r="0.9" fill="#64748B" />
+</svg>

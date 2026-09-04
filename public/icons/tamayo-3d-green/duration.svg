@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Green 3D duration icon">
+  <defs>
+    <linearGradient id="bgDurationG" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse"><stop stop-color="#F0FDF4"/><stop offset="1" stop-color="#86EFAC"/></linearGradient>
+    <linearGradient id="glyphDurationG" x1="9" y1="9" x2="23" y2="23" gradientUnits="userSpaceOnUse"><stop stop-color="#34D399"/><stop offset="1" stop-color="#047857"/></linearGradient>
+  </defs>
+  <circle cx="16" cy="16" r="13.5" fill="url(#bgDurationG)"/>
+  <rect x="9" y="10" width="14" height="12" rx="2.2" fill="url(#glyphDurationG)"/>
+  <path d="M12 8.5v2.4M20 8.5v2.4M9 13h14" stroke="#D1FAE5" stroke-width="2" stroke-linecap="round"/>
+</svg>

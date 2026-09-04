@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Purple 3D duration icon">
+  <defs>
+    <linearGradient id="bgDurationPurple" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F6F2FF" />
+      <stop offset="1" stop-color="#C3ADF7" />
+    </linearGradient>
+    <linearGradient id="glyphDurationPurple" x1="9" y1="9" x2="23" y2="23" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A988F0" />
+      <stop offset="1" stop-color="#6B4DD2" />
+    </linearGradient>
+  </defs>
+  <circle cx="16" cy="16" r="13.5" fill="url(#bgDurationPurple)" />
+  <rect x="9" y="10" width="14" height="12" rx="2.2" fill="url(#glyphDurationPurple)" />
+  <path d="M12 8.5v2.4M20 8.5v2.4M9 13h14" stroke="#F1EAFF" stroke-width="2" stroke-linecap="round" />
+</svg>

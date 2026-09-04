@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="3D route icon">
+  <defs>
+    <linearGradient id="bgRoute" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E6FFF4" />
+      <stop offset="1" stop-color="#7FE5B6" />
+    </linearGradient>
+    <filter id="shadowRoute" x="0" y="0" width="32" height="32" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#0F5132" flood-opacity="0.35" />
+    </filter>
+  </defs>
+  <circle cx="16" cy="16" r="13.5" fill="url(#bgRoute)" stroke="#0C7A4D" stroke-width="1.6" filter="url(#shadowRoute)" />
+  <path d="M11 22V12.3L13.5 9.8H18.5L21 12.3V22" stroke="#0F172A" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M16 10.8V22" stroke="#0F172A" stroke-width="2.1" stroke-linecap="round" />
+  <circle cx="16" cy="14.6" r="1.1" fill="#22C55E" />
+  <circle cx="16" cy="18.2" r="1.1" fill="#2563EB" />
+</svg>

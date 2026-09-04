@@ -7,7 +7,7 @@
  */
 
 import { z } from "zod";
-import { commonSchemas, createEnumSchema } from "@/lib/validation";
+import { commonSchemas, createEnumSchema } from "../primitives";
 
 /**
  * Payment mode enum (from Prisma).

@@ -14,6 +14,19 @@ import {
 } from "@/lib/validation/schemas/booking-schemas";
 import { isOperationalError } from "@/lib/errors";
 import { captureServerEvent } from "@/lib/observability/posthog-server";
+import { getSession } from "@/lib/auth/session";
+import { serverEnv } from "@/config/env/server";
+
+function readSessionUserId(session: unknown): string | null {
+  if (!session || typeof session !== "object") {
+    return null;
+  }
+  const user = (session as { user?: { id?: unknown } }).user;
+  if (!user || typeof user.id !== "string") {
+    return null;
+  }
+  return user.id;
+}
 
 /**
  * POST /api/v1/bookings — Create booking
@@ -23,9 +36,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = validateDto(CreateBookingSchema, body);
 
-    // TODO: Replace with Better Auth customer identity extraction
+    const session = await getSession();
     const customerId =
-      request.headers.get("x-mock-customer-id") || "mock-customer-1";
+      readSessionUserId(session) ??
+      request.headers.get("x-mock-customer-id") ??
+      "mock-customer-1";
 
     // Create booking with full transactional integrity
     const result = await bookingService.createBooking({
@@ -41,6 +56,7 @@ export async function POST(request: NextRequest) {
       category: validatedData.category,
       ageBucket: validatedData.ageBucket,
       productType: validatedData.productType,
+      vehiclePresetId: validatedData.vehiclePresetId,
       estimatedKm: validatedData.estimatedKm,
       returnDistanceKm: validatedData.returnDistanceKm,
     });
@@ -92,11 +108,15 @@ export async function POST(request: NextRequest) {
     }
 
     console.error("Unexpected error in POST /api/v1/bookings:", error);
+    const devMessage =
+      serverEnv.nodeEnv === "development" && error instanceof Error
+        ? error.message
+        : "An unexpected error occurred";
     return NextResponse.json(
       {
         success: false,
         error: {
-          message: "An unexpected error occurred",
+          message: devMessage,
           code: "INTERNAL_ERROR",
         },
       },
@@ -179,11 +199,15 @@ export async function GET(request: NextRequest) {
     }
 
     console.error("Unexpected error in GET /api/v1/bookings:", error);
+    const devMessage =
+      serverEnv.nodeEnv === "development" && error instanceof Error
+        ? error.message
+        : "An unexpected error occurred";
     return NextResponse.json(
       {
         success: false,
         error: {
-          message: "An unexpected error occurred",
+          message: devMessage,
           code: "INTERNAL_ERROR",
         },
       },

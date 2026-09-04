@@ -3,11 +3,11 @@
 import {
   BadgeIndianRupee,
   ArrowRight,
-  ArrowRightLeft,
   BadgeCheck,
   Car,
   Clock3,
   Info,
+  LocateFixed,
   Minus,
   Plus,
   Headphones,
@@ -22,7 +22,8 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import type { ComponentType } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { LocationAutocompleteInput } from "@/components/shared/location/location-autocomplete-input";
 
 type QuickAction = {
   title: string;
@@ -44,12 +45,6 @@ type InspirationCard = {
 
 const quickActions: QuickAction[] = [
   {
-    title: "Outstation Cabs",
-    description: "Book cabs for outstation trips across India",
-    href: "/customer/booking-quote",
-    icon: Car,
-  },
-  {
     title: "Plan Itinerary",
     description: "Create your trip and add places in minutes",
     href: "/customer/booking-quote",
@@ -57,16 +52,16 @@ const quickActions: QuickAction[] = [
     isNew: true,
   },
   {
-    title: "One Way Cabs",
-    description: "Book one-way rides on selected routes",
-    href: "/customer/booking-quote",
-    icon: ArrowRightLeft,
+    title: "Explore Itineraries",
+    description: "Browse sample plans to build your route faster",
+    href: "/customer",
+    icon: MapPinned,
   },
   {
     title: "My Trips",
     description: "View upcoming and completed trips",
     href: "/customer",
-    icon: MapPinned,
+    icon: Car,
   },
   {
     title: "Offers",
@@ -114,12 +109,213 @@ const rideModes: Array<{ id: RideMode; label: string }> = [
   { id: "airportOnly", label: "Airport only" },
 ];
 
+const TIME_OPTIONS = Array.from({ length: 48 }, (_, index) => {
+  const hours24 = Math.floor(index / 2);
+  const minutes = index % 2 === 0 ? "00" : "30";
+  const meridiem = hours24 >= 12 ? "PM" : "AM";
+  const hours12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
+
+  return {
+    value: `${`${hours24}`.padStart(2, "0")}:${minutes}`,
+    label: `${hours12}:${minutes} ${meridiem}`,
+  };
+});
+
+type TimeDropdownProps = {
+  value: string;
+  onValueChange: (value: string) => void;
+  ariaLabel: string;
+  minimumValue?: string | null;
+};
+
+function TimeDropdown({ value, onValueChange, ariaLabel, minimumValue }: TimeDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [openUpward, setOpenUpward] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  const selectedOption = TIME_OPTIONS.find((option) => option.value === value) ?? TIME_OPTIONS[0];
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    function handlePointerDown(event: MouseEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    }
+
+    window.addEventListener("mousedown", handlePointerDown);
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("mousedown", handlePointerDown);
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isOpen]);
+
+  function toggleDropdown() {
+    if (!isOpen && rootRef.current) {
+      const bounds = rootRef.current.getBoundingClientRect();
+      const estimatedDropdownHeight = 260;
+      const spaceBelow = window.innerHeight - bounds.bottom;
+      const spaceAbove = bounds.top;
+      setOpenUpward(spaceBelow < estimatedDropdownHeight && spaceAbove > spaceBelow);
+    }
+
+    setIsOpen((previousValue) => !previousValue);
+  }
+
+  return (
+    <div ref={rootRef} className="relative w-full">
+      <button
+        type="button"
+        onClick={toggleDropdown}
+        className="w-full bg-transparent text-left font-medium text-foreground outline-none"
+        aria-label={ariaLabel}
+        aria-expanded={isOpen}
+      >
+        {selectedOption.label}
+      </button>
+
+      {isOpen ? (
+        <div
+          className={
+            openUpward
+              ? "absolute bottom-[calc(100%+0.35rem)] left-0 right-0 z-40 max-h-64 overflow-y-auto rounded-md border border-border bg-card py-1 shadow-xl"
+              : "absolute top-[calc(100%+0.35rem)] left-0 right-0 z-40 max-h-64 overflow-y-auto rounded-md border border-border bg-card py-1 shadow-xl"
+          }
+        >
+          {TIME_OPTIONS.map((timeOption) => (
+            <button
+              key={timeOption.value}
+              type="button"
+              onClick={() => {
+                if (minimumValue && timeOption.value < minimumValue) {
+                  return;
+                }
+                onValueChange(timeOption.value);
+                setIsOpen(false);
+              }}
+              className={
+                minimumValue && timeOption.value < minimumValue
+                  ? "block w-full cursor-not-allowed px-3 py-2 text-left text-sm text-muted-foreground opacity-50"
+                  : timeOption.value === value
+                  ? "block w-full bg-emerald-50 px-3 py-2 text-left text-sm font-semibold text-emerald-700"
+                  : "block w-full px-3 py-2 text-left text-sm text-foreground hover:bg-accent"
+              }
+            >
+              {timeOption.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function toDateInputValue(date: Date) {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function addDaysToDateString(dateString: string, days: number) {
+  const date = new Date(`${dateString}T00:00:00`);
+  date.setDate(date.getDate() + days);
+  return toDateInputValue(date);
+}
+
+function getMinimumFutureTimeValue(now: Date = new Date()) {
+  const nextSlot = new Date(now);
+  nextSlot.setSeconds(0, 0);
+
+  const currentMinutes = nextSlot.getMinutes();
+  const remainder = currentMinutes % 30;
+
+  if (remainder !== 0) {
+    nextSlot.setMinutes(currentMinutes + (30 - remainder));
+  }
+
+  const hours = `${nextSlot.getHours()}`.padStart(2, "0");
+  const minutes = `${nextSlot.getMinutes()}`.padStart(2, "0");
+
+  return `${hours}:${minutes}`;
+}
+
+function getFieldTextClass(value: string) {
+  return value.trim()
+    ? "w-full bg-transparent font-medium text-foreground outline-none placeholder:text-muted-foreground"
+    : "w-full bg-transparent text-muted-foreground outline-none placeholder:text-muted-foreground";
+}
+
+function getCityTokenFromLocation(location: string) {
+  return location
+    .split(",")[0]
+    ?.trim();
+}
+
 export default function CustomerOverviewPage() {
   const [selectedRideMode, setSelectedRideMode] = useState<RideMode>("oneWay");
   const [cityTourPackage, setCityTourPackage] = useState<CityTourPackage>("8h80km");
   const [pickupLocationInput, setPickupLocationInput] = useState("");
   const [dropoffLocationInput, setDropoffLocationInput] = useState("");
   const [stopLocations, setStopLocations] = useState<string[]>([]);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [locationHint, setLocationHint] = useState<string | null>(null);
+  const [tripStartDate, setTripStartDate] = useState("");
+  const [tripEndDate, setTripEndDate] = useState("");
+  const [tripStartTime, setTripStartTime] = useState("09:00");
+  const [tripEndTime, setTripEndTime] = useState("18:00");
+  const [nowReference, setNowReference] = useState(() => Date.now());
+  const todayDate = useMemo(() => toDateInputValue(new Date()), []);
+  const minimumFutureTimeValue = useMemo(
+    () => getMinimumFutureTimeValue(new Date(nowReference)),
+    [nowReference]
+  );
+  const isTourMode = selectedRideMode === "multiCityRoundTrip" || selectedRideMode === "cityTour";
+  const minimumStartTime =
+    tripStartDate && tripStartDate === todayDate ? minimumFutureTimeValue : null;
+  const minimumEndTimeBase =
+    tripEndDate && tripEndDate === todayDate ? minimumFutureTimeValue : null;
+  const minimumEndTime =
+    tripEndDate && tripStartDate && tripEndDate === tripStartDate
+      ? minimumEndTimeBase
+        ? minimumEndTimeBase > tripStartTime
+          ? minimumEndTimeBase
+          : tripStartTime
+        : tripStartTime
+      : minimumEndTimeBase;
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setNowReference(Date.now());
+    }, 60000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (minimumStartTime && tripStartTime < minimumStartTime) {
+      setTripStartTime(minimumStartTime);
+    }
+  }, [minimumStartTime, tripStartTime]);
+
+  useEffect(() => {
+    if (minimumEndTime && tripEndTime < minimumEndTime) {
+      setTripEndTime(minimumEndTime);
+    }
+  }, [minimumEndTime, tripEndTime]);
 
   function updateStopLocation(index: number, value: string) {
     setStopLocations((prev) => prev.map((item, itemIndex) => (itemIndex === index ? value : item)));
@@ -133,6 +329,73 @@ export default function CustomerOverviewPage() {
     setStopLocations((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
   }
 
+  function detectPickupLocation() {
+    if (!navigator.geolocation) {
+      setLocationHint("Location detection is not supported on this device.");
+      return;
+    }
+
+    setIsDetectingLocation(true);
+    setLocationHint("Detecting your current location...");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude.toFixed(5);
+        const lng = position.coords.longitude.toFixed(5);
+        setPickupLocationInput(`Current location (${lat}, ${lng})`);
+        setLocationHint("Pickup location detected. You can edit it if needed.");
+        setIsDetectingLocation(false);
+      },
+      () => {
+        setLocationHint("Unable to detect location. Please enter pickup manually.");
+        setIsDetectingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+      }
+    );
+  }
+
+  function updateTripStartDate(nextValue: string) {
+    const normalizedStart = nextValue < todayDate ? todayDate : nextValue;
+    let normalizedEnd = tripEndDate;
+
+    if (normalizedEnd && normalizedEnd < normalizedStart) {
+      normalizedEnd = normalizedStart;
+    }
+
+    if (normalizedEnd) {
+      const maxEndForStart = addDaysToDateString(normalizedStart, 6);
+      if (normalizedEnd > maxEndForStart) {
+        normalizedEnd = maxEndForStart;
+      }
+    }
+
+    setTripStartDate(normalizedStart);
+    setTripEndDate(normalizedEnd);
+  }
+
+  function updateTripEndDate(nextValue: string) {
+    const normalizedEndBase = nextValue < todayDate ? todayDate : nextValue;
+    let normalizedStart = tripStartDate;
+    let normalizedEnd = normalizedEndBase;
+
+    if (!normalizedStart) {
+      normalizedStart = normalizedEnd;
+    } else if (normalizedEnd < normalizedStart) {
+      normalizedStart = normalizedEnd;
+    }
+
+    const maxEndForStart = addDaysToDateString(normalizedStart, 6);
+    if (normalizedEnd > maxEndForStart) {
+      normalizedEnd = maxEndForStart;
+    }
+
+    setTripStartDate(normalizedStart);
+    setTripEndDate(normalizedEnd);
+  }
+
   const quoteHref = useMemo(() => {
     const params = new URLSearchParams();
 
@@ -144,15 +407,24 @@ export default function CustomerOverviewPage() {
           : "MULTI_CITY";
     const normalizedStops = stopLocations.map((location) => location.trim()).filter(Boolean);
     const normalizedDropoff = dropoffLocationInput.trim();
+    const normalizedPickup = pickupLocationInput.trim();
+    const sourceCityToken = normalizedPickup ? getCityTokenFromLocation(normalizedPickup) : "";
+    const destinationCityToken = normalizedDropoff
+      ? getCityTokenFromLocation(normalizedDropoff)
+      : "";
 
     params.set("productType", mappedProductType);
     params.set("rideMode", selectedRideMode);
-    if (pickupLocationInput.trim()) {
-      params.set("pickupLocation", pickupLocationInput.trim());
+    if (normalizedPickup) {
+      params.set("pickupLocation", normalizedPickup);
     }
 
-    if (normalizedDropoff) {
-      params.set("destinationCity", normalizedDropoff);
+    if (sourceCityToken) {
+      params.set("sourceCity", sourceCityToken);
+    }
+
+    if (destinationCityToken) {
+      params.set("destinationCity", destinationCityToken);
     }
 
     normalizedStops.forEach((stop) => params.append("drop", stop));
@@ -166,8 +438,40 @@ export default function CustomerOverviewPage() {
       params.set("estimatedKm", cityTourPackage === "8h80km" ? "80" : "120");
     }
 
+    if (tripStartDate) {
+      params.set("tripStartDate", `${tripStartDate}T${tripStartTime}`);
+    }
+
+    if (isTourMode && tripEndDate) {
+      params.set("tripEndDate", `${tripEndDate}T${tripEndTime}`);
+    }
+
     return `/customer/booking-quote?${params.toString()}`;
-  }, [cityTourPackage, dropoffLocationInput, pickupLocationInput, selectedRideMode, stopLocations]);
+  }, [
+    cityTourPackage,
+    dropoffLocationInput,
+    isTourMode,
+    pickupLocationInput,
+    selectedRideMode,
+    stopLocations,
+    tripEndDate,
+    tripEndTime,
+    tripStartDate,
+    tripStartTime,
+  ]);
+
+  const reservedDays = useMemo(() => {
+    if (!tripStartDate || !tripEndDate || !isTourMode) {
+      return null;
+    }
+
+    const start = new Date(`${tripStartDate}T00:00:00`);
+    const end = new Date(`${tripEndDate}T00:00:00`);
+    const durationMs = end.getTime() - start.getTime();
+    const days = Math.floor(durationMs / (1000 * 60 * 60 * 24)) + 1;
+
+    return days > 0 ? days : 1;
+  }, [isTourMode, tripEndDate, tripStartDate]);
 
   return (
     <div className="space-y-5 sm:space-y-7">
@@ -326,78 +630,193 @@ export default function CustomerOverviewPage() {
                 ) : null}
 
                 <div className="mt-2 space-y-2">
-                  <label className="flex items-center gap-2 rounded-md bg-muted px-3 py-3 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4 text-emerald-600" />
-                    <input
-                      type="text"
+                  <div className="space-y-1.5">
+                    <LocationAutocompleteInput
                       value={pickupLocationInput}
-                      onChange={(event) => setPickupLocationInput(event.target.value)}
+                      onValueChange={setPickupLocationInput}
                       placeholder="Pickup location"
-                      className="w-full bg-transparent outline-none placeholder:text-muted-foreground"
+                      leadingIcon={<MapPin className="h-4 w-4 shrink-0 text-emerald-600" />}
+                      inputClassName={getFieldTextClass(pickupLocationInput)}
+                      trailingContent={
+                        <button
+                          type="button"
+                          onClick={detectPickupLocation}
+                          disabled={isDetectingLocation}
+                          className="inline-flex items-center gap-1 whitespace-nowrap rounded border border-emerald-200 bg-white px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          <LocateFixed className="h-3.5 w-3.5" />
+                          {isDetectingLocation ? "Detecting..." : "Detect my location"}
+                        </button>
+                      }
                     />
-                  </label>
+                    {locationHint ? (
+                      <p className="text-xs text-muted-foreground">{locationHint}</p>
+                    ) : null}
+                  </div>
 
                   {selectedRideMode === "multiCityRoundTrip" ? (
                     <>
                       {stopLocations.map((location, index) => (
-                        <div
+                        <LocationAutocompleteInput
                           key={`stop-${index}`}
-                          className="flex items-center gap-2 rounded-md bg-muted px-3 py-3 text-sm text-muted-foreground"
-                        >
-                          <MapPinned className="h-4 w-4 shrink-0 text-emerald-600" />
-                          <input
-                            type="text"
-                            value={location}
-                            onChange={(event) => updateStopLocation(index, event.target.value)}
-                            placeholder={`Stop ${index + 1}`}
-                            className="w-full bg-transparent outline-none placeholder:text-muted-foreground"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeStopLocation(index)}
-                            className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded border border-emerald-200 bg-white text-emerald-700 hover:bg-emerald-100"
-                            aria-label={`Remove stop ${index + 1}`}
-                          >
-                            <Minus className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
+                          value={location}
+                          onValueChange={(value) => updateStopLocation(index, value)}
+                          placeholder={`Stop ${index + 1}`}
+                          leadingIcon={<MapPinned className="h-4 w-4 shrink-0 text-emerald-600" />}
+                          inputClassName={getFieldTextClass(location)}
+                          trailingContent={
+                            <button
+                              type="button"
+                              onClick={() => removeStopLocation(index)}
+                              className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded border border-emerald-200 bg-white text-emerald-700 hover:bg-emerald-100"
+                              aria-label={`Remove stop ${index + 1}`}
+                            >
+                              <Minus className="h-3.5 w-3.5" />
+                            </button>
+                          }
+                        />
                       ))}
 
-                      <label className="flex items-center gap-2 rounded-md bg-muted px-3 py-3 text-sm text-muted-foreground">
-                        <MapPinned className="h-4 w-4 text-emerald-600" />
-                        <input
-                          type="text"
-                          value={dropoffLocationInput}
-                          onChange={(event) => setDropoffLocationInput(event.target.value)}
-                          placeholder="Dropoff location"
-                          className="w-full bg-transparent outline-none placeholder:text-muted-foreground"
-                        />
-                      </label>
+                      <LocationAutocompleteInput
+                        value={dropoffLocationInput}
+                        onValueChange={setDropoffLocationInput}
+                        placeholder="Dropoff location"
+                        leadingIcon={<MapPinned className="h-4 w-4 text-emerald-600" />}
+                        inputClassName={getFieldTextClass(dropoffLocationInput)}
+                      />
                     </>
                   ) : (
-                    <label className="flex items-center gap-2 rounded-md bg-muted px-3 py-3 text-sm text-muted-foreground">
-                      <MapPinned className="h-4 w-4 text-emerald-600" />
-                      <input
-                        type="text"
-                        value={dropoffLocationInput}
-                        onChange={(event) => setDropoffLocationInput(event.target.value)}
-                        placeholder="Dropoff location"
-                        className="w-full bg-transparent outline-none placeholder:text-muted-foreground"
-                      />
-                    </label>
+                    <LocationAutocompleteInput
+                      value={dropoffLocationInput}
+                      onValueChange={setDropoffLocationInput}
+                      placeholder="Dropoff location"
+                      leadingIcon={<MapPinned className="h-4 w-4 text-emerald-600" />}
+                      inputClassName={getFieldTextClass(dropoffLocationInput)}
+                    />
                   )}
                 </div>
 
-                <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                  <div className="flex items-center gap-2 rounded-md bg-muted px-3 py-3 text-sm text-muted-foreground">
-                    <Clock3 className="h-4 w-4 text-emerald-600" />
-                    Pickup date
+                {isTourMode ? (
+                  <div className="mt-2 space-y-2">
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <label className="space-y-1.5">
+                        <span className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                          Start date
+                        </span>
+                        <span className="flex items-center gap-2 rounded-md bg-muted px-3 py-3 text-sm">
+                          <Clock3 className="h-4 w-4 text-emerald-600" />
+                          <input
+                            type="date"
+                            value={tripStartDate}
+                            min={todayDate}
+                            onChange={(event) => updateTripStartDate(event.target.value)}
+                            className={
+                              tripStartDate
+                                ? "w-full bg-transparent font-medium text-foreground outline-none"
+                                : "w-full bg-transparent text-muted-foreground outline-none"
+                            }
+                            aria-label="Trip start date"
+                          />
+                        </span>
+                      </label>
+                      <label className="space-y-1.5">
+                        <span className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                          Start time
+                        </span>
+                        <span className="flex items-center gap-2 rounded-md bg-muted px-3 py-3 text-sm">
+                          <Clock3 className="h-4 w-4 text-emerald-600" />
+                          <TimeDropdown
+                            value={tripStartTime}
+                            onValueChange={setTripStartTime}
+                            ariaLabel="Trip start time"
+                            minimumValue={minimumStartTime}
+                          />
+                        </span>
+                      </label>
+                      <label className="space-y-1.5">
+                        <span className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                          End date
+                        </span>
+                        <span className="flex items-center gap-2 rounded-md bg-muted px-3 py-3 text-sm">
+                          <Car className="h-4 w-4 text-emerald-600" />
+                          <input
+                            type="date"
+                            value={tripEndDate}
+                            min={tripStartDate || todayDate}
+                            max={addDaysToDateString(tripStartDate || todayDate, 6)}
+                            onChange={(event) => updateTripEndDate(event.target.value)}
+                            className={
+                              tripEndDate
+                                ? "w-full bg-transparent font-medium text-foreground outline-none"
+                                : "w-full bg-transparent text-muted-foreground outline-none"
+                            }
+                            aria-label="Trip end date"
+                          />
+                        </span>
+                      </label>
+                      <label className="space-y-1.5">
+                        <span className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                          End time
+                        </span>
+                        <span className="flex items-center gap-2 rounded-md bg-muted px-3 py-3 text-sm">
+                          <Clock3 className="h-4 w-4 text-emerald-600" />
+                          <TimeDropdown
+                            value={tripEndTime}
+                            onValueChange={setTripEndTime}
+                            ariaLabel="Trip end time"
+                            minimumValue={minimumEndTime}
+                          />
+                        </span>
+                      </label>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Maximum 7 days allowed between start and end dates.
+                    </p>
+                    {reservedDays ? (
+                      <p className="text-sm font-medium text-emerald-700">
+                        You are reserving vehicle for {reservedDays} day
+                        {reservedDays > 1 ? "s" : ""}.
+                      </p>
+                    ) : null}
                   </div>
-                  <div className="flex items-center gap-2 rounded-md bg-muted px-3 py-3 text-sm text-muted-foreground">
-                    <Car className="h-4 w-4 text-emerald-600" />
-                    Select time
+                ) : (
+                  <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                    <label className="space-y-1.5">
+                      <span className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                        Pickup date
+                      </span>
+                      <span className="flex items-center gap-2 rounded-md bg-muted px-3 py-3 text-sm">
+                        <Clock3 className="h-4 w-4 text-emerald-600" />
+                        <input
+                          type="date"
+                          value={tripStartDate}
+                          min={todayDate}
+                          onChange={(event) => updateTripStartDate(event.target.value)}
+                          className={
+                            tripStartDate
+                              ? "w-full bg-transparent font-medium text-foreground outline-none"
+                              : "w-full bg-transparent text-muted-foreground outline-none"
+                          }
+                          aria-label="Pickup date"
+                        />
+                      </span>
+                    </label>
+                    <label className="space-y-1.5">
+                      <span className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                        Pickup time
+                      </span>
+                      <span className="flex items-center gap-2 rounded-md bg-muted px-3 py-3 text-sm">
+                        <Car className="h-4 w-4 text-emerald-600" />
+                        <TimeDropdown
+                          value={tripStartTime}
+                          onValueChange={setTripStartTime}
+                          ariaLabel="Pickup time"
+                          minimumValue={minimumStartTime}
+                        />
+                      </span>
+                    </label>
                   </div>
-                </div>
+                )}
 
                 <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <Link
@@ -428,7 +847,7 @@ export default function CustomerOverviewPage() {
       </section>
 
       <div className="px-4 sm:px-6 lg:px-8">
-        <section className="flex gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 xl:grid-cols-5">
+        <section className="flex gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 xl:grid-cols-4">
           {quickActions.map((item) => {
             const Icon = item.icon;
             return (

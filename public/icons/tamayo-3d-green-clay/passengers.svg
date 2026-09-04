@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Green clay passengers icon">
+  <defs>
+    <linearGradient id="bgPaTop" x1="6" y1="4" x2="26" y2="28"><stop stop-color="#B9F4A7"/><stop offset="1" stop-color="#7AD592"/></linearGradient>
+    <linearGradient id="bgPaSide" x1="8" y1="8" x2="24" y2="28"><stop stop-color="#2D7A54"/><stop offset="1" stop-color="#164D33"/></linearGradient>
+    <linearGradient id="frontUser" x1="9" y1="10" x2="21" y2="23"><stop stop-color="#9FF08D"/><stop offset="1" stop-color="#48A86D"/></linearGradient>
+    <linearGradient id="backUser" x1="13" y1="10" x2="23" y2="23"><stop stop-color="#2D7A54"/><stop offset="1" stop-color="#0F3F2C"/></linearGradient>
+  </defs>
+  <ellipse cx="16.1" cy="27.1" rx="9.9" ry="2.3" fill="#194F35" opacity=".2"/>
+  <rect x="4.5" y="5.4" width="23" height="23" rx="6.6" fill="url(#bgPaSide)"/>
+  <rect x="4.5" y="3.6" width="23" height="22" rx="6.6" fill="url(#bgPaTop)"/>
+  <path d="M19.5 21.8c0-1.8 1.3-3.3 3-3.7v-.4c0-2.8-2.2-5-5-5-2 0-3.7 1.2-4.5 2.9 2.4.6 4.2 2.6 4.6 5.2z" fill="url(#backUser)"/>
+  <circle cx="13.6" cy="11.6" r="3.3" fill="url(#frontUser)"/>
+  <path d="M8.6 22.4c0-2.8 2.3-5.1 5.1-5.1s5.1 2.3 5.1 5.1v1h-10.2z" fill="url(#frontUser)"/>
+  <path d="M8.3 8.8c2.3-2.2 4.5-3 7.7-2.9" stroke="#ECFFF1" stroke-linecap="round" stroke-opacity=".55" stroke-width="1.3"/>
+</svg>

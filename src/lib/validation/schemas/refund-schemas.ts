@@ -7,7 +7,7 @@
  */
 
 import { z } from "zod";
-import { commonSchemas, createEnumSchema } from "@/lib/validation";
+import { commonSchemas, createEnumSchema } from "../primitives";
 
 /**
  * Refund status enum (from Prisma).

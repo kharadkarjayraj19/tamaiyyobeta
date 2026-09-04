@@ -8,7 +8,7 @@
  */
 
 import { z } from "zod";
-import { commonSchemas } from "../index";
+import { commonSchemas } from "../primitives";
 
 /**
  * Supplier onboarding draft schema.

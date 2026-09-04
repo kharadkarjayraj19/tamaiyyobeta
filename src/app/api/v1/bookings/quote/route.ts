@@ -10,6 +10,18 @@ import { validateDto } from "@/lib/validation";
 import { BookingQuoteRequestSchema } from "@/lib/validation/schemas/booking-schemas";
 import { isOperationalError } from "@/lib/errors";
 import { captureServerEvent } from "@/lib/observability/posthog-server";
+import { getSession } from "@/lib/auth/session";
+
+function readSessionUserId(session: unknown): string | null {
+  if (!session || typeof session !== "object") {
+    return null;
+  }
+  const user = (session as { user?: { id?: unknown } }).user;
+  if (!user || typeof user.id !== "string") {
+    return null;
+  }
+  return user.id;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,9 +29,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = validateDto(BookingQuoteRequestSchema, body);
 
-    // TODO: Replace with Better Auth customer identity extraction
+    const session = await getSession();
     const customerId =
-      request.headers.get("x-mock-customer-id") || "mock-customer-1";
+      readSessionUserId(session) ??
+      request.headers.get("x-mock-customer-id") ??
+      "mock-customer-1";
 
     // Generate quote
     const quote = await bookingService.generateQuote({
@@ -35,6 +49,7 @@ export async function POST(request: NextRequest) {
       category: validatedData.category,
       ageBucket: validatedData.ageBucket,
       productType: validatedData.productType,
+      vehiclePresetId: validatedData.vehiclePresetId,
       estimatedKm: validatedData.estimatedKm,
       returnDistanceKm: validatedData.returnDistanceKm,
     });

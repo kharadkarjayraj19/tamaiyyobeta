@@ -5,8 +5,8 @@ export default function CustomerBookingQuotePage() {
   return (
     <div className="space-y-8">
       <SectionHeader
-        title="Quote builder"
-        description="Generate tour and one-way quotes with billable km and bundled operational charges."
+        title="See prices"
+        description="Compare your fare, included distance, and reserve quickly with transparent pricing."
       />
       <QuoteWorkbench />
     </div>
