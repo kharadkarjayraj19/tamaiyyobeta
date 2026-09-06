@@ -45,6 +45,7 @@
 - Finalize env contract (`DATABASE_URL`, `SHADOW_DATABASE_URL`, Better Auth, PostHog, Google Maps, payment gateway keys).
 - Move secrets to deployment secret manager; no runtime reliance on local `.env`.
 - Add startup validation for required production variables.
+- Keep Vercel build command as `npm run build` (do not switch to `npm run dev` for deployments).
 
 **Exit criteria**
 
@@ -97,6 +98,7 @@
 - Introduce staged rollout (dev -> staging -> production).
 - Define release checklist with smoke tests for role routes and booking APIs.
 - Document rollback actions (app deploy rollback + DB mitigation strategy).
+- Track temporary deploy unblocks explicitly and remove them before stable production promotion.
 
 **Exit criteria**
 
@@ -126,6 +128,19 @@
 - [ ] Booking/quote/billing tests green in CI.
 - [ ] Monitoring + alerts active for booking funnel and API health.
 - [ ] Production rollout + rollback checklist approved.
+- [ ] Vercel deploys with `npm run build` and no temporary bypasses for lint/type checks.
+
+---
+
+## 6) Vercel build policy (2026-09-06)
+
+- Vercel should run `npm run build` for deployments; this runs Next.js production build checks and emits optimized artifacts.
+- Do not set Vercel build command to `npm run dev`. Dev mode is a local hot-reload server, not a production build pipeline.
+- Ensure Prisma client is generated during deployment build (current approach: `package.json` build script runs `prisma generate && next build`).
+- Temporary staging unblock currently used on `development` branch:
+  - `next.config.ts -> eslint.ignoreDuringBuilds = true`
+  - `next.config.ts -> typescript.ignoreBuildErrors = true`
+- Keep this unblock only while clearing legacy lint/type debt; remove both flags before stable production hardening.
 
 ---
 
@@ -134,3 +149,5 @@
 | Date | Change |
 | --- | --- |
 | 2026-08-28 | Initial dev-to-prod shift plan added with phased workstreams and release gates. |
+| 2026-09-06 | Added Vercel build policy, documented why `npm run dev` must not be used for deployments, and tracked temporary build unblocks on `development`. |
+| 2026-09-06 | Added Prisma client generation requirement for Vercel builds to avoid `.prisma/client/default` module errors. |
