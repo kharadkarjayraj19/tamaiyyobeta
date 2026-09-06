@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import posthog from "posthog-js";
 
 import { clientEnv } from "@/config/env/client";
@@ -26,7 +26,9 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <PostHogPageviewTracker />
+      <Suspense fallback={null}>
+        <PostHogPageviewTracker />
+      </Suspense>
       {children}
     </>
   );
