@@ -130,3 +130,4 @@ Useful local pages:
 - If OTP verify fails with DB auth errors, confirm local `DATABASE_URL` credentials are valid because OTP verification upserts `Identity` + `CustomerAccount`.
 - If OTP SMS is not delivered, verify `MSG91_AUTH_KEY`, `MSG91_TEMPLATE_ID`, and approved DLT template mapping in MSG91. Without keys, dev mode falls back to debug OTP in API response.
 - If you have not completed DLT registration yet, keep `MSG91_AUTH_KEY`/`MSG91_TEMPLATE_ID` unset for local development and use the debug OTP from `/api/v1/auth/otp/request` response; production OTP rollout must wait for approved DLT entity/header/template.
+- Temporary fallback option: set `DEFAULT_TEST_OTP=1234` to force a fixed OTP during testing windows; remove it after MSG91/DLT go-live.

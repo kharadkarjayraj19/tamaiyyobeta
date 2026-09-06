@@ -37,10 +37,24 @@ export async function POST(request: NextRequest) {
     const validatedData = validateDto(CreateBookingSchema, body);
 
     const session = await getSession();
+    const sessionCustomerId = readSessionUserId(session);
+    const mockCustomerId = request.headers.get("x-mock-customer-id");
     const customerId =
-      readSessionUserId(session) ??
-      request.headers.get("x-mock-customer-id") ??
-      "mock-customer-1";
+      sessionCustomerId ??
+      (serverEnv.nodeEnv === "development" ? mockCustomerId : null);
+
+    if (!customerId) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            message: "Please login to reserve this cab.",
+            code: "AUTH_REQUIRED",
+          },
+        },
+        { status: 401 }
+      );
+    }
 
     // Create booking with full transactional integrity
     const result = await bookingService.createBooking({

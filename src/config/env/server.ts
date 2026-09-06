@@ -22,6 +22,7 @@ export const serverEnv = {
   posthogHost: process.env.POSTHOG_HOST ?? process.env.NEXT_PUBLIC_POSTHOG_HOST,
   msg91AuthKey: process.env.MSG91_AUTH_KEY,
   msg91TemplateId: process.env.MSG91_TEMPLATE_ID,
+  defaultTestOtp: process.env.DEFAULT_TEST_OTP,
 } as const;
 
 // Runtime validation for required database configuration

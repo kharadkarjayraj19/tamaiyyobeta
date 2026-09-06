@@ -36,6 +36,10 @@ export function middleware(request: NextRequest) {
   }
 
   const { pathname } = request.nextUrl;
+  // Progressive auth: customer browsing is open, login is enforced at reserve/payment actions.
+  if (pathname === "/customer" || pathname.startsWith("/customer/")) {
+    return NextResponse.next();
+  }
   if (!isProtectedRolePath(pathname)) {
     return NextResponse.next();
   }
@@ -49,5 +53,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/customer/:path*", "/supplier/:path*", "/admin/:path*"],
+  matcher: ["/supplier/:path*", "/admin/:path*"],
 };

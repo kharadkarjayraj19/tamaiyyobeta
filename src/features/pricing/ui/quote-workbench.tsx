@@ -526,6 +526,12 @@ export function QuoteWorkbench() {
         body: JSON.stringify(payload),
       });
 
+      if (response.status === 401) {
+        const callbackUrl = `/customer/booking-quote?${searchParams.toString()}`;
+        router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+        return;
+      }
+
       const result = await response.json();
       if (!response.ok || !result.success) {
         throw new Error(result?.error?.message ?? "Unable to create booking.");

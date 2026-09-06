@@ -49,6 +49,20 @@ function buildOtp(): string {
   return randomInt(100000, 1000000).toString();
 }
 
+function resolveOtpCode(): string {
+  const configured = serverEnv.defaultTestOtp?.trim();
+  if (configured && /^\d{4,6}$/.test(configured)) {
+    return configured;
+  }
+
+  // Temporary fallback for OTP-gated staging/production testing when MSG91 is not configured.
+  if (!serverEnv.msg91AuthKey || !serverEnv.msg91TemplateId) {
+    return "1234";
+  }
+
+  return buildOtp();
+}
+
 function cleanupExpiredRecords() {
   const now = Date.now();
   for (const [phone, record] of otpStore.entries()) {
@@ -118,7 +132,7 @@ export async function requestPhoneOtp(phone: string) {
     throw new Error(`Please wait ${retryAfterSeconds}s before requesting OTP again.`);
   }
 
-  const code = buildOtp();
+  const code = resolveOtpCode();
   const providerResult = await sendOtpViaMsg91({
     phone: normalized,
     otp: code,
