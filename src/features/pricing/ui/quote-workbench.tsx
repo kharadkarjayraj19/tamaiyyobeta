@@ -112,6 +112,7 @@ type VehicleQuoteResult = {
 
 type CreateBookingOptions = {
   quoteReturnUrl?: string;
+  silent?: boolean;
 };
 
 const VEHICLE_PRESETS: VehiclePreset[] = [
@@ -364,6 +365,7 @@ export function QuoteWorkbench() {
   const [error, setError] = useState<string | null>(null);
   const [shouldAutoQuote, setShouldAutoQuote] = useState(false);
   const [operationalOption, setOperationalOption] = useState<OperationalOption>("ALL_INCLUSIVE");
+  const [autoReserveInProgress, setAutoReserveInProgress] = useState(false);
   const autoReserveAttemptedRef = useRef(false);
 
   const routeStopsSummary = form.destinationStops
@@ -434,6 +436,7 @@ export function QuoteWorkbench() {
     if (!autoReservePresetId || autoReserveAttemptedRef.current) {
       return;
     }
+    setAutoReserveInProgress(true);
 
     if (loadingQuote || Boolean(loadingBookingCategory) || vehicleQuotes.length === 0) {
       return;
@@ -443,6 +446,12 @@ export function QuoteWorkbench() {
       (entry) => entry.preset.id === autoReservePresetId && entry.quote
     );
     if (!matchingQuote) {
+      const cleanQuoteParams = new URLSearchParams(searchParams.toString());
+      cleanQuoteParams.delete("autoReserve");
+      router.replace(buildQuoteUrlFromParams(cleanQuoteParams));
+      autoReserveAttemptedRef.current = true;
+      setAutoReserveInProgress(false);
+      setError("Unable to resume reservation for selected vehicle. Please tap Reserve again.");
       return;
     }
 
@@ -453,6 +462,7 @@ export function QuoteWorkbench() {
     router.replace(cleanQuoteUrl);
     void createBookingForPreset(matchingQuote.preset, {
       quoteReturnUrl: cleanQuoteUrl,
+      silent: true,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, loadingQuote, loadingBookingCategory, vehicleQuotes]);
@@ -551,7 +561,9 @@ export function QuoteWorkbench() {
 
   async function createBookingForPreset(preset: VehiclePreset, options?: CreateBookingOptions) {
     setError(null);
-    setLoadingBookingCategory(preset.id);
+    if (!options?.silent) {
+      setLoadingBookingCategory(preset.id);
+    }
 
     try {
       const payload = buildPayload(preset);
@@ -621,9 +633,12 @@ export function QuoteWorkbench() {
 
       router.push(`/customer/reserve?${params.toString()}`);
     } catch (err) {
+      setAutoReserveInProgress(false);
       setError(err instanceof Error ? err.message : "Unable to create booking.");
     } finally {
-      setLoadingBookingCategory(null);
+      if (!options?.silent) {
+        setLoadingBookingCategory(null);
+      }
     }
   }
 
@@ -634,6 +649,14 @@ export function QuoteWorkbench() {
 
   return (
     <div className="space-y-6">
+      {autoReserveInProgress ? (
+        <div className="rounded-xl border border-emerald-100 bg-emerald-50/40 p-5 text-sm text-emerald-800 shadow-sm">
+          <p className="font-semibold">Resuming your reservation...</p>
+          <p className="mt-1 text-xs text-emerald-700">
+            We are confirming your selected cab and taking you to review.
+          </p>
+        </div>
+      ) : null}
       <div className="rounded-xl border border-emerald-100 bg-white p-4 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-1">
@@ -708,7 +731,11 @@ export function QuoteWorkbench() {
             return (
               <article
                 key={vehicleQuote.preset.id}
-                className="space-y-4 rounded-xl border border-border bg-card p-4 shadow-sm"
+                className={
+                  autoReserveInProgress
+                    ? "pointer-events-none space-y-4 rounded-xl border border-border bg-card p-4 opacity-70 shadow-sm"
+                    : "space-y-4 rounded-xl border border-border bg-card p-4 shadow-sm"
+                }
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">

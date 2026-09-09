@@ -125,10 +125,13 @@ export default async function CustomerReservePage({ searchParams }: ReservePageP
   const quoteReturnUrlParam = readParam(params.quoteReturnUrl, "").trim();
   const perKmRateParam = readParam(params.perKmRate, "").trim();
   const stopLocations = readParamList(params.stop);
-  const normalizedDestination = destinationCity.trim().toLowerCase();
-  const intermediateStops = stopLocations.filter(
-    (stop) => stop.trim().toLowerCase() !== normalizedDestination
-  );
+  // The booking quote handoff includes the full destination chain in `stop`.
+  // The final item is the end city; everything before it is intermediate stops.
+  const hasRouteStops = stopLocations.length > 0;
+  const endCityFromRoute = hasRouteStops
+    ? stopLocations[stopLocations.length - 1] ?? destinationCity
+    : destinationCity;
+  const intermediateStops = hasRouteStops ? stopLocations.slice(0, -1) : [];
   const inferredAgeBucketLabel = inferAgeBucketLabel(vehicle, perKmRateParam);
   const resolvedAgeBucketLabel = ageBucketParam || inferredAgeBucketLabel || "0-3 years";
   const resolvedFuelType = fuelTypeParam || inferFuelType(vehicle);
@@ -236,10 +239,10 @@ export default async function CustomerReservePage({ searchParams }: ReservePageP
                     End city
                   </p>
                   <p
-                    title={destinationCity}
+                    title={endCityFromRoute}
                     className="max-w-[18rem] truncate text-sm font-medium text-foreground"
                   >
-                    {destinationCity}
+                    {endCityFromRoute}
                   </p>
                 </div>
               </div>
