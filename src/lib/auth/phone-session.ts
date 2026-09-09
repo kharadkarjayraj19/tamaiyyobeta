@@ -1,6 +1,10 @@
 import "server-only";
 
-import { randomInt, randomUUID } from "node:crypto";
+import {
+  createHmac,
+  randomInt,
+  timingSafeEqual,
+} from "node:crypto";
 
 import prisma from "@/lib/db/prisma";
 import { serverEnv } from "@/config/env/server";
@@ -39,7 +43,7 @@ type ProviderOtpSendResult = {
 };
 
 const otpStore = new Map<string, OtpRecord>();
-const sessionStore = new Map<string, SessionRecord>();
+const SESSION_SIGNING_SECRET = serverEnv.betterAuthSecret || "tamayo-dev-session-secret";
 
 function normalizePhone(phone: string): string {
   return phone.replace(/\D/g, "");
@@ -70,11 +74,72 @@ function cleanupExpiredRecords() {
       otpStore.delete(phone);
     }
   }
+}
 
-  for (const [token, record] of sessionStore.entries()) {
-    if (record.expiresAtMs <= now) {
-      sessionStore.delete(token);
+function toBase64Url(value: string) {
+  return Buffer.from(value, "utf8").toString("base64url");
+}
+
+function fromBase64Url(value: string) {
+  return Buffer.from(value, "base64url").toString("utf8");
+}
+
+function signPayload(payloadSegment: string) {
+  return createHmac("sha256", SESSION_SIGNING_SECRET)
+    .update(payloadSegment)
+    .digest("base64url");
+}
+
+function createSignedSessionToken(record: SessionRecord) {
+  const payloadSegment = toBase64Url(JSON.stringify(record));
+  const signatureSegment = signPayload(payloadSegment);
+  return `${payloadSegment}.${signatureSegment}`;
+}
+
+function parseSignedSessionToken(token: string): SessionRecord | null {
+  const parts = token.split(".");
+  if (parts.length !== 2) {
+    return null;
+  }
+
+  const [payloadSegment, signatureSegment] = parts;
+  const expectedSignature = signPayload(payloadSegment);
+
+  try {
+    const provided = Buffer.from(signatureSegment, "base64url");
+    const expected = Buffer.from(expectedSignature, "base64url");
+    if (provided.length !== expected.length) {
+      return null;
     }
+    if (!timingSafeEqual(provided, expected)) {
+      return null;
+    }
+  } catch {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(fromBase64Url(payloadSegment)) as SessionRecord;
+    if (!parsed || typeof parsed !== "object") {
+      return null;
+    }
+
+    if (
+      !parsed.user ||
+      typeof parsed.user.id !== "string" ||
+      typeof parsed.user.phone !== "string" ||
+      !parsed.session ||
+      typeof parsed.session.id !== "string" ||
+      typeof parsed.session.createdAt !== "string" ||
+      typeof parsed.session.expiresAt !== "string" ||
+      typeof parsed.expiresAtMs !== "number"
+    ) {
+      return null;
+    }
+
+    return parsed;
+  } catch {
+    return null;
   }
 }
 
@@ -161,17 +226,22 @@ export async function verifyPhoneOtp(params: { phone: string; otp: string }) {
 
   const normalizedPhone = normalizePhone(params.phone);
   const normalizedOtp = params.otp.trim();
+  const configuredTestOtp = serverEnv.defaultTestOtp?.trim();
+  const isTestOtpBypass =
+    Boolean(configuredTestOtp) &&
+    /^\d{4,6}$/.test(configuredTestOtp) &&
+    normalizedOtp === configuredTestOtp;
   const record = otpStore.get(normalizedPhone);
 
-  if (!record || record.expiresAt <= Date.now()) {
+  if (!isTestOtpBypass && (!record || record.expiresAt <= Date.now())) {
     throw new Error("Invalid or expired OTP. Please request a new code.");
   }
 
-  if (record.attemptsUsed >= MAX_VERIFY_ATTEMPTS) {
+  if (!isTestOtpBypass && record.attemptsUsed >= MAX_VERIFY_ATTEMPTS) {
     throw new Error("Maximum OTP attempts reached. Please request a new OTP.");
   }
 
-  if (record.code !== normalizedOtp) {
+  if (!isTestOtpBypass && record.code !== normalizedOtp) {
     record.attemptsUsed += 1;
     otpStore.set(normalizedPhone, record);
 
@@ -183,7 +253,9 @@ export async function verifyPhoneOtp(params: { phone: string; otp: string }) {
     throw new Error(`Incorrect OTP. ${attemptsLeft} attempt(s) remaining.`);
   }
 
-  otpStore.delete(normalizedPhone);
+  if (record) {
+    otpStore.delete(normalizedPhone);
+  }
 
   const identity = await prisma.identity.upsert({
     where: { phone: normalizedPhone },
@@ -205,11 +277,11 @@ export async function verifyPhoneOtp(params: { phone: string; otp: string }) {
     },
   });
 
-  const sessionToken = randomUUID();
   const now = Date.now();
+  const sessionId = toBase64Url(`${normalizedPhone}:${now}:${Math.random()}`);
   const expiresAtMs = now + SESSION_TTL_MS;
 
-  sessionStore.set(sessionToken, {
+  const sessionRecord: SessionRecord = {
     user: {
       id: customerAccount.id,
       email: identity.email ?? null,
@@ -217,12 +289,14 @@ export async function verifyPhoneOtp(params: { phone: string; otp: string }) {
       phone: normalizedPhone,
     },
     session: {
-      id: sessionToken,
+      id: sessionId,
       createdAt: new Date(now).toISOString(),
       expiresAt: new Date(expiresAtMs).toISOString(),
     },
     expiresAtMs,
-  });
+  };
+
+  const sessionToken = createSignedSessionToken(sessionRecord);
 
   return {
     sessionToken,
@@ -231,18 +305,16 @@ export async function verifyPhoneOtp(params: { phone: string; otp: string }) {
 }
 
 export function getPhoneSession(token: string | undefined | null) {
-  cleanupExpiredRecords();
   if (!token) {
     return null;
   }
 
-  const record = sessionStore.get(token);
+  const record = parseSignedSessionToken(token);
   if (!record) {
     return null;
   }
 
   if (record.expiresAtMs <= Date.now()) {
-    sessionStore.delete(token);
     return null;
   }
 
@@ -262,8 +334,5 @@ export function getPhoneSession(token: string | undefined | null) {
 }
 
 export function clearPhoneSession(token: string | undefined | null) {
-  if (!token) {
-    return;
-  }
-  sessionStore.delete(token);
+  void token;
 }

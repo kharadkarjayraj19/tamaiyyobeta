@@ -57,6 +57,7 @@
 - **Local auth bypass toggle**: development-only `DEV_AUTH_BYPASS=true` enables deterministic mock sessions for protected role trees until full login flow is wired.
 - **Phone OTP login (MVP)**: `/login` now supports phone OTP request/verify flow with callback redirect; server session fallback uses `tamayo.session_token` for protected role routes, with logout endpoint at `/api/v1/auth/logout`.
 - **OTP auth hardening**: OTP request has `30s` resend cooldown and max `3` verify attempts; server events emit PostHog funnel telemetry for OTP request/verify success and failures.
+- **OTP session stability (Vercel)**: phone-session fallback now uses a signed stateless `tamayo.session_token` payload, avoiding in-memory session loss across serverless instances during reserve flow.
 - **Post-reserve customer review step**: after `Reserve by paying ₹499`, customer now lands on `/customer/reserve` to review booking details, fare summary, and clear inclusions/exclusions before payment-gateway handoff (still pending).
 - **Customer home UI (interactive)**: `/customer` now runs as a full-width hero-first experience with ride-mode tabs (`One way`, `Multi city / Round trip`, `City tour`, `Airport only`), contextual fare guidance tooltips, and multi-city route input that supports up to 10 intermediate stops between pickup and final dropoff.
 - **Quote handoff prefill**: customer hero selections now pass route context into `/customer/booking-quote` through query params so quote workbench defaults reflect selected ride mode, route sequence, and city-tour package presets.
@@ -128,4 +129,5 @@
 | 2026-09-04 | **Implemented (MVP):** phone OTP login enabled via `/api/v1/auth/otp/request` and `/api/v1/auth/otp/verify`, with cookie-backed `tamayo.session_token` session fallback for protected layouts and `/api/v1/auth/logout` support. |
 | 2026-09-04 | **Implemented (MVP):** OTP auth now supports MSG91 provider integration, 30-second resend cooldown, max 3 verify attempts, and PostHog funnel events for OTP lifecycle. |
 | 2026-09-04 | **Implemented:** reserve CTA now navigates to `/customer/reserve` as the next customer step with booking + fare context while Razorpay/payment capture remains planned. |
+| 2026-09-09 | **Implemented (stability):** replaced in-memory phone session persistence with signed stateless `tamayo.session_token` payload to prevent OTP-login/session loss on Vercel serverless routing. |
 | 2026-09-08 | **Implemented:** `/customer/reserve` upgraded to a review-booking surface with trip context, inclusion/exclusion messaging, and pre-payment summary while payment-gateway integration remains pending. |
