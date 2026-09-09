@@ -355,6 +355,7 @@ export function QuoteWorkbench() {
   const [error, setError] = useState<string | null>(null);
   const [shouldAutoQuote, setShouldAutoQuote] = useState(false);
   const [operationalOption, setOperationalOption] = useState<OperationalOption>("ALL_INCLUSIVE");
+  const autoReserveAttemptedRef = useRef(false);
 
   const routeStopsSummary = form.destinationStops
     .split(DESTINATION_SEPARATOR)
@@ -418,6 +419,28 @@ export function QuoteWorkbench() {
     }));
     setShouldAutoQuote(true);
   }, [searchParams]);
+
+  useEffect(() => {
+    const autoReservePresetId = searchParams.get("autoReserve");
+    if (!autoReservePresetId || autoReserveAttemptedRef.current) {
+      return;
+    }
+
+    if (loadingQuote || Boolean(loadingBookingCategory) || vehicleQuotes.length === 0) {
+      return;
+    }
+
+    const matchingQuote = vehicleQuotes.find(
+      (entry) => entry.preset.id === autoReservePresetId && entry.quote
+    );
+    if (!matchingQuote) {
+      return;
+    }
+
+    autoReserveAttemptedRef.current = true;
+    void createBookingForPreset(matchingQuote.preset);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, loadingQuote, loadingBookingCategory, vehicleQuotes]);
 
   useEffect(() => {
     if (!shouldAutoQuote || loadingQuote) {
@@ -527,7 +550,9 @@ export function QuoteWorkbench() {
       });
 
       if (response.status === 401) {
-        const callbackUrl = `/customer/booking-quote?${searchParams.toString()}`;
+        const callbackParams = new URLSearchParams(searchParams.toString());
+        callbackParams.set("autoReserve", preset.id);
+        const callbackUrl = `/customer/booking-quote?${callbackParams.toString()}`;
         router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
         return;
       }
