@@ -75,7 +75,7 @@ export function PhoneLoginForm({ callbackUrl }: PhoneLoginFormProps) {
       }
 
       setMessage("Login successful. Redirecting...");
-      router.push(callbackUrl || "/customer");
+      router.replace(callbackUrl || "/customer");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to verify OTP.");

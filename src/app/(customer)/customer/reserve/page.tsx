@@ -108,6 +108,7 @@ export default async function CustomerReservePage({ searchParams }: ReservePageP
   const vehicle = readParam(params.vehicle, "Selected vehicle");
   const sourceCity = readParam(params.sourceCity, "Source");
   const destinationCity = readParam(params.destinationCity, "Destination");
+  const pickupLocation = readParam(params.pickupLocation, "");
   const tripStartDate = readParam(params.tripStartDate, "");
   const tripEndDate = readParam(params.tripEndDate, "");
   const reserveAmount = readParam(params.reserveAmount, "499");
@@ -121,6 +122,7 @@ export default async function CustomerReservePage({ searchParams }: ReservePageP
   const ageBucketParam = readParam(params.ageBucketLabel, "").trim();
   const fuelTypeParam = readParam(params.fuelType, "").replaceAll("+", " + ").trim();
   const productType = readParam(params.productType, "ROUND_TRIP");
+  const quoteReturnUrlParam = readParam(params.quoteReturnUrl, "").trim();
   const perKmRateParam = readParam(params.perKmRate, "").trim();
   const stopLocations = readParamList(params.stop);
   const normalizedDestination = destinationCity.trim().toLowerCase();
@@ -131,6 +133,25 @@ export default async function CustomerReservePage({ searchParams }: ReservePageP
   const resolvedAgeBucketLabel = ageBucketParam || inferredAgeBucketLabel || "0-3 years";
   const resolvedFuelType = fuelTypeParam || inferFuelType(vehicle);
   const resolvedPerKmRate = perKmRateParam || inferPerKmRate(vehicle, resolvedAgeBucketLabel);
+  const fallbackQuoteParams = new URLSearchParams();
+  if (productType) fallbackQuoteParams.set("productType", productType);
+  if (sourceCity && sourceCity !== "Source") fallbackQuoteParams.set("sourceCity", sourceCity);
+  if (destinationCity && destinationCity !== "Destination")
+    fallbackQuoteParams.set("destinationCity", destinationCity);
+  if (tripStartDate) fallbackQuoteParams.set("tripStartDate", tripStartDate);
+  if (tripEndDate) fallbackQuoteParams.set("tripEndDate", tripEndDate);
+  if (routeDistanceKm) fallbackQuoteParams.set("estimatedKm", routeDistanceKm);
+  if (returnDistanceKm) fallbackQuoteParams.set("returnDistanceKm", returnDistanceKm);
+  if (pickupLocation && pickupLocation !== "Pickup pending")
+    fallbackQuoteParams.set("pickupLocation", pickupLocation);
+  stopLocations.forEach((stop) => fallbackQuoteParams.append("drop", stop));
+  const fallbackQuoteReturnUrl = fallbackQuoteParams.size
+    ? `/customer/booking-quote?${fallbackQuoteParams.toString()}`
+    : "/customer/booking-quote";
+  const quoteReturnUrl =
+    quoteReturnUrlParam.startsWith("/customer/booking-quote")
+      ? quoteReturnUrlParam
+      : fallbackQuoteReturnUrl;
 
   const isAllInclusive = operationalOption === "ALL_INCLUSIVE";
   const fuelTypeLine = "Fuel,";
@@ -386,7 +407,7 @@ export default async function CustomerReservePage({ searchParams }: ReservePageP
           <div className="mt-4 flex flex-wrap gap-2">
             <Button disabled>Proceed to payment (coming soon)</Button>
             <Button asChild variant="outline">
-              <Link href="/customer/booking-quote">Back to quotes</Link>
+              <Link href={quoteReturnUrl}>Back to quotes</Link>
             </Button>
           </div>
         </aside>

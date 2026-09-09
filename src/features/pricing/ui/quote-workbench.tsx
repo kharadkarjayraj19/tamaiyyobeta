@@ -110,6 +110,10 @@ type VehicleQuoteResult = {
   error: string | null;
 };
 
+type CreateBookingOptions = {
+  quoteReturnUrl?: string;
+};
+
 const VEHICLE_PRESETS: VehiclePreset[] = [
   {
     id: "sedan",
@@ -344,6 +348,11 @@ function parseDestinationStops(raw: string) {
     .map((location) => ({ location }));
 }
 
+function buildQuoteUrlFromParams(params: URLSearchParams) {
+  const query = params.toString();
+  return query ? `/customer/booking-quote?${query}` : "/customer/booking-quote";
+}
+
 export function QuoteWorkbench() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -438,7 +447,13 @@ export function QuoteWorkbench() {
     }
 
     autoReserveAttemptedRef.current = true;
-    void createBookingForPreset(matchingQuote.preset);
+    const cleanQuoteParams = new URLSearchParams(searchParams.toString());
+    cleanQuoteParams.delete("autoReserve");
+    const cleanQuoteUrl = buildQuoteUrlFromParams(cleanQuoteParams);
+    router.replace(cleanQuoteUrl);
+    void createBookingForPreset(matchingQuote.preset, {
+      quoteReturnUrl: cleanQuoteUrl,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, loadingQuote, loadingBookingCategory, vehicleQuotes]);
 
@@ -534,7 +549,7 @@ export function QuoteWorkbench() {
     }
   }
 
-  async function createBookingForPreset(preset: VehiclePreset) {
+  async function createBookingForPreset(preset: VehiclePreset, options?: CreateBookingOptions) {
     setError(null);
     setLoadingBookingCategory(preset.id);
 
@@ -573,6 +588,9 @@ export function QuoteWorkbench() {
       const selectedStops = parseDestinationStops(form.destinationStops)
         .map((stop) => stop.location)
         .filter(Boolean);
+      const quoteReturnParams = new URLSearchParams(searchParams.toString());
+      quoteReturnParams.delete("autoReserve");
+      const quoteReturnUrl = options?.quoteReturnUrl ?? buildQuoteUrlFromParams(quoteReturnParams);
       const params = new URLSearchParams({
         bookingRef: bookingResult.booking.bookingRef,
         bookingStatus: bookingResult.booking.status,
@@ -587,6 +605,7 @@ export function QuoteWorkbench() {
         ageBucketLabel: selectedAgeLabel,
         fuelType: preset.fuelTags.join("+"),
         productType: form.productType,
+        quoteReturnUrl,
       });
 
       if (matchedQuote) {
