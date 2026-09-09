@@ -178,7 +178,7 @@ export default async function CustomerReservePage({ searchParams }: ReservePageP
   ];
 
   return (
-    <div className="space-y-8 pb-[calc(env(safe-area-inset-bottom)+6.5rem)] sm:pb-12">
+    <div className="space-y-8 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:pb-8">
       <SectionHeader
         title="Review your booking"
         description="Confirm trip details, inclusions, and exclusions before proceeding to payment."
@@ -357,9 +357,9 @@ export default async function CustomerReservePage({ searchParams }: ReservePageP
               </p>
               <ul className="mt-1.5 space-y-0.5 text-[11px] font-medium text-foreground sm:text-[11px]">
                 {inclusions.map((item) => (
-                  <li key={item} className="inline-flex items-start gap-1 rounded-md bg-white px-1.5 py-0.5">
+                  <li key={item} className="flex w-full items-start gap-1 rounded-md bg-white px-1.5 py-0.5">
                     <CheckCircle2 className="mt-0.5 h-3 w-3 shrink-0 text-emerald-700" />
-                    <span className="leading-snug">{item}</span>
+                    <span className="min-w-0 leading-snug break-words">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -371,9 +371,9 @@ export default async function CustomerReservePage({ searchParams }: ReservePageP
               </p>
               <ul className="mt-1.5 space-y-0.5 text-[11px] font-medium text-foreground sm:text-[11px]">
                 {exclusions.map((item) => (
-                  <li key={item} className="inline-flex items-start gap-1 rounded-md bg-white px-1.5 py-0.5">
+                  <li key={item} className="flex w-full items-start gap-1 rounded-md bg-white px-1.5 py-0.5">
                     <TriangleAlert className="mt-0.5 h-3 w-3 shrink-0 text-amber-700" />
-                    <span className="leading-snug">{item}</span>
+                    <span className="min-w-0 leading-snug break-words">{item}</span>
                   </li>
                 ))}
               </ul>
