@@ -322,3 +322,6 @@ This keeps reviews focused and lowers hallucination/regression risk.
 | 2026-08-29 | Implemented post-CTA results enhancement: `/customer/booking-quote` now shows a modern fare-result card with total amount, included km context, and reserve (`₹499`) call-to-action aligned to customer flow. |
 | 2026-08-29 | Implemented quote UX enrichment: interactive vehicle presets, age toggle (`0-3` / `4-7`), duration/included-km cards, fuel tags, and petrol/CNG queue advisory copy on the quote results surface. |
 | 2026-09-04 | Implemented post-reserve handoff: reserve CTA now routes to `/customer/reserve` with booking reference, route snapshot, and reserve amount summary as the next-page placeholder until payment gateway integration lands. |
+| 2026-09-08 | Implemented reserve-page upgrade: `/customer/reserve` now acts as a review-booking step with expanded trip details and explicit inclusions/exclusions before payment handoff. |
+| 2026-09-08 | UI refinement: review page now shows route timeline with start/end/stop markers and icon-based inclusion/exclusion cards aligned to Tamayo's green theme. |
+| 2026-09-09 | Updated reserve review UX to a focused customer flow (no sidebar/top-navbar chrome), with compact inline trip metrics and resilient age/fuel/per-km copy fallbacks. |

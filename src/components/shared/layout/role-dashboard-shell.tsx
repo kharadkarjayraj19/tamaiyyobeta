@@ -37,7 +37,10 @@ export function RoleDashboardShell({ role, children }: RoleDashboardShellProps) 
   const pathname = usePathname();
   const items = useMemo(() => getNavigationForRole(role), [role]);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const hideSidebar = role === "customer" && pathname === "/customer";
+  const isCustomerOverview = role === "customer" && pathname === "/customer";
+  const isCustomerReserveFlow = role === "customer" && pathname.startsWith("/customer/reserve");
+  const hideSidebar = isCustomerOverview || isCustomerReserveFlow;
+  const hideTopBar = isCustomerReserveFlow;
   const sidebar = <Sidebar role={role} items={items} pathname={pathname} />;
 
   return (
@@ -46,11 +49,13 @@ export function RoleDashboardShell({ role, children }: RoleDashboardShellProps) 
         <SkipToContent />
         <DashboardLayout
           topBar={
-            <TopNavbar
-              role={role}
-              onOpenSidebar={() => setMobileNavOpen(true)}
-              showMenuButton={!hideSidebar}
-            />
+            hideTopBar ? null : (
+              <TopNavbar
+                role={role}
+                onOpenSidebar={() => setMobileNavOpen(true)}
+                showMenuButton={!hideSidebar}
+              />
+            )
           }
           sidebar={hideSidebar ? undefined : sidebar}
         >
@@ -61,7 +66,7 @@ export function RoleDashboardShell({ role, children }: RoleDashboardShellProps) 
           >
             <PageContainer
               variant="wide"
-              className={hideSidebar ? "px-0 py-3 sm:px-0 lg:px-0" : undefined}
+              className={isCustomerOverview ? "px-0 py-3 sm:px-0 lg:px-0" : undefined}
             >
               {children}
             </PageContainer>

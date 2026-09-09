@@ -543,13 +543,25 @@ export function QuoteWorkbench() {
       const matchedQuote = vehicleQuotes.find(
         (entry) => entry.preset.id === preset.id
       )?.quote;
+      const selectedAgeLabel =
+        AGE_OPTIONS.find((option) => option.value === form.ageBucket)?.label ?? "selected";
+      const selectedStops = parseDestinationStops(form.destinationStops)
+        .map((stop) => stop.location)
+        .filter(Boolean);
       const params = new URLSearchParams({
         bookingRef: bookingResult.booking.bookingRef,
         bookingStatus: bookingResult.booking.status,
         vehicle: preset.label,
         sourceCity: form.sourceCity,
         destinationCity: form.destinationCity || "your destination",
+        pickupLocation: form.pickupLocation || "Pickup pending",
+        tripStartDate: form.tripStartDate || "",
+        tripEndDate: form.tripEndDate || "",
         reserveAmount: String(RESERVE_TOKEN_AMOUNT),
+        operationalOption,
+        ageBucketLabel: selectedAgeLabel,
+        fuelType: preset.fuelTags.join("+"),
+        productType: form.productType,
       });
 
       if (matchedQuote) {
@@ -557,7 +569,11 @@ export function QuoteWorkbench() {
         params.set("routeDistanceKm", String(matchedQuote.routeDistanceKm ?? ""));
         params.set("returnDistanceKm", String(matchedQuote.returnDistanceKm ?? ""));
         params.set("dispatchHubCity", matchedQuote.dispatchHubCity ?? "");
+        params.set("includedDays", String(matchedQuote.includedDays));
+        params.set("totalIncludedKm", String(matchedQuote.totalIncludedKm));
+        params.set("perKmRate", String(Math.round(Number(matchedQuote.perKmRate))));
       }
+      selectedStops.forEach((stop) => params.append("stop", stop));
 
       router.push(`/customer/reserve?${params.toString()}`);
     } catch (err) {
