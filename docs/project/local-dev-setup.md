@@ -21,6 +21,7 @@ Optional for feature testing:
   - `GOOGLE_MAPS_DIRECTIONS_API_KEY` + `GOOGLE_MAPS_PLACES_API_KEY` (recommended split)
 - **PostHog keys** for analytics verification (`NEXT_PUBLIC_POSTHOG_KEY`, `POSTHOG_PROJECT_API_KEY`)
 - **MSG91 OTP keys** for real SMS OTP (`MSG91_AUTH_KEY`, `MSG91_TEMPLATE_ID`)
+- **Google OAuth keys** for social sign-in (`GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`)
 
 ---
 
@@ -62,6 +63,12 @@ Optional local auth shortcut:
   - `/customer/*` resolves as `mock-customer-1`
   - `/supplier/*` resolves as `mock-supplier-1`
   - `/admin/*` resolves as `mock-admin-1`
+
+Optional Google login env values:
+
+- `BETTER_AUTH_URL=http://localhost:3000`
+- `GOOGLE_OAUTH_CLIENT_ID=...`
+- `GOOGLE_OAUTH_CLIENT_SECRET=...`
 
 Create the shadow DB once:
 

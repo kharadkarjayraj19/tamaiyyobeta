@@ -200,9 +200,10 @@ This section maps the **current repo** wiring (Better Auth ≥1.6, Next.js App R
 | HTTP handler | `src/app/api/auth/[...all]/route.ts` — `toNextJsHandler(auth)` |
 | React client (Client Components only) | `src/lib/auth/client.ts` — `createAuthClient` from `better-auth/react` |
 | Public vs role paths | `src/lib/auth/guards.ts` — `ROLE_PATH_PREFIXES`, `LOGIN_PATH`, `buildLoginRedirect` |
-| Server env | `src/config/env/auth.ts` — `BETTER_AUTH_SECRET` / `BETTER_AUTH_URL` (see `.env.example`) |
+| Server env | `src/config/env/auth.ts` + `src/config/env/server.ts` — `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` (see `.env.example`) |
 | Edge middleware (optimistic) | `src/middleware.ts` — checks cookie **name prefix** `better-auth.session_token` (Edge-safe; **not** cryptographic validation) |
 | OTP login APIs (MVP) | `src/app/api/v1/auth/otp/request/route.ts`, `src/app/api/v1/auth/otp/verify/route.ts`, `src/app/api/v1/auth/logout/route.ts` |
+| Google login + phone completion (MVP) | `src/app/api/v1/auth/google/start/route.ts`, `src/app/api/v1/auth/google/callback/route.ts`, `src/app/api/v1/auth/google/complete-phone/route.ts`, `src/lib/auth/google-oauth.ts`, `src/app/login/complete-profile/page.tsx` |
 | OTP/session fallback | `src/lib/auth/phone-session.ts` + `src/lib/auth/session.ts` fallback lookup via `tamayo.session_token`; request cooldown 30s and max 3 verify attempts; phone session cookie is signed/stateless for serverless compatibility |
 | Local auth bypass toggle | `DEV_AUTH_BYPASS=true` (development only) skips middleware redirect + provides deterministic mock sessions in `require-session.ts` for role trees. |
 | Client session bridge | `src/features/auth/session-bridge-provider.tsx` — minimal context for future navbar UI |
@@ -226,5 +227,7 @@ This section maps the **current repo** wiring (Better Auth ≥1.6, Next.js App R
 | 2026-09-04 | **Implemented (MVP):** phone OTP login flow added with request/verify/logout routes, `tamayo.session_token` cookie sessions, and `/login` UI for callback-based role-route access. |
 | 2026-09-04 | **Implemented (MVP hardening):** MSG91 OTP provider integration seam with local debug fallback, resend cooldown (30s), max verify attempts (3), and PostHog auth funnel events (`otp_requested`, `otp_request_failed`, `otp_verified`, `otp_verify_failed`). |
 | 2026-09-09 | **Implemented (stability):** replaced in-memory phone session store with signed stateless session token payload in `tamayo.session_token` so OTP login persists across serverless instances on Vercel. |
+| 2026-09-09 | **Implemented (MVP):** Google OAuth sign-in added with mandatory phone capture before session issuance (`/login/complete-profile`), reusing signed `tamayo.session_token` session cookies for booking/reserve flows. |
+| 2026-09-14 | **Hardened:** Google callback no longer forwards user email via URL query; phone-completion handoff relies on signed pending-profile cookie state only. |
 
 As RBAC and providers land, extend the “Repository implementation” table and §20; move **Maturity** toward `MVP` when login flows are production-ready.

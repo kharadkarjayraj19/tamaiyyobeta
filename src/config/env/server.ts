@@ -10,6 +10,8 @@ export const serverEnv = {
     process.env.NODE_ENV === "development" && process.env.DEV_AUTH_BYPASS === "true",
   betterAuthSecret: process.env.BETTER_AUTH_SECRET,
   betterAuthUrl: process.env.BETTER_AUTH_URL,
+  googleOauthClientId: process.env.GOOGLE_OAUTH_CLIENT_ID,
+  googleOauthClientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
   authMiddlewareEnabled: process.env.AUTH_MIDDLEWARE_ENABLED,
   databaseUrl: process.env.DATABASE_URL,
   googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,

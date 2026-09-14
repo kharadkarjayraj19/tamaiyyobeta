@@ -9,7 +9,8 @@ import { authEnv } from "@/config/env/auth";
  *
  * - **Stateless foundation:** no primary `database` adapter yet; sessions use signed cookie cache
  *   per Better Auth stateless defaults. Add Drizzle/Prisma/SQL when persistence is required.
- * - **Google OAuth:** add `socialProviders.google` when credentials exist.
+ * - **Google OAuth:** currently handled via custom `/api/v1/auth/google/*` routes while
+ *   keeping `tamayo.session_token` session fallback aligned with booking flows.
  * - **OTP / magic link:** add official plugins when product specs land.
  *
  * @see https://www.better-auth.com/docs/concepts/session-management#stateless-session-management
@@ -32,11 +33,5 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: false,
   },
-  // socialProviders: {
-  //   google: {
-  //     clientId: process.env.GOOGLE_CLIENT_ID!,
-  //     clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-  //   },
-  // },
   plugins: [nextCookies()],
 });

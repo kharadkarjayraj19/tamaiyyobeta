@@ -37,6 +37,13 @@ type SessionRecord = {
   expiresAtMs: number;
 };
 
+type SessionUserInput = {
+  customerId: string;
+  email: string | null;
+  name: string | null;
+  phone: string;
+};
+
 type ProviderOtpSendResult = {
   provider: "MSG91" | "LOCAL";
   debugCode?: string;
@@ -94,6 +101,32 @@ function createSignedSessionToken(record: SessionRecord) {
   const payloadSegment = toBase64Url(JSON.stringify(record));
   const signatureSegment = signPayload(payloadSegment);
   return `${payloadSegment}.${signatureSegment}`;
+}
+
+export function createPhoneSessionTokenForCustomer(user: SessionUserInput) {
+  const now = Date.now();
+  const sessionId = toBase64Url(`${user.phone}:${now}:${Math.random()}`);
+  const expiresAtMs = now + SESSION_TTL_MS;
+
+  const sessionRecord: SessionRecord = {
+    user: {
+      id: user.customerId,
+      email: user.email,
+      name: user.name,
+      phone: user.phone,
+    },
+    session: {
+      id: sessionId,
+      createdAt: new Date(now).toISOString(),
+      expiresAt: new Date(expiresAtMs).toISOString(),
+    },
+    expiresAtMs,
+  };
+
+  return {
+    sessionToken: createSignedSessionToken(sessionRecord),
+    sessionMaxAgeSeconds: Math.floor(SESSION_TTL_MS / 1000),
+  };
 }
 
 function parseSignedSessionToken(token: string): SessionRecord | null {
@@ -277,31 +310,12 @@ export async function verifyPhoneOtp(params: { phone: string; otp: string }) {
     },
   });
 
-  const now = Date.now();
-  const sessionId = toBase64Url(`${normalizedPhone}:${now}:${Math.random()}`);
-  const expiresAtMs = now + SESSION_TTL_MS;
-
-  const sessionRecord: SessionRecord = {
-    user: {
-      id: customerAccount.id,
-      email: identity.email ?? null,
-      name: customerAccount.name ?? null,
-      phone: normalizedPhone,
-    },
-    session: {
-      id: sessionId,
-      createdAt: new Date(now).toISOString(),
-      expiresAt: new Date(expiresAtMs).toISOString(),
-    },
-    expiresAtMs,
-  };
-
-  const sessionToken = createSignedSessionToken(sessionRecord);
-
-  return {
-    sessionToken,
-    sessionMaxAgeSeconds: Math.floor(SESSION_TTL_MS / 1000),
-  };
+  return createPhoneSessionTokenForCustomer({
+    customerId: customerAccount.id,
+    email: identity.email ?? null,
+    name: customerAccount.name ?? null,
+    phone: normalizedPhone,
+  });
 }
 
 export function getPhoneSession(token: string | undefined | null) {

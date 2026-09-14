@@ -60,14 +60,6 @@ function formatDateTime(value: string): string {
   }).format(date);
 }
 
-function inferFuelType(vehicle: string): string {
-  const normalized = vehicle.toLowerCase();
-  if (normalized.includes("sedan") || normalized.includes("ertiga") || normalized.includes("rumion")) {
-    return "CNG + Petrol";
-  }
-  return "Diesel";
-}
-
 function inferAgeBucketLabel(vehicle: string, perKmRate: string): string {
   const normalized = vehicle.toLowerCase();
   const rate = Number(perKmRate);
@@ -120,7 +112,6 @@ export default async function CustomerReservePage({ searchParams }: ReservePageP
   const totalIncludedKm = readParam(params.totalIncludedKm, "");
   const operationalOption = readParam(params.operationalOption, "ALL_INCLUSIVE");
   const ageBucketParam = readParam(params.ageBucketLabel, "").trim();
-  const fuelTypeParam = readParam(params.fuelType, "").replaceAll("+", " + ").trim();
   const productType = readParam(params.productType, "ROUND_TRIP");
   const quoteReturnUrlParam = readParam(params.quoteReturnUrl, "").trim();
   const perKmRateParam = readParam(params.perKmRate, "").trim();
@@ -134,7 +125,6 @@ export default async function CustomerReservePage({ searchParams }: ReservePageP
   const intermediateStops = hasRouteStops ? stopLocations.slice(0, -1) : [];
   const inferredAgeBucketLabel = inferAgeBucketLabel(vehicle, perKmRateParam);
   const resolvedAgeBucketLabel = ageBucketParam || inferredAgeBucketLabel || "0-3 years";
-  const resolvedFuelType = fuelTypeParam || inferFuelType(vehicle);
   const resolvedPerKmRate = perKmRateParam || inferPerKmRate(vehicle, resolvedAgeBucketLabel);
   const fallbackQuoteParams = new URLSearchParams();
   if (productType) fallbackQuoteParams.set("productType", productType);

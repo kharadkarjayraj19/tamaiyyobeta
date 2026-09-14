@@ -58,6 +58,9 @@
 - **Phone OTP login (MVP)**: `/login` now supports phone OTP request/verify flow with callback redirect; server session fallback uses `tamayo.session_token` for protected role routes, with logout endpoint at `/api/v1/auth/logout`.
 - **OTP auth hardening**: OTP request has `30s` resend cooldown and max `3` verify attempts; server events emit PostHog funnel telemetry for OTP request/verify success and failures.
 - **OTP session stability (Vercel)**: phone-session fallback now uses a signed stateless `tamayo.session_token` payload, avoiding in-memory session loss across serverless instances during reserve flow.
+- **Google login + required phone capture (MVP)**: `/login` now offers Google sign-in; first-time Google users must complete `/login/complete-profile` with a phone number before customer session is issued.
+- **Quote/reserve navigation hardening**: OTP callback auto-reserve now consumes one-time `autoReserve` state and preserves a `quoteReturnUrl` so browser back and “Back to quotes” keep booking context without looping.
+- **Reserve mobile spacing + overflow fix**: reserve view now uses compact safe-area bottom padding and wrapping inclusion/exclusion rows to prevent extra horizontal scroll and oversized bottom whitespace.
 - **Post-reserve customer review step**: after `Reserve by paying ₹499`, customer now lands on `/customer/reserve` to review booking details, fare summary, and clear inclusions/exclusions before payment-gateway handoff (still pending).
 - **Customer home UI (interactive)**: `/customer` now runs as a full-width hero-first experience with ride-mode tabs (`One way`, `Multi city / Round trip`, `City tour`, `Airport only`), contextual fare guidance tooltips, and multi-city route input that supports up to 10 intermediate stops between pickup and final dropoff.
 - **Quote handoff prefill**: customer hero selections now pass route context into `/customer/booking-quote` through query params so quote workbench defaults reflect selected ride mode, route sequence, and city-tour package presets.
@@ -129,5 +132,9 @@
 | 2026-09-04 | **Implemented (MVP):** phone OTP login enabled via `/api/v1/auth/otp/request` and `/api/v1/auth/otp/verify`, with cookie-backed `tamayo.session_token` session fallback for protected layouts and `/api/v1/auth/logout` support. |
 | 2026-09-04 | **Implemented (MVP):** OTP auth now supports MSG91 provider integration, 30-second resend cooldown, max 3 verify attempts, and PostHog funnel events for OTP lifecycle. |
 | 2026-09-04 | **Implemented:** reserve CTA now navigates to `/customer/reserve` as the next customer step with booking + fare context while Razorpay/payment capture remains planned. |
+| 2026-09-06 | **Implemented:** customer route tree no longer enforces upfront layout auth gate; auth is now progressively enforced at reserve/payment actions. |
 | 2026-09-09 | **Implemented (stability):** replaced in-memory phone session persistence with signed stateless `tamayo.session_token` payload to prevent OTP-login/session loss on Vercel serverless routing. |
+| 2026-09-09 | **Implemented (stability):** booking quote ↔ reserve navigation now consumes one-shot `autoReserve`, preserves quote return context, and prevents browser-back reserve loops after OTP continuation. |
+| 2026-09-09 | **Implemented (UI stability):** reserve page route overview now excludes duplicated end-city stops and fixes mobile overflow/bottom-spacing regressions. |
+| 2026-09-09 | **Implemented (MVP):** Google OAuth login flow added with mandatory phone completion before session issuance, preserving callback-based reserve/quote continuation. |
 | 2026-09-08 | **Implemented:** `/customer/reserve` upgraded to a review-booking surface with trip context, inclusion/exclusion messaging, and pre-payment summary while payment-gateway integration remains pending. |

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { PhoneLoginForm } from "@/features/auth/ui/phone-login-form";
 
 type LoginPageProps = {
-  searchParams?: Promise<{ callbackUrl?: string }>;
+  searchParams?: Promise<{ callbackUrl?: string; error?: string }>;
 };
 
 /**
@@ -13,6 +13,14 @@ type LoginPageProps = {
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = searchParams ? await searchParams : {};
   const callbackUrl = params.callbackUrl;
+  const error = params.error;
+  const googleStartParams = new URLSearchParams();
+  if (callbackUrl) {
+    googleStartParams.set("callbackUrl", callbackUrl);
+  }
+  const googleStartUrl = `/api/v1/auth/google/start${
+    googleStartParams.toString() ? `?${googleStartParams.toString()}` : ""
+  }`;
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-6 py-16">
@@ -28,6 +36,21 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <span className="font-mono text-foreground">{callbackUrl}</span>
         </p>
       ) : null}
+      {error ? (
+        <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-center text-xs text-destructive">
+          {error === "google_not_configured"
+            ? "Google sign-in is not configured yet. Add Google OAuth keys."
+            : error === "google_state_invalid"
+              ? "Google sign-in session expired. Please try again."
+              : error === "google_signin_cancelled"
+                ? "Google sign-in was cancelled. Please try again."
+                : "Unable to sign in with Google right now. Please retry."}
+        </p>
+      ) : null}
+      <Button asChild variant="outline">
+        <Link href={googleStartUrl}>Continue with Google</Link>
+      </Button>
+      <p className="text-center text-xs text-muted-foreground">or continue with phone OTP</p>
       <PhoneLoginForm callbackUrl={callbackUrl} />
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
         <Button asChild variant="secondary">
