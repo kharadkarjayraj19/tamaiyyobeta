@@ -6,8 +6,6 @@ import { serverEnv } from "@/config/env/server";
 
 const GOOGLE_OAUTH_STATE_TTL_SECONDS = 10 * 60;
 const GOOGLE_PENDING_PROFILE_TTL_SECONDS = 15 * 60;
-const AUTH_BASE_URL =
-  serverEnv.betterAuthUrl ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 const GOOGLE_CALLBACK_PATH = "/api/v1/auth/google/callback";
 const COOKIE_SIGNING_SECRET = serverEnv.betterAuthSecret || "tamayo-dev-session-secret";
 
@@ -166,10 +164,6 @@ export function readGooglePendingProfileToken(
   return parsed;
 }
 
-export function getGoogleOAuthRedirectUri() {
-  return `${AUTH_BASE_URL}${GOOGLE_CALLBACK_PATH}`;
-}
-
 export function getGoogleOAuthConfig() {
   const clientId = serverEnv.googleOauthClientId?.trim();
   const clientSecret = serverEnv.googleOauthClientSecret?.trim();
@@ -177,4 +171,14 @@ export function getGoogleOAuthConfig() {
     throw new Error("Google login is not configured. Set GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET.");
   }
   return { clientId, clientSecret };
+}
+
+export function buildGoogleOAuthRedirectUriFromOrigin(origin: string) {
+  const safeOrigin = origin.trim();
+  if (!safeOrigin) {
+    const fallback =
+      serverEnv.betterAuthUrl ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+    return `${fallback}${GOOGLE_CALLBACK_PATH}`;
+  }
+  return `${safeOrigin}${GOOGLE_CALLBACK_PATH}`;
 }

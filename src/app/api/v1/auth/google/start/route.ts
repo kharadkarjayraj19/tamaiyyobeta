@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import {
+  buildGoogleOAuthRedirectUriFromOrigin,
   createGoogleOAuthState,
   getGoogleOAuthConfig,
-  getGoogleOAuthRedirectUri,
   normalizeInternalCallbackUrl,
 } from "@/lib/auth/google-oauth";
 import { TAMAYO_GOOGLE_STATE_COOKIE } from "@/lib/auth/constants";
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const callbackUrl = normalizeInternalCallbackUrl(request.nextUrl.searchParams.get("callbackUrl"));
     const { clientId } = getGoogleOAuthConfig();
     const { state, token, maxAgeSeconds } = createGoogleOAuthState(callbackUrl);
-    const redirectUri = getGoogleOAuthRedirectUri();
+    const redirectUri = buildGoogleOAuthRedirectUriFromOrigin(request.nextUrl.origin);
 
     const googleAuthUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
     googleAuthUrl.searchParams.set("client_id", clientId);

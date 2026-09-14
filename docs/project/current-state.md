@@ -55,10 +55,10 @@
 - **Launch-hub dispatch distance rule**: distance estimation for quote/create now evaluates all launch hubs (`Mumbai`, `Pune`, `Chhatrapati Sambhajinagar`/`Aurangabad`, `Nashik`) as closed loops and selects the lowest total (`hub -> pickup -> stops -> final drop -> same hub`), including dispatch overhead in route km.
 - **Route-distance return visibility**: quote UI now shows return-km context inline in estimated route distance for intercity routes when return distance is available (e.g., "including return X kms").
 - **Local auth bypass toggle**: development-only `DEV_AUTH_BYPASS=true` enables deterministic mock sessions for protected role trees until full login flow is wired.
-- **Phone OTP login (MVP)**: `/login` now supports phone OTP request/verify flow with callback redirect; server session fallback uses `tamayo.session_token` for protected role routes, with logout endpoint at `/api/v1/auth/logout`.
+- **Phone OTP endpoints (standby)**: OTP request/verify/logout APIs remain available for later production verification rollout, but `/login` no longer presents OTP as the primary sign-in path.
 - **OTP auth hardening**: OTP request has `30s` resend cooldown and max `3` verify attempts; server events emit PostHog funnel telemetry for OTP request/verify success and failures.
 - **OTP session stability (Vercel)**: phone-session fallback now uses a signed stateless `tamayo.session_token` payload, avoiding in-memory session loss across serverless instances during reserve flow.
-- **Google login + required phone capture (MVP)**: `/login` now offers Google sign-in; first-time Google users must complete `/login/complete-profile` with a phone number before customer session is issued.
+- **Google login + required phone capture (MVP)**: `/login` now uses Google as the single entry; first-time Google users must complete `/login/complete-profile` with a phone number before customer session is issued (phone accepted directly for now; OTP verification deferred).
 - **Quote/reserve navigation hardening**: OTP callback auto-reserve now consumes one-time `autoReserve` state and preserves a `quoteReturnUrl` so browser back and “Back to quotes” keep booking context without looping.
 - **Reserve mobile spacing + overflow fix**: reserve view now uses compact safe-area bottom padding and wrapping inclusion/exclusion rows to prevent extra horizontal scroll and oversized bottom whitespace.
 - **Post-reserve customer review step**: after `Reserve by paying ₹499`, customer now lands on `/customer/reserve` to review booking details, fare summary, and clear inclusions/exclusions before payment-gateway handoff (still pending).
@@ -138,3 +138,4 @@
 | 2026-09-09 | **Implemented (UI stability):** reserve page route overview now excludes duplicated end-city stops and fixes mobile overflow/bottom-spacing regressions. |
 | 2026-09-09 | **Implemented (MVP):** Google OAuth login flow added with mandatory phone completion before session issuance, preserving callback-based reserve/quote continuation. |
 | 2026-09-08 | **Implemented:** `/customer/reserve` upgraded to a review-booking surface with trip context, inclusion/exclusion messaging, and pre-payment summary while payment-gateway integration remains pending. |
+| 2026-09-14 | **Implemented (product flow):** `/login` switched to Google-only sign-in UX; phone number capture remains mandatory post-Google while OTP verification is intentionally deferred to a later rollout phase. |

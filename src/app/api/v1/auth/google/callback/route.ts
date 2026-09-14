@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/lib/db/prisma";
 import {
+  buildGoogleOAuthRedirectUriFromOrigin,
   createGooglePendingProfileToken,
   getGoogleOAuthConfig,
-  getGoogleOAuthRedirectUri,
   readGoogleOAuthStateToken,
 } from "@/lib/auth/google-oauth";
 import {
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
   try {
     const tokenData = await exchangeCodeForGoogleToken({
       code: rawCode,
-      redirectUri: getGoogleOAuthRedirectUri(),
+      redirectUri: buildGoogleOAuthRedirectUriFromOrigin(request.nextUrl.origin),
     });
     const userInfo = await fetchGoogleUserInfo(tokenData.access_token);
 

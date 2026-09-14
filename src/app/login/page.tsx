@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { PhoneLoginForm } from "@/features/auth/ui/phone-login-form";
 
 type LoginPageProps = {
   searchParams?: Promise<{ callbackUrl?: string; error?: string }>;
@@ -27,7 +26,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       <div className="space-y-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
         <p className="text-sm text-muted-foreground">
-          Continue with mobile OTP to access your dashboard.
+          Continue with Google to access your dashboard.
         </p>
       </div>
       {callbackUrl ? (
@@ -48,10 +47,13 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         </p>
       ) : null}
       <Button asChild variant="outline">
-        <Link href={googleStartUrl}>Continue with Google</Link>
+        <Link href={googleStartUrl} prefetch={false}>
+          Continue with Google
+        </Link>
       </Button>
-      <p className="text-center text-xs text-muted-foreground">or continue with phone OTP</p>
-      <PhoneLoginForm callbackUrl={callbackUrl} />
+      <p className="text-center text-xs text-muted-foreground">
+        We will ask for your mobile number in the next step to continue booking.
+      </p>
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
         <Button asChild variant="secondary">
           <Link href="/">Back to home</Link>

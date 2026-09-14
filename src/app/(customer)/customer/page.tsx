@@ -253,8 +253,8 @@ function getMinimumFutureTimeValue(now: Date = new Date()) {
 
 function getFieldTextClass(value: string) {
   return value.trim()
-    ? "w-full bg-transparent font-medium text-foreground outline-none placeholder:text-muted-foreground"
-    : "w-full bg-transparent text-muted-foreground outline-none placeholder:text-muted-foreground";
+    ? "w-full bg-transparent text-base font-medium text-foreground outline-none placeholder:text-muted-foreground sm:text-sm"
+    : "w-full bg-transparent text-base text-muted-foreground outline-none placeholder:text-muted-foreground sm:text-sm";
 }
 
 function getCityTokenFromLocation(location: string) {
