@@ -261,5 +261,7 @@ Lower layers must not import higher layers. Document exceptions if a primitive e
 | (Initial) | Foundation design system specification created. |
 | — | Added cross-link to cross-role change discipline; header uses formal **Maturity** (`FOUNDATION`). |
 | 2026-05-13 | Web app shell implemented per **docs/features/app-shell.md** (nav, layouts, table/card wrappers). |
+| 2026-09-18 | Added shared button-variant usage pattern for conversion-focused customer CTAs via reusable green gradient button styling (`tamayoGradient`) instead of per-page ad-hoc gradient classes. |
+| 2026-09-18 | Updated `tamayoGradient` shared button variant with glassmorphism treatment (translucent border, blur, and elevated shadow) so all gradient conversion CTAs share one modern visual behavior. |
 
 When you materially change tokens, patterns, or philosophy, add a row here and link any superseded sections from `docs/architecture.md` if needed.

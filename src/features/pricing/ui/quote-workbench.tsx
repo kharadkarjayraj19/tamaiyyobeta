@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 
+import { LocationAutocompleteInput } from "@/components/shared/location/location-autocomplete-input";
 import { Button } from "@/components/ui/button";
 
 type QuoteLineItem = {
@@ -114,6 +114,13 @@ type CreateBookingOptions = {
   quoteReturnUrl?: string;
 };
 
+type EditorKind =
+  | "from"
+  | "to"
+  | "stops"
+  | "pickupDateTime"
+  | null;
+
 const VEHICLE_PRESETS: VehiclePreset[] = [
   {
     id: "sedan",
@@ -182,6 +189,12 @@ const AGE_OPTIONS: Array<{ value: AgeBucketOption; label: string }> = [
   { value: "THREE_TO_SEVEN", label: "4-7 years" },
 ];
 
+const TRIP_TYPE_OPTIONS: Array<{ value: ProductTypeOption; label: string }> = [
+  { value: "ROUND_TRIP", label: "Outstation" },
+  { value: "ONE_WAY", label: "One-Way" },
+  { value: "MULTI_CITY", label: "City Tour" },
+];
+
 const OPERATIONAL_OPTIONS: Array<{ value: OperationalOption; label: string }> = [
   { value: "SELF_PAY", label: "Self pay" },
   { value: "ALL_INCLUSIVE", label: "All inclusive" },
@@ -207,7 +220,7 @@ function InlineInfo({
   content: string;
 }) {
   return (
-    <span className="relative inline-flex items-center">
+    <span className="group relative inline-flex items-center">
       <button
         type="button"
         aria-label={`${label} info`}
@@ -311,6 +324,101 @@ function CompactDropdown<T extends string>({
   );
 }
 
+function TopbarDropdown<T extends string>({
+  value,
+  options,
+  onValueChange,
+  ariaLabel,
+}: {
+  value: T;
+  options: Array<{ value: T; label: string }>;
+  onValueChange: (next: T) => void;
+  ariaLabel: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const selected = options.find((option) => option.value === value) ?? options[0];
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    function onPointerDown(event: MouseEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    function onEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    }
+
+    window.addEventListener("mousedown", onPointerDown);
+    window.addEventListener("keydown", onEscape);
+    return () => {
+      window.removeEventListener("mousedown", onPointerDown);
+      window.removeEventListener("keydown", onEscape);
+    };
+  }, [isOpen]);
+
+  return (
+    <div ref={rootRef} className="relative">
+      <button
+        type="button"
+        aria-label={ariaLabel}
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="flex w-full items-center justify-between gap-2 rounded-lg border border-white/35 bg-white/10 px-2.5 py-2 text-left text-white hover:bg-white/20 md:px-3 md:py-2.5"
+      >
+        <div className="min-w-0">
+          <p className="text-[9px] font-semibold uppercase tracking-wide text-emerald-100 md:text-[10px]">
+            Trip type
+          </p>
+          <p className="truncate text-[11px] font-semibold text-white md:text-[14px]">
+            {selected.label}
+          </p>
+        </div>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 20 20"
+          className="h-3.5 w-3.5 shrink-0 text-emerald-100 md:h-4 md:w-4"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M5 7.5L10 12.5L15 7.5" />
+        </svg>
+      </button>
+      {isOpen ? (
+        <div className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-lg border border-border bg-white shadow-lg">
+          {options.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => {
+                onValueChange(option.value);
+                setIsOpen(false);
+              }}
+              className={
+                option.value === value
+                  ? "block w-full bg-emerald-50 px-3 py-2 text-left text-xs font-semibold text-emerald-700 md:text-sm"
+                  : "block w-full px-3 py-2 text-left text-xs text-foreground hover:bg-accent md:text-sm"
+              }
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function currency(value: string) {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -348,6 +456,114 @@ function parseDestinationStops(raw: string) {
     .map((location) => ({ location }));
 }
 
+function formatDateToken(value: string) {
+  if (!value) {
+    return "Pick-up date";
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "2-digit",
+    month: "short",
+  }).format(parsed);
+}
+
+function formatTimeToken(value: string) {
+  if (!value) {
+    return "Pick-up time";
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+  return new Intl.DateTimeFormat("en-IN", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).format(parsed);
+}
+
+function toDateInputValue(value: string): string {
+  if (!value) {
+    return "";
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return "";
+  }
+  const year = parsed.getFullYear();
+  const month = `${parsed.getMonth() + 1}`.padStart(2, "0");
+  const day = `${parsed.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getTwelveHourParts(value: string): {
+  hour: number;
+  minute: number;
+  period: "AM" | "PM";
+} {
+  const parsed = value ? new Date(value) : new Date();
+  if (Number.isNaN(parsed.getTime())) {
+    return { hour: 9, minute: 0, period: "AM" };
+  }
+  const rawHour = parsed.getHours();
+  const period = rawHour >= 12 ? "PM" : "AM";
+  const hour = rawHour % 12 === 0 ? 12 : rawHour % 12;
+  return { hour, minute: parsed.getMinutes(), period };
+}
+
+function TopbarOverlay({
+  title,
+  onClose,
+  children,
+  onConfirm,
+  confirmLabel = "Done",
+}: {
+  title: string;
+  onClose: () => void;
+  children: ReactNode;
+  onConfirm: () => void;
+  confirmLabel?: string;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-emerald-950/35 px-4 pt-16 backdrop-blur-[1px] sm:pt-20">
+      <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-emerald-200 bg-white shadow-2xl">
+        <div className="flex items-center justify-between border-b border-emerald-100 bg-gradient-to-r from-emerald-50 via-green-50 to-emerald-50 px-4 py-3 sm:px-5">
+          <h3 className="text-xl font-semibold tracking-tight text-emerald-950">{title}</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-lg font-semibold leading-none text-slate-500 transition hover:border-slate-300 hover:bg-slate-50"
+            aria-label="Close dialog"
+          >
+            X
+          </button>
+        </div>
+        <div className="px-4 py-4 sm:px-5">{children}</div>
+        <div className="flex items-center justify-end gap-2 border-t border-emerald-100 bg-emerald-50/50 px-4 py-3 sm:px-5">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="border-emerald-200 bg-white text-emerald-900 hover:bg-emerald-50"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            variant="tamayoGradient"
+            onClick={onConfirm}
+          >
+            {confirmLabel}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function buildQuoteUrlFromParams(params: URLSearchParams) {
   const query = params.toString();
   return query ? `/customer/booking-quote?${query}` : "/customer/booking-quote";
@@ -364,13 +580,34 @@ export function QuoteWorkbench() {
   const [error, setError] = useState<string | null>(null);
   const [shouldAutoQuote, setShouldAutoQuote] = useState(false);
   const [operationalOption, setOperationalOption] = useState<OperationalOption>("ALL_INCLUSIVE");
+  const [activeEditor, setActiveEditor] = useState<EditorKind>(null);
+  const [draftSourceCity, setDraftSourceCity] = useState("");
+  const [draftDestinationCity, setDraftDestinationCity] = useState("");
+  const [draftStops, setDraftStops] = useState<string[]>([]);
+  const [draftTripDate, setDraftTripDate] = useState("");
+  const [draftHour, setDraftHour] = useState(9);
+  const [draftMinute, setDraftMinute] = useState(0);
+  const [draftPeriod, setDraftPeriod] = useState<"AM" | "PM">("AM");
   const autoReserveAttemptedRef = useRef(false);
 
-  const routeStopsSummary = form.destinationStops
-    .split(DESTINATION_SEPARATOR)
-    .map((stop) => stop.trim())
-    .filter(Boolean)
-    .join(" -> ");
+  const routeStops = parseDestinationStops(form.destinationStops)
+    .map((stop) => stop.location.trim())
+    .filter(Boolean);
+  const intermediateStops = routeStops.length > 0 ? routeStops.slice(0, -1) : [];
+  const finalStop = routeStops.length > 0 ? routeStops[routeStops.length - 1] : "";
+  const destinationToken = finalStop || form.destinationCity || "Destination";
+  const routeChain = [form.sourceCity, ...intermediateStops, destinationToken]
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0 && part !== "Destination");
+  const routeChainSummary = routeChain.length > 0 ? routeChain.join(" -> ") : "Plan your route";
+
+  const routeStopsSummary =
+    intermediateStops.length > 0
+      ? `${intermediateStops.length} stop${intermediateStops.length > 1 ? "s" : ""}`
+      : "Add stops";
+  const pickupDateToken = formatDateToken(form.tripStartDate);
+  const pickupTimeToken = formatTimeToken(form.tripStartDate);
+  const compactDateTimeLabel = form.tripStartDate ? `${pickupDateToken} • ${pickupTimeToken}` : "Pick date & time";
 
   useEffect(() => {
     const productType = searchParams.get("productType");
@@ -637,32 +874,396 @@ export function QuoteWorkbench() {
     setShouldAutoQuote(true);
   }
 
+  function openFromEditor() {
+    setDraftSourceCity(form.sourceCity);
+    setActiveEditor("from");
+  }
+
+  function openToEditor() {
+    setDraftDestinationCity(destinationToken === "Destination" ? "" : destinationToken);
+    setActiveEditor("to");
+  }
+
+  function openStopsEditor() {
+    setDraftStops(intermediateStops);
+    setDraftSourceCity(form.sourceCity);
+    setDraftDestinationCity(destinationToken === "Destination" ? "" : destinationToken);
+    setActiveEditor("stops");
+  }
+
+  function openPickupDateTimeEditor() {
+    setDraftTripDate(toDateInputValue(form.tripStartDate));
+    const parts = getTwelveHourParts(form.tripStartDate);
+    setDraftHour(parts.hour);
+    setDraftMinute(parts.minute);
+    setDraftPeriod(parts.period);
+    setActiveEditor("pickupDateTime");
+  }
+
+  function applyFromEditor() {
+    setForm((prev) => ({ ...prev, sourceCity: draftSourceCity.trim() }));
+    setShouldAutoQuote(true);
+    setActiveEditor(null);
+  }
+
+  function applyToEditor() {
+    const nextDestination = draftDestinationCity.trim();
+    setForm((prev) => {
+      const updatedStops = [...intermediateStops];
+      if (nextDestination) {
+        updatedStops.push(nextDestination);
+      }
+      return {
+        ...prev,
+        destinationCity: nextDestination,
+        destinationStops: updatedStops.join(DESTINATION_SEPARATOR),
+      };
+    });
+    setShouldAutoQuote(true);
+    setActiveEditor(null);
+  }
+
+  function applyStopsEditor() {
+    const cleanedIntermediateStops = draftStops.map((stop) => stop.trim()).filter(Boolean);
+    const finalDestination =
+      draftDestinationCity.trim() || (destinationToken === "Destination" ? "" : destinationToken);
+    const nextSource = draftSourceCity.trim() || form.sourceCity;
+    setForm((prev) => ({
+      ...prev,
+      sourceCity: nextSource,
+      destinationCity: finalDestination,
+      destinationStops: [...cleanedIntermediateStops, finalDestination].filter(Boolean).join(DESTINATION_SEPARATOR),
+    }));
+    setShouldAutoQuote(true);
+    setActiveEditor(null);
+  }
+
+  function applyPickupDateTimeEditor() {
+    if (!draftTripDate) {
+      setError("Please choose a pickup date.");
+      return;
+    }
+    const twentyFourHour =
+      draftPeriod === "PM" ? (draftHour % 12) + 12 : draftHour % 12;
+    const formattedHour = `${twentyFourHour}`.padStart(2, "0");
+    const formattedMinute = `${draftMinute}`.padStart(2, "0");
+    const nextDateTime = `${draftTripDate}T${formattedHour}:${formattedMinute}`;
+    setForm((prev) => ({ ...prev, tripStartDate: nextDateTime }));
+    setShouldAutoQuote(true);
+    setActiveEditor(null);
+  }
+
+  function handleTripTypeChange(nextType: ProductTypeOption) {
+    setForm((prev) => ({ ...prev, productType: nextType }));
+    setShouldAutoQuote(true);
+  }
+
+  function updateDraftStopAt(index: number, value: string) {
+    setDraftStops((prev) => prev.map((stop, stopIndex) => (stopIndex === index ? value : stop)));
+  }
+
+  function addDraftStop() {
+    setDraftStops((prev) => [...prev, ""]);
+  }
+
+  function removeDraftStop(index: number) {
+    setDraftStops((prev) => prev.filter((_, stopIndex) => stopIndex !== index));
+  }
+
+  function adjustDraftHour(delta: number) {
+    setDraftHour((prev) => {
+      const next = prev + delta;
+      if (next > 12) {
+        return 1;
+      }
+      if (next < 1) {
+        return 12;
+      }
+      return next;
+    });
+  }
+
+  function adjustDraftMinute(delta: number) {
+    setDraftMinute((prev) => {
+      const step = 5;
+      const next = prev + delta * step;
+      if (next >= 60) {
+        return 0;
+      }
+      if (next < 0) {
+        return 55;
+      }
+      return next;
+    });
+  }
+
+  function toggleDraftPeriod() {
+    setDraftPeriod((prev) => (prev === "AM" ? "PM" : "AM"));
+  }
+
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-emerald-100 bg-white p-4 shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
-              Your route
-            </p>
-            <h3 className="text-lg font-semibold text-foreground">
-              {form.sourceCity} to {form.destinationCity || "your destination"}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {form.pickupLocation || "Pickup location pending"}{" "}
-              {routeStopsSummary ? `-> ${routeStopsSummary}` : ""}
-            </p>
+      <div className="rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-900 via-emerald-800 to-emerald-700 p-2 shadow-sm md:hidden">
+        <button
+          type="button"
+          onClick={openStopsEditor}
+          className="w-full rounded-lg bg-white/10 px-2.5 py-2 text-left hover:bg-white/15"
+        >
+          <p className="truncate text-[11px] font-semibold text-white">{routeChainSummary}</p>
+        </button>
+        <div className="mt-1.5 grid grid-cols-[0.9fr_1.35fr_1fr] gap-1.5">
+          <TopbarDropdown
+            value={form.productType}
+            options={TRIP_TYPE_OPTIONS}
+            onValueChange={handleTripTypeChange}
+            ariaLabel="Trip type"
+          />
+          <button
+            type="button"
+            onClick={openPickupDateTimeEditor}
+            className="rounded-lg border border-white/35 bg-white/10 px-2.5 py-2 text-left text-white hover:bg-white/20"
+          >
+            <p className="text-[9px] font-semibold uppercase tracking-wide text-emerald-100">Date & time</p>
+            <p className="truncate text-[11px] font-semibold text-white">{compactDateTimeLabel}</p>
+          </button>
+          <Button
+            onClick={generateQuotes}
+            disabled={loadingQuote || Boolean(loadingBookingCategory)}
+            className="h-full rounded-lg bg-gradient-to-r from-emerald-400 to-green-300 px-3 text-[13px] font-semibold text-emerald-950 hover:from-emerald-300 hover:to-green-200"
+          >
+            {loadingQuote ? "Refreshing..." : "Search"}
+          </Button>
+        </div>
+      </div>
+
+      <div className="hidden rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-900 via-emerald-800 to-emerald-700 p-2.5 shadow-sm md:block">
+        <div className="flex flex-wrap items-stretch gap-2">
+          <div className="min-w-0 flex-1 basis-[12rem]">
+            <TopbarDropdown
+              value={form.productType}
+              options={TRIP_TYPE_OPTIONS}
+              onValueChange={handleTripTypeChange}
+              ariaLabel="Trip type"
+            />
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={generateQuotes} disabled={loadingQuote || Boolean(loadingBookingCategory)}>
-              {loadingQuote ? "Refreshing..." : "Refresh prices"}
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/customer">Modify booking</Link>
+          <button
+            type="button"
+            onClick={openFromEditor}
+            className="min-w-0 flex-1 basis-[10rem] rounded-md bg-white/10 px-2.5 py-2 text-left hover:bg-white/20"
+          >
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-emerald-100">From</p>
+            <p className="truncate text-[15px] font-semibold text-white">{form.sourceCity || "Source"}</p>
+          </button>
+          <button
+            type="button"
+            onClick={openStopsEditor}
+            className="min-w-[6rem] rounded-md bg-white/10 px-2.5 py-2 text-left hover:bg-white/20"
+          >
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-emerald-100">Stops</p>
+            <p className="truncate text-[13px] font-medium text-white/95">{routeStopsSummary}</p>
+          </button>
+          <button
+            type="button"
+            onClick={openToEditor}
+            className="min-w-0 flex-1 basis-[10rem] rounded-md bg-white/10 px-2.5 py-2 text-left hover:bg-white/20"
+          >
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-emerald-100">To</p>
+            <p className="truncate text-[15px] font-semibold text-white">{destinationToken}</p>
+          </button>
+          <button
+            type="button"
+            onClick={openPickupDateTimeEditor}
+            className="min-w-0 flex-1 basis-[9rem] rounded-md bg-white/10 px-2.5 py-2 text-left hover:bg-white/20"
+          >
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-emerald-100">Pick-up date</p>
+            <p className="truncate text-[14px] font-semibold text-white">{pickupDateToken}</p>
+          </button>
+          <button
+            type="button"
+            onClick={openPickupDateTimeEditor}
+            className="min-w-0 flex-1 basis-[8rem] rounded-md bg-white/10 px-2.5 py-2 text-left hover:bg-white/20"
+          >
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-emerald-100">Pick-up time</p>
+            <p className="truncate text-[14px] font-semibold text-white">{pickupTimeToken}</p>
+          </button>
+          <div className="flex min-w-[7rem] items-stretch gap-2">
+            <Button
+              onClick={generateQuotes}
+              disabled={loadingQuote || Boolean(loadingBookingCategory)}
+              className="h-full min-w-[6.5rem] bg-gradient-to-r from-emerald-400 to-green-300 font-semibold text-emerald-950 hover:from-emerald-300 hover:to-green-200"
+            >
+              {loadingQuote ? "Refreshing..." : "Search"}
             </Button>
           </div>
         </div>
       </div>
+
+      {activeEditor === "from" ? (
+        <TopbarOverlay title="From" onClose={() => setActiveEditor(null)} onConfirm={applyFromEditor}>
+          <label className="mb-1 block text-xs font-medium text-muted-foreground">Search source city</label>
+          <LocationAutocompleteInput
+            value={draftSourceCity}
+            onValueChange={setDraftSourceCity}
+            placeholder="Enter pickup city"
+            className="w-full"
+            inputClassName="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+          />
+        </TopbarOverlay>
+      ) : null}
+
+      {activeEditor === "to" ? (
+        <TopbarOverlay title="To" onClose={() => setActiveEditor(null)} onConfirm={applyToEditor}>
+          <label className="mb-1 block text-xs font-medium text-muted-foreground">Search destination city</label>
+          <LocationAutocompleteInput
+            value={draftDestinationCity}
+            onValueChange={setDraftDestinationCity}
+            placeholder="Enter destination city"
+            className="w-full"
+            inputClassName="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+          />
+        </TopbarOverlay>
+      ) : null}
+
+      {activeEditor === "stops" ? (
+        <TopbarOverlay
+          title="Manage stops"
+          onClose={() => setActiveEditor(null)}
+          onConfirm={applyStopsEditor}
+        >
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <p className="px-0.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">From</p>
+              <LocationAutocompleteInput
+                value={draftSourceCity}
+                onValueChange={setDraftSourceCity}
+                placeholder="Search source city"
+                className="w-full [&>div:first-child]:rounded-lg [&>div:first-child]:border [&>div:first-child]:border-emerald-200 [&>div:first-child]:bg-transparent [&>div:first-child]:px-3 [&>div:first-child]:py-2 [&>div:first-child]:transition [&>div:first-child]:focus-within:border-emerald-400 [&>div:first-child]:focus-within:ring-2 [&>div:first-child]:focus-within:ring-emerald-100 [&>div:last-child]:bg-white"
+                inputClassName="w-full bg-transparent text-[13px] font-semibold text-foreground outline-none placeholder:text-muted-foreground"
+              />
+            </div>
+            <div className="space-y-2">
+              {draftStops.length === 0 ? (
+                <p className="text-[11px] text-muted-foreground">No intermediate stops added yet.</p>
+              ) : null}
+              {draftStops.map((stop, index) => (
+                <div key={`stop-${index}`} className="flex items-center gap-2">
+                  <LocationAutocompleteInput
+                    value={stop}
+                    onValueChange={(nextValue) => updateDraftStopAt(index, nextValue)}
+                    placeholder={`Stop ${index + 1}`}
+                    className="w-full [&>div:first-child]:rounded-lg [&>div:first-child]:border [&>div:first-child]:border-emerald-200 [&>div:first-child]:bg-transparent [&>div:first-child]:px-3 [&>div:first-child]:py-2 [&>div:first-child]:transition [&>div:first-child]:focus-within:border-emerald-400 [&>div:first-child]:focus-within:ring-2 [&>div:first-child]:focus-within:ring-emerald-100 [&>div:last-child]:bg-white"
+                    inputClassName="w-full bg-transparent text-[13px] font-semibold text-foreground outline-none placeholder:text-muted-foreground"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => removeDraftStop(index)}
+                    className="border-rose-200 text-rose-700 hover:bg-rose-50"
+                  >
+                    -
+                  </Button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={addDraftStop}
+                className="border-emerald-200 bg-white text-emerald-900 hover:bg-emerald-50"
+              >
+                + Add stop
+              </Button>
+            </div>
+            <div className="space-y-1">
+              <p className="px-0.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">To</p>
+              <LocationAutocompleteInput
+                value={draftDestinationCity}
+                onValueChange={setDraftDestinationCity}
+                placeholder="Search destination city"
+                className="w-full [&>div:first-child]:rounded-lg [&>div:first-child]:border [&>div:first-child]:border-emerald-200 [&>div:first-child]:bg-transparent [&>div:first-child]:px-3 [&>div:first-child]:py-2 [&>div:first-child]:transition [&>div:first-child]:focus-within:border-emerald-400 [&>div:first-child]:focus-within:ring-2 [&>div:first-child]:focus-within:ring-emerald-100 [&>div:last-child]:bg-white"
+                inputClassName="w-full bg-transparent text-[13px] font-semibold text-foreground outline-none placeholder:text-muted-foreground"
+              />
+            </div>
+          </div>
+        </TopbarOverlay>
+      ) : null}
+
+      {activeEditor === "pickupDateTime" ? (
+        <TopbarOverlay
+          title="Update pickup date & time"
+          onClose={() => setActiveEditor(null)}
+          onConfirm={applyPickupDateTimeEditor}
+        >
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs font-medium text-muted-foreground">Pickup date</label>
+              <input
+                type="date"
+                value={draftTripDate}
+                onChange={(event) => setDraftTripDate(event.target.value)}
+                className="mt-1 w-full rounded-md border border-border px-3 py-2 text-sm outline-none ring-0 focus:border-emerald-400"
+              />
+            </div>
+            {draftTripDate ? (
+              <div>
+                <p className="mb-1 text-xs font-medium text-muted-foreground">Pickup time</p>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="rounded-lg border border-border bg-muted/20 p-2 text-center">
+                    <button
+                      type="button"
+                      onClick={() => adjustDraftHour(1)}
+                      className="w-full rounded border border-border bg-white py-1 text-xs font-semibold"
+                    >
+                      +
+                    </button>
+                    <p className="py-1 text-lg font-semibold text-foreground">{String(draftHour).padStart(2, "0")}</p>
+                    <button
+                      type="button"
+                      onClick={() => adjustDraftHour(-1)}
+                      className="w-full rounded border border-border bg-white py-1 text-xs font-semibold"
+                    >
+                      -
+                    </button>
+                  </div>
+                  <div className="rounded-lg border border-border bg-muted/20 p-2 text-center">
+                    <button
+                      type="button"
+                      onClick={() => adjustDraftMinute(1)}
+                      className="w-full rounded border border-border bg-white py-1 text-xs font-semibold"
+                    >
+                      +
+                    </button>
+                    <p className="py-1 text-lg font-semibold text-foreground">{String(draftMinute).padStart(2, "0")}</p>
+                    <button
+                      type="button"
+                      onClick={() => adjustDraftMinute(-1)}
+                      className="w-full rounded border border-border bg-white py-1 text-xs font-semibold"
+                    >
+                      -
+                    </button>
+                  </div>
+                  <div className="rounded-lg border border-border bg-muted/20 p-2 text-center">
+                    <button
+                      type="button"
+                      onClick={toggleDraftPeriod}
+                      className="w-full rounded border border-border bg-white py-1 text-xs font-semibold"
+                    >
+                      toggle
+                    </button>
+                    <p className="py-1 text-lg font-semibold text-foreground">{draftPeriod}</p>
+                    <button
+                      type="button"
+                      onClick={toggleDraftPeriod}
+                      className="w-full rounded border border-border bg-white py-1 text-xs font-semibold"
+                    >
+                      toggle
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </TopbarOverlay>
+      ) : null}
 
       {error ? (
         <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
@@ -678,6 +1279,13 @@ export function QuoteWorkbench() {
 
       {vehicleQuotes.length > 0 ? (
         <div className="space-y-4">
+          <div className="hidden rounded-2xl bg-gradient-to-r from-emerald-900 via-emerald-800 to-emerald-700 px-4 py-3 text-white shadow-sm md:block">
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <p className="text-sm font-semibold">Trusted cabs</p>
+              <p className="text-sm font-semibold">Clean cabs</p>
+              <p className="text-sm font-semibold">On-time pickup</p>
+            </div>
+          </div>
           {loadingQuote ? (
             <p className="text-xs font-medium text-muted-foreground">
               Updating prices for selected vehicle age...
@@ -704,6 +1312,12 @@ export function QuoteWorkbench() {
             const perKmRateDisplay = `₹${Math.round(Number(quote.perKmRate))}/km`;
             const routeDistanceBase =
               quote.routeDistanceKm ?? quote.usableDistanceKm ?? quote.billableKm;
+            const distanceSourceLabel =
+              form.estimatedKm.trim() ? "manual distance override" : "Google Maps";
+            const includedKmDisplay =
+              routeDistanceBase > quote.includedKmPerDay
+                ? Math.round(routeDistanceBase)
+                : quote.totalIncludedKm;
             const rawEstimatedTotal = Number(quote.estimatedTotal);
             const displayedTotal =
               operationalOption === "SELF_PAY"
@@ -713,20 +1327,16 @@ export function QuoteWorkbench() {
             return (
               <article
                 key={vehicleQuote.preset.id}
-                className="space-y-4 rounded-xl border border-border bg-card p-4 shadow-sm"
+                className="space-y-0 rounded-xl border border-border bg-white p-4 shadow-sm md:space-y-4"
               >
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                <div className="hidden items-center justify-start md:flex">
+                  <div className="items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 md:inline-flex">
                     <ClayIcon name="verified" size={24} alt="Verified fare" />
-                    Verified fare breakdown
+                    Verified fare
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Distance source: {form.estimatedKm.trim() ? "manual override" : "Google Maps"}
-                  </p>
                 </div>
 
-                <div className="rounded-xl border border-border bg-white p-4">
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="space-y-3">
                       <div className="space-y-2">
                         {vehicleQuote.preset.fuelTags.includes("CNG+Petrol") ? (
@@ -744,7 +1354,7 @@ export function QuoteWorkbench() {
                           <img
                             src={vehicleQuote.preset.cardImageUrl}
                             alt={vehicleQuote.preset.cardImageAlt}
-                            className="h-20 w-32 rounded-md border border-emerald-100 object-cover"
+                            className="h-[92px] w-[147px] rounded-md border border-emerald-100 object-cover"
                             loading="lazy"
                           />
                           <div className="space-y-1">
@@ -777,7 +1387,7 @@ export function QuoteWorkbench() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-[0.45fr_0.55fr] gap-2 md:grid-cols-2">
                         <div className="space-y-2 rounded-lg border border-border/70 bg-background p-3">
                           <div className="group flex min-h-[2rem] items-start gap-1">
                             <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
@@ -798,7 +1408,7 @@ export function QuoteWorkbench() {
                             onValueChange={(next) => handleAgeChange(next)}
                             ariaLabel="Vehicle age"
                           />
-                          <p className="text-[11px] text-muted-foreground">
+                          <p className="hidden text-[11px] text-muted-foreground md:block">
                             {form.ageBucket === "ZERO_TO_THREE"
                               ? "Assured new vehicle."
                               : "Economy age vehicle selected."}
@@ -834,10 +1444,14 @@ export function QuoteWorkbench() {
                             onValueChange={(next) => setOperationalOption(next)}
                             ariaLabel="Toll parking and food option"
                           />
-                          <p className="text-[11px] text-muted-foreground">
+                          <p
+                            className={`text-[11px] text-muted-foreground ${
+                              operationalOption === "SELF_PAY" ? "block" : "hidden md:block"
+                            }`}
+                          >
                             {operationalOption === "ALL_INCLUSIVE"
                               ? "All-inclusive selected."
-                              : "Self-pay selected."}
+                              : "Pay separately during trip"}
                           </p>
                           {operationalOption === "ALL_INCLUSIVE" ? (
                             <span className="inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
@@ -851,6 +1465,10 @@ export function QuoteWorkbench() {
                         <p className="flex items-center gap-1.5 font-medium text-foreground">
                           <ClayIcon name="route" size={24} alt="Tour route" />
                           Estimated route distance: {routeDistanceBase} kms
+                          <InlineInfo
+                            label="Distance source"
+                            content={`Distance source: ${distanceSourceLabel}. This estimate uses mapped route distance for fare transparency. Actual billable km follows package rules.`}
+                          />
                           {quote.returnDistanceKm
                             ? ` (including return ${quote.returnDistanceKm} kms)`
                             : ""}
@@ -872,7 +1490,7 @@ export function QuoteWorkbench() {
 
                     <div className="w-full rounded-lg border border-emerald-100 bg-emerald-50/60 p-4 lg:w-[15rem]">
                       <p className="text-sm font-semibold text-emerald-700">Affordable fare</p>
-                      <p className="mt-1 text-3xl font-bold tracking-tight text-foreground">
+                      <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
                         {currency(displayedTotal)}
                       </p>
                       <p className="mt-1 text-xs text-muted-foreground">
@@ -881,7 +1499,8 @@ export function QuoteWorkbench() {
                           : "Base fare shown. Tolls, parking and driver food payable during trip."}
                       </p>
                       <Button
-                        className="mt-3 w-full bg-emerald-600 hover:bg-emerald-700"
+                        variant="tamayoGradient"
+                        className="mt-3 w-full"
                         onClick={() => createBookingForPreset(vehicleQuote.preset)}
                         disabled={Boolean(loadingBookingCategory) || loadingQuote}
                       >
@@ -925,12 +1544,11 @@ export function QuoteWorkbench() {
                           </p>
                           <p className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-foreground">
                             <ClayIcon name="included-km" size={22} alt="Included km" />
-                            {quote.totalIncludedKm} km
+                            {includedKmDisplay} km
                           </p>
                         </div>
                       </div>
                     </div>
-                  </div>
                 </div>
               </article>
             );

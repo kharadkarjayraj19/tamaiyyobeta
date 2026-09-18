@@ -103,3 +103,22 @@ Every `docs/features/<feature>.md` MUST declare a **maturity** near the top (aft
 
 - Run or preserve **ESLint** and **TypeScript** cleanliness for touched files.
 - Prefer **accessibility-friendly** patterns (semantic elements, focusable controls).
+
+## Proactive UX and asset checks
+
+Before finalizing UI changes, proactively surface practical UX risks and alternatives to the user (without making silent product decisions), especially for mobile-first customer flows.
+
+- **Asset fitness check:** if an image/logo appears intended for hero/poster use (dense text, long tagline, large aspect ratio), suggest a **UI-suitable variant** (wordmark-only or symbol-only) before wiring it into compact chrome like navbars.
+- **Readability check:** call out when text in an asset will be unreadable at target render size; recommend removing micro-taglines from nav/header logos.
+- **Performance check:** proactively suggest lightweight asset optimization for frequently rendered UI surfaces (compressed WebP/PNG, right-size dimensions, avoid oversized images in sticky headers).
+- **Decision transparency:** if a better UX option exists, suggest it explicitly in chat first, then implement the user’s chosen direction.
+
+## Execution guardrails (strict)
+
+1. **Always document changes:** Every behavior-affecting change must be reflected in the relevant `docs/features/*.md` file in the same change set (or immediately after), in addition to any required `docs/project/*` sync.
+2. **No unrequested changes:** Never implement code changes that the user did not ask for. If a potential improvement is discovered, propose it first and wait for confirmation.
+3. **No silent assumptions:** Never assume unclear product behavior. Clarify ambiguities with the user and explicitly involve them in decisions and trade-offs.
+4. **Documentation-first workflow:** For non-trivial tasks, update/confirm documentation direction first, then implement code.
+5. **Understand before edit:** Read relevant docs and inspect related code paths before making changes. Only implement after building sufficient context.
+6. **Go slow, be precise:** Prefer careful, incremental updates over broad fast edits; validate each step to reduce regressions.
+7. **Respect existing patterns and reuse:** Follow established component and architecture patterns. Avoid unnecessary rewrites; prefer reusable shared abstractions (e.g., dialogs, dropdowns, input patterns) where applicable.

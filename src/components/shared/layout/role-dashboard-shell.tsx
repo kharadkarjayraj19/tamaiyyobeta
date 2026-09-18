@@ -39,8 +39,10 @@ export function RoleDashboardShell({ role, children }: RoleDashboardShellProps) 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const isCustomerOverview = role === "customer" && pathname === "/customer";
   const isCustomerReserveFlow = role === "customer" && pathname.startsWith("/customer/reserve");
+  const isCustomerQuoteFlow = role === "customer" && pathname.startsWith("/customer/booking-quote");
   const hideSidebar = isCustomerOverview || isCustomerReserveFlow;
   const hideTopBar = isCustomerReserveFlow;
+  const useBackButton = isCustomerQuoteFlow;
   const sidebar = <Sidebar role={role} items={items} pathname={pathname} />;
 
   return (
@@ -53,7 +55,8 @@ export function RoleDashboardShell({ role, children }: RoleDashboardShellProps) 
               <TopNavbar
                 role={role}
                 onOpenSidebar={() => setMobileNavOpen(true)}
-                showMenuButton={!hideSidebar}
+                showMenuButton={!hideSidebar && !useBackButton}
+                showBackButton={useBackButton}
               />
             )
           }
@@ -66,7 +69,13 @@ export function RoleDashboardShell({ role, children }: RoleDashboardShellProps) 
           >
             <PageContainer
               variant="wide"
-              className={isCustomerOverview ? "px-0 py-3 sm:px-0 lg:px-0" : undefined}
+              className={
+                isCustomerOverview
+                  ? "px-0 py-3 sm:px-0 lg:px-0"
+                  : isCustomerQuoteFlow
+                    ? "pt-2 pb-4 sm:pt-3"
+                    : undefined
+              }
             >
               {children}
             </PageContainer>

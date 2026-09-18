@@ -1,15 +1,10 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
-  Building2,
-  CalendarClock,
-  CarFront,
-  CheckCircle2,
-  Clock3,
+  ChevronLeft,
   CircleDot,
   Flag,
-  Milestone,
   MapPin,
-  Route,
   ShieldCheck,
   TriangleAlert,
 } from "lucide-react";
@@ -21,10 +16,9 @@ type ReservePageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-function readParam(
-  value: string | string[] | undefined,
-  fallback: string
-): string {
+type ReserveInfoIconName = "route" | "passengers" | "fuel" | "duration";
+
+function readParam(value: string | string[] | undefined, fallback: string): string {
   if (Array.isArray(value)) {
     return value[0] ?? fallback;
   }
@@ -44,6 +38,33 @@ function readParamList(value: string | string[] | undefined): string[] {
     .filter(Boolean);
 }
 
+function parseKmValue(value: string): number | null {
+  if (!value) {
+    return null;
+  }
+  const cleaned = value.replace(/,/g, "").trim();
+  const parsed = Number(cleaned);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function ReserveInfoIcon({
+  name,
+  alt,
+}: {
+  name: ReserveInfoIconName;
+  alt: string;
+}) {
+  return (
+    <Image
+      src={`/icons/tamayo-3d-green/${name}.svg`}
+      alt={alt}
+      width={16}
+      height={16}
+      className="shrink-0 object-contain"
+    />
+  );
+}
+
 function formatDateTime(value: string): string {
   if (!value) {
     return "Not selected";
@@ -60,25 +81,6 @@ function formatDateTime(value: string): string {
   }).format(date);
 }
 
-function inferAgeBucketLabel(vehicle: string, perKmRate: string): string {
-  const normalized = vehicle.toLowerCase();
-  const rate = Number(perKmRate);
-
-  if (!rate || Number.isNaN(rate)) {
-    return "";
-  }
-
-  if (normalized.includes("sedan")) return rate === 13 ? "0-3 years" : rate === 12 ? "4-7 years" : "";
-  if (normalized.includes("ertiga") || normalized.includes("rumion"))
-    return rate === 15 ? "0-3 years" : rate === 14 ? "4-7 years" : "";
-  if (normalized.includes("carens")) return rate === 16 ? "0-3 years" : rate === 15 ? "4-7 years" : "";
-  if (normalized.includes("innova")) return rate === 20 ? "0-3 years" : rate === 19 ? "4-7 years" : "";
-  if (normalized.includes("urbania")) return rate === 36 ? "0-3 years" : rate === 35 ? "4-7 years" : "";
-  if (normalized.includes("traveller")) return rate === 28 ? "0-3 years" : rate === 26 ? "4-7 years" : "";
-
-  return "";
-}
-
 function inferPerKmRate(vehicle: string, ageBucketLabel: string): string {
   const normalized = vehicle.toLowerCase();
   const isNew = ageBucketLabel.includes("0-3");
@@ -93,50 +95,77 @@ function inferPerKmRate(vehicle: string, ageBucketLabel: string): string {
   return "";
 }
 
+function inferFuelLabel(vehicle: string): string {
+  const normalized = vehicle.toLowerCase();
+  if (normalized.includes("sedan") || normalized.includes("ertiga") || normalized.includes("rumion")) {
+    return "CNG/Petrol";
+  }
+  return "Diesel";
+}
+
+function inferCapacity(vehicle: string): string {
+  const normalized = vehicle.toLowerCase();
+  if (normalized.includes("sedan")) return "4";
+  if (normalized.includes("ertiga") || normalized.includes("rumion")) return "6";
+  if (normalized.includes("carens")) return "6";
+  if (normalized.includes("innova")) return "7";
+  if (normalized.includes("urbania")) return "16";
+  if (normalized.includes("traveller")) return "21";
+  return "4";
+}
+
+function resolveVehicleImage(vehicle: string): string {
+  const normalized = vehicle.toLowerCase();
+  if (normalized.includes("ertiga") || normalized.includes("rumion")) {
+    return "https://res.cloudinary.com/m19yxquu/image/upload/v1788501874/tamayo_ertig-50kb.jpg";
+  }
+  if (normalized.includes("carens")) {
+    return "https://res.cloudinary.com/m19yxquu/image/upload/v1788501875/tamayo_ki-50kb.jpg";
+  }
+  if (normalized.includes("innova")) {
+    return "https://res.cloudinary.com/m19yxquu/image/upload/v1788501874/tamayo_innov-50kb.jpg";
+  }
+  if (normalized.includes("urbania")) {
+    return "https://res.cloudinary.com/m19yxquu/image/upload/v1788501875/tamayo_urbani-50kb.jpg";
+  }
+  if (normalized.includes("traveller")) {
+    return "https://res.cloudinary.com/m19yxquu/image/upload/v1788501874/tamayo_21seater_-50kb.jpg";
+  }
+  return "https://res.cloudinary.com/m19yxquu/image/upload/v1788501874/tamayo_dzir-50kb.jpg";
+}
+
 export default async function CustomerReservePage({ searchParams }: ReservePageProps) {
   const params = searchParams ? await searchParams : {};
 
   const bookingRef = readParam(params.bookingRef, "Pending");
-  const vehicle = readParam(params.vehicle, "Selected vehicle");
+  const vehicle = readParam(params.vehicle, "Sedan - Dzire or Aura");
   const sourceCity = readParam(params.sourceCity, "Source");
   const destinationCity = readParam(params.destinationCity, "Destination");
-  const pickupLocation = readParam(params.pickupLocation, "");
   const tripStartDate = readParam(params.tripStartDate, "");
   const tripEndDate = readParam(params.tripEndDate, "");
   const reserveAmount = readParam(params.reserveAmount, "499");
   const estimatedTotal = readParam(params.estimatedTotal, "");
   const routeDistanceKm = readParam(params.routeDistanceKm, "");
-  const returnDistanceKm = readParam(params.returnDistanceKm, "");
-  const dispatchHubCity = readParam(params.dispatchHubCity, "");
   const includedDays = readParam(params.includedDays, "");
   const totalIncludedKm = readParam(params.totalIncludedKm, "");
   const operationalOption = readParam(params.operationalOption, "ALL_INCLUSIVE");
-  const ageBucketParam = readParam(params.ageBucketLabel, "").trim();
-  const productType = readParam(params.productType, "ROUND_TRIP");
+  const ageBucketLabel = readParam(params.ageBucketLabel, "0-3 years").trim();
   const quoteReturnUrlParam = readParam(params.quoteReturnUrl, "").trim();
   const perKmRateParam = readParam(params.perKmRate, "").trim();
   const stopLocations = readParamList(params.stop);
-  // The booking quote handoff includes the full destination chain in `stop`.
-  // The final item is the end city; everything before it is intermediate stops.
+
   const hasRouteStops = stopLocations.length > 0;
   const endCityFromRoute = hasRouteStops
     ? stopLocations[stopLocations.length - 1] ?? destinationCity
     : destinationCity;
   const intermediateStops = hasRouteStops ? stopLocations.slice(0, -1) : [];
-  const inferredAgeBucketLabel = inferAgeBucketLabel(vehicle, perKmRateParam);
-  const resolvedAgeBucketLabel = ageBucketParam || inferredAgeBucketLabel || "0-3 years";
-  const resolvedPerKmRate = perKmRateParam || inferPerKmRate(vehicle, resolvedAgeBucketLabel);
+
   const fallbackQuoteParams = new URLSearchParams();
-  if (productType) fallbackQuoteParams.set("productType", productType);
-  if (sourceCity && sourceCity !== "Source") fallbackQuoteParams.set("sourceCity", sourceCity);
-  if (destinationCity && destinationCity !== "Destination")
-    fallbackQuoteParams.set("destinationCity", destinationCity);
+  fallbackQuoteParams.set("sourceCity", sourceCity);
+  fallbackQuoteParams.set("destinationCity", destinationCity);
   if (tripStartDate) fallbackQuoteParams.set("tripStartDate", tripStartDate);
   if (tripEndDate) fallbackQuoteParams.set("tripEndDate", tripEndDate);
   if (routeDistanceKm) fallbackQuoteParams.set("estimatedKm", routeDistanceKm);
-  if (returnDistanceKm) fallbackQuoteParams.set("returnDistanceKm", returnDistanceKm);
-  if (pickupLocation && pickupLocation !== "Pickup pending")
-    fallbackQuoteParams.set("pickupLocation", pickupLocation);
   stopLocations.forEach((stop) => fallbackQuoteParams.append("drop", stop));
   const fallbackQuoteReturnUrl = fallbackQuoteParams.size
     ? `/customer/booking-quote?${fallbackQuoteParams.toString()}`
@@ -146,265 +175,216 @@ export default async function CustomerReservePage({ searchParams }: ReservePageP
       ? quoteReturnUrlParam
       : fallbackQuoteReturnUrl;
 
-  const isAllInclusive = operationalOption === "ALL_INCLUSIVE";
-  const fuelTypeLine = "Fuel,";
+  const resolvedPerKmRate = perKmRateParam || inferPerKmRate(vehicle, ageBucketLabel);
+  const fuelLabel = inferFuelLabel(vehicle);
+  const paxCount = inferCapacity(vehicle);
+  const vehicleImage = resolveVehicleImage(vehicle);
+  const pickupTimeLabel = formatDateTime(tripStartDate);
+  const endTimeLabel = formatDateTime(tripEndDate);
+  const estimatedTotalNumber = Number(estimatedTotal);
+  const hasEstimatedTotal = Boolean(estimatedTotal) && !Number.isNaN(estimatedTotalNumber);
+  const routeTitle = `${sourceCity} -> ${endCityFromRoute}`;
+  const routeDistanceNumber = parseKmValue(routeDistanceKm);
+  const includedDistanceNumber = parseKmValue(totalIncludedKm);
+  const effectiveIncludedKm = [routeDistanceNumber, includedDistanceNumber].reduce<number | null>(
+    (currentMax, value) => {
+      if (value === null) return currentMax;
+      if (currentMax === null) return value;
+      return Math.max(currentMax, value);
+    },
+    null
+  );
+  const effectiveIncludedKmLabel =
+    effectiveIncludedKm !== null ? `${effectiveIncludedKm} kms included in current fare.` : null;
+
   const inclusions = [
-    `${vehicle} with ${resolvedAgeBucketLabel} vehicle age.`,
-    `${fuelTypeLine} Professional driver and Air conditioned vehicle.`,
-    productType === "ONE_WAY"
-      ? "One-way fare applies on hotspot routes; otherwise round-trip pricing is used."
-      : "This trip follows round-trip pricing.",
-    isAllInclusive
-      ? "Toll, parking and driver food allowance is all inclusive."
-      : "Toll, parking and driver food allowance is self pay.",
+    effectiveIncludedKmLabel ?? "Package kms included in current fare.",
+    "Toll, state tax, and parking charges are included.",
+    "Driver allowance is included for selected trip option.",
   ];
   const exclusions = [
     resolvedPerKmRate
-      ? `Kilometers beyond included package should be paid at ₹${resolvedPerKmRate}/km.`
-      : "Kilometers beyond included package should be paid as per selected rate.",
-    isAllInclusive
-      ? "Route/time changes beyond booking terms may add extra charges."
-      : "Self-pay selected: toll, parking and driver food allowance ₹300/day should be paid separately.",
+      ? `After included kms, additional usage is charged at ₹${resolvedPerKmRate}/km.`
+      : "Additional distance beyond package will be charged extra.",
+    operationalOption === "ALL_INCLUSIVE"
+      ? "Major route/time changes after booking may change fare."
+      : "Self-pay selected: toll, parking and driver food are paid during trip.",
   ];
 
   return (
-    <div className="space-y-8 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:pb-8">
+    <div className="space-y-3 pb-[calc(env(safe-area-inset-bottom)+11rem)] md:space-y-4 md:pb-8">
       <SectionHeader
-        title="Review your booking"
-        description="Confirm trip details, inclusions, and exclusions before proceeding to payment."
+        title="Review booking"
+        description="Cross-check route and fare before payment."
       />
 
-      <section className="grid gap-4 lg:grid-cols-[1.35fr,0.9fr]">
-        <div className="space-y-4 rounded-xl border border-emerald-100 bg-white p-4 shadow-sm">
-          <div>
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
-                Trip details
+      <section className="space-y-3">
+        <article className="rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-900 via-emerald-800 to-emerald-700 p-3 text-white shadow-sm">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 space-y-1">
+              <p className="truncate text-lg font-semibold tracking-tight">{routeTitle}</p>
+              <p className="text-[13px] text-emerald-100">
+                {pickupTimeLabel}
+                {tripEndDate ? ` - ${endTimeLabel}` : ""}
               </p>
-              <p className="text-xs text-muted-foreground">
-                Booking ref: <span className="font-semibold text-foreground">{bookingRef}</span>
-              </p>
+              <p className="text-[11px] text-emerald-200">Booking ref: {bookingRef}</p>
             </div>
-          </div>
-
-          <div className="rounded-lg border border-emerald-100 bg-emerald-50/40 p-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
-              Route overview
-            </p>
-            <div className="mt-2 space-y-2">
-              <div className="flex items-start gap-2 rounded-md bg-white px-3 py-2">
-                <MapPin className="mt-0.5 h-4 w-4 text-emerald-700" />
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
-                    Start city
-                  </p>
-                  <p
-                    title={sourceCity}
-                    className="max-w-[18rem] truncate text-sm font-medium text-foreground"
-                  >
-                    {sourceCity}
-                  </p>
-                </div>
-              </div>
-              {intermediateStops.map((stop, index) => (
-                <div key={`${stop}-${index}`} className="flex items-start gap-2 rounded-md bg-white px-3 py-2">
-                  <CircleDot className="mt-0.5 h-4 w-4 text-emerald-600" />
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
-                      Stop {index + 1}
-                    </p>
-                    <p
-                      title={stop}
-                      className="max-w-[18rem] truncate text-sm font-medium text-foreground"
-                    >
-                      {stop}
-                    </p>
-                  </div>
-                </div>
-              ))}
-              <div className="flex items-start gap-2 rounded-md bg-white px-3 py-2">
-                <Flag className="mt-0.5 h-4 w-4 text-emerald-800" />
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
-                    End city
-                  </p>
-                  <p
-                    title={endCityFromRoute}
-                    className="max-w-[18rem] truncate text-sm font-medium text-foreground"
-                  >
-                    {endCityFromRoute}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-lg border border-emerald-100 bg-gradient-to-br from-white to-emerald-50/40 p-1.5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
-              Trip at a glance
-            </p>
-            <div className="mt-1 grid gap-1 sm:grid-cols-2">
-              <div className="rounded-md border border-emerald-100 bg-white p-1 shadow-sm">
-                <p className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
-                  <CarFront className="h-3 w-3" />
-                  Vehicle
-                </p>
-                <p className="mt-0.5 text-xs font-semibold leading-snug text-foreground">{vehicle}</p>
-              </div>
-
-              <div className="rounded-md border border-emerald-100 bg-white p-1 shadow-sm">
-                <p className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
-                  <ShieldCheck className="h-3 w-3" />
-                  Toll, parking and driver food
-                </p>
-                <p className="mt-0.5 text-xs font-semibold text-foreground">
-                  {isAllInclusive ? "All inclusive" : "Self pay"}
-                </p>
-              </div>
-
-              <div className="rounded-md border border-emerald-100 bg-white p-1 shadow-sm">
-                <p className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
-                  <CalendarClock className="h-3 w-3" />
-                  Pickup time
-                </p>
-                <p className="mt-0.5 text-xs font-semibold leading-snug text-foreground">
-                  {formatDateTime(tripStartDate)}
-                </p>
-              </div>
-
-              <div className="rounded-md border border-emerald-100 bg-white p-1 shadow-sm">
-                <p className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
-                  <Clock3 className="h-3 w-3" />
-                  End time
-                </p>
-                <p className="mt-0.5 text-xs font-semibold leading-snug text-foreground">
-                  {formatDateTime(tripEndDate)}
-                </p>
-              </div>
-
-              {dispatchHubCity ? (
-                <div className="rounded-md border border-emerald-100 bg-white p-1 shadow-sm">
-                  <p className="inline-flex items-center gap-1 text-[11px] font-semibold text-foreground">
-                    <Building2 className="h-3 w-3 text-emerald-700" />
-                    <span className="text-[10px] uppercase tracking-wide text-emerald-700">
-                      Dispatch city -
-                    </span>
-                    <span className="text-xs text-emerald-700">{dispatchHubCity}</span>
-                  </p>
-                </div>
-              ) : null}
-
-              {routeDistanceKm ? (
-                <div className="rounded-md border border-emerald-100 bg-white p-1 shadow-sm">
-                  <p className="inline-flex items-center gap-1 text-[11px] font-semibold text-foreground">
-                    <Route className="h-3 w-3 text-emerald-700" />
-                    <span className="text-[10px] uppercase tracking-wide text-emerald-700">
-                      Route distance -
-                    </span>
-                    <span className="text-xs">{routeDistanceKm} kms</span>
-                  </p>
-                  {returnDistanceKm ? (
-                    <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">
-                      Includes return {returnDistanceKm} kms
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-
-              {includedDays ? (
-                <div className="rounded-md border border-emerald-100 bg-white p-1 shadow-sm">
-                  <p className="inline-flex items-center gap-1 text-[11px] font-semibold text-foreground">
-                    <CalendarClock className="h-3 w-3 text-emerald-700" />
-                    <span className="text-[10px] uppercase tracking-wide text-emerald-700">
-                      Trip duration -
-                    </span>
-                    <span className="text-xs">
-                      {includedDays} day{includedDays === "1" ? "" : "s"}
-                    </span>
-                  </p>
-                </div>
-              ) : null}
-
-              {totalIncludedKm ? (
-                <div className="rounded-md border border-emerald-100 bg-white p-1 shadow-sm">
-                  <p className="inline-flex items-center gap-1 text-[11px] font-semibold text-foreground">
-                    <Milestone className="h-3 w-3 text-emerald-700" />
-                    <span className="text-[10px] uppercase tracking-wide text-emerald-700">
-                      Included distance -
-                    </span>
-                    <span className="text-xs">{totalIncludedKm} kms</span>
-                  </p>
-                </div>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-lg border border-emerald-100 bg-emerald-50/40 p-3">
-              <p className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">
-                <CheckCircle2 className="h-4 w-4" />
-                Inclusions
-              </p>
-              <ul className="mt-1.5 space-y-0.5 text-[11px] font-medium text-foreground sm:text-[11px]">
-                {inclusions.map((item) => (
-                  <li key={item} className="flex w-full items-start gap-1 rounded-md bg-white px-1.5 py-0.5">
-                    <CheckCircle2 className="mt-0.5 h-3 w-3 shrink-0 text-emerald-700" />
-                    <span className="min-w-0 leading-snug break-words">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="rounded-lg border border-amber-200 bg-amber-50/40 p-3">
-              <p className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-amber-700">
-                <TriangleAlert className="h-4 w-4" />
-                Exclusions
-              </p>
-              <ul className="mt-1.5 space-y-0.5 text-[11px] font-medium text-foreground sm:text-[11px]">
-                {exclusions.map((item) => (
-                  <li key={item} className="flex w-full items-start gap-1 rounded-md bg-white px-1.5 py-0.5">
-                    <TriangleAlert className="mt-0.5 h-3 w-3 shrink-0 text-amber-700" />
-                    <span className="min-w-0 leading-snug break-words">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <aside className="h-fit rounded-xl border border-emerald-100 bg-emerald-50/60 p-4 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
-            Booking review
-          </p>
-          <p className="mt-1 text-2xl font-bold text-foreground">Pay ₹{reserveAmount} only</p>
-          {estimatedTotal ? (
-            <p className="mt-1 text-sm text-muted-foreground">
-              Estimated trip fare: ₹{Number(estimatedTotal).toLocaleString("en-IN")}
-            </p>
-          ) : null}
-          {totalIncludedKm || includedDays ? (
-            <div className="mt-3 rounded-md border border-emerald-100 bg-white p-2.5">
-              <p className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">
-                <Route className="h-3.5 w-3.5" />
-                Fare package summary
-              </p>
-              <div className="mt-1 space-y-1 text-xs text-muted-foreground">
-                {includedDays ? <p>Duration included: {includedDays} day{includedDays === "1" ? "" : "s"}</p> : null}
-                {totalIncludedKm ? <p>Distance included: {totalIncludedKm} kms</p> : null}
-              </div>
-            </div>
-          ) : null}
-          <p className="mt-2 text-xs text-muted-foreground">
-            By proceeding, you agree that final payable amounts may vary if route, time, or usage
-            differs from current estimate.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Button disabled>Proceed to payment (coming soon)</Button>
-            <Button asChild variant="outline">
-              <Link href={quoteReturnUrl}>Back to quotes</Link>
+            <Button
+              asChild
+              variant="outline"
+              className="h-8 border-emerald-200/50 bg-white/15 px-2.5 text-[11px] text-white hover:bg-white/25 hover:text-white"
+            >
+              <Link href={quoteReturnUrl}>
+                <ChevronLeft className="mr-1 h-3.5 w-3.5" />
+                Back to quotes
+              </Link>
             </Button>
           </div>
-        </aside>
+          {hasEstimatedTotal ? (
+            <p className="mt-2 text-[12px] text-emerald-100">
+              Estimated total: ₹{estimatedTotalNumber.toLocaleString("en-IN")}
+            </p>
+          ) : null}
+        </article>
+
+        <article className="space-y-3 rounded-2xl border border-emerald-200 bg-white p-3 shadow-sm">
+          <div className="flex gap-3">
+            <img
+              src={vehicleImage}
+              alt={vehicle}
+              className="h-[92px] w-[122px] shrink-0 rounded-lg border border-emerald-100 object-cover"
+              loading="lazy"
+            />
+            <div className="min-w-0 flex-1">
+              <div className="min-w-0">
+                <p className="truncate text-[18px] font-semibold leading-tight text-foreground">{vehicle}</p>
+                <p className="text-[12px] text-muted-foreground">or similar • {ageBucketLabel}</p>
+              </div>
+              <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[12px] text-muted-foreground">
+                <span className="inline-flex items-center gap-1 rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[11px] text-amber-700">
+                  <ReserveInfoIcon name="fuel" alt="Fuel type" />
+                  {fuelLabel}
+                </span>
+                {routeDistanceKm ? (
+                  <span className="inline-flex items-center gap-1">
+                    <ReserveInfoIcon name="route" alt="Route distance" />
+                    {routeDistanceKm} kms
+                  </span>
+                ) : null}
+                <span className="inline-flex items-center gap-1">
+                  <ReserveInfoIcon name="passengers" alt="Passenger capacity" />
+                  {paxCount}
+                </span>
+                {includedDays ? (
+                  <span className="inline-flex items-center gap-1">
+                    <ReserveInfoIcon name="duration" alt="Trip duration" />
+                    {includedDays} day{includedDays === "1" ? "" : "s"}
+                  </span>
+                ) : null}
+              </div>
+            </div>
+          </div>
+          <p className="rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-2 text-[12px] text-amber-800">
+            Cab operator will be assigned after booking confirmation.
+          </p>
+        </article>
+
+        <article className="rounded-xl border border-emerald-100 bg-gradient-to-b from-white to-emerald-50/40 p-2.5 shadow-sm">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">Route overview</p>
+          <div className="relative mt-1.5 space-y-1.5 pl-0.5">
+            <span
+              aria-hidden
+              className="absolute bottom-3 left-[11px] top-3 w-px bg-gradient-to-b from-emerald-200 via-emerald-300 to-emerald-200"
+            />
+            <div className="grid grid-cols-[22px_minmax(0,1fr)] items-start gap-1.5">
+              <span className="mt-0.5 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200">
+                <MapPin className="h-3 w-3" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Start city</p>
+                <p className="text-[13px] font-medium leading-snug text-foreground">{sourceCity}</p>
+              </div>
+            </div>
+            {intermediateStops.map((stop, index) => (
+              <div key={`${stop}-${index}`} className="grid grid-cols-[22px_minmax(0,1fr)] items-start gap-1.5">
+                <span className="mt-0.5 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200">
+                  <CircleDot className="h-3 w-3" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    Stop {index + 1}
+                  </p>
+                  <p className="text-[13px] font-medium leading-snug text-foreground">{stop}</p>
+                </div>
+              </div>
+            ))}
+            <div className="grid grid-cols-[22px_minmax(0,1fr)] items-start gap-1.5">
+              <span className="mt-0.5 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200">
+                <Flag className="h-3 w-3" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">End city</p>
+                <p className="text-[13px] font-medium leading-snug text-foreground">{endCityFromRoute}</p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article className="rounded-xl border border-emerald-100 bg-white p-2.5 shadow-sm">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">Inclusions</p>
+          <ul className="mt-1.5 space-y-1.5">
+            {inclusions.map((item) => (
+              <li key={item} className="flex items-start gap-1.5">
+                <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-700" />
+                <p className="text-[12px] leading-snug text-foreground">{item}</p>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-2.5 border-t border-border/70 pt-2.5">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-700">Exclusions</p>
+            <ul className="mt-1.5 space-y-1.5">
+              {exclusions.map((item) => (
+                <li key={item} className="flex items-start gap-1.5">
+                  <TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-700" />
+                  <p className="text-[12px] leading-snug text-foreground">{item}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </article>
       </section>
+
+      <div className="fixed inset-x-0 bottom-0 z-[60] border-t border-emerald-200 bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+0.65rem)] pt-2 text-foreground shadow-[0_-8px_24px_rgba(0,0,0,0.12)] backdrop-blur md:hidden">
+        <p className="text-center text-[12px] text-emerald-700">
+          {hasEstimatedTotal
+            ? `Reserve now at ₹${reserveAmount}. Remaining estimated ₹${estimatedTotalNumber.toLocaleString("en-IN")} on trip.`
+            : `Reserve now at ₹${reserveAmount}.`}
+        </p>
+        <div className="mt-2 flex items-center gap-2">
+          <div className="rounded-md border border-emerald-300 bg-emerald-50 px-2.5 py-1.5">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700">Reserve now</p>
+            <p className="text-[15px] font-bold text-foreground">₹{reserveAmount}</p>
+          </div>
+          <Button
+            variant="tamayoGradient"
+            disabled
+            className="h-11 flex-1 text-[13px] font-semibold disabled:cursor-not-allowed disabled:opacity-100"
+          >
+            Proceed to payment
+          </Button>
+        </div>
+      </div>
+
+      <div className="hidden items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-white p-3 shadow-sm md:flex">
+        <p className="text-sm text-emerald-800">
+          {hasEstimatedTotal
+            ? `Reserve now at ₹${reserveAmount}. Remaining estimated ₹${estimatedTotalNumber.toLocaleString("en-IN")} on trip.`
+            : `Reserve now at ₹${reserveAmount}.`}
+        </p>
+        <Button variant="tamayoGradient" disabled className="h-10 min-w-[11rem] disabled:opacity-100">
+          Proceed to payment
+        </Button>
+      </div>
     </div>
   );
 }

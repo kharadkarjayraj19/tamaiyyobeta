@@ -98,3 +98,8 @@ Behavioral and token-level parity for future Flutter work should follow `docs/fe
 | 2026-08-07 | Navigation expanded with role-specific operational entries (`/customer/booking-quote`, `/admin/one-way-corridors`) to support pricing flow verification. |
 | 2026-08-11 | Root layout now wraps shell/pages with PostHog provider for cross-role pageview instrumentation; shell composition unchanged. |
 | 2026-08-28 | Added pathname-aware customer-home shell mode: hide sidebar + drawer menu on `/customer`, keep standard role navigation on other customer routes. |
+| 2026-09-18 | Customer top navbar branding simplified for booking flows: removed ` / Customer` label and switched to image wordmark rendering (`/public/images/tamayo-logo.png`) for customer role while supplier/admin keep role-context text. |
+| 2026-09-18 | Customer quote-flow density pass: reduced customer wordmark render size in top navbar and tightened top page padding specifically for `/customer/booking-quote` to reduce header-to-content gap on mobile. |
+| 2026-09-18 | Customer quote flow now uses a dedicated mobile back-arrow leading action in top navbar (replacing hamburger menu) with browser-back and `/customer` fallback behavior to prioritize conversion flow over drawer navigation. |
+| 2026-09-18 | Refined customer quote back-arrow visual style to a lighter ghost treatment with subtle neutral border and lower visual weight, avoiding heavy box/divider collision in compact mobile header. |
+| 2026-09-18 | Further simplified customer quote back-arrow control by removing visible box border/background and nudging icon position toward top-left for cleaner compact-header alignment. |

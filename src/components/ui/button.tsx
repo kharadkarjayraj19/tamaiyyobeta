@@ -16,6 +16,8 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        tamayoGradient:
+          "border border-white/35 bg-gradient-to-r from-emerald-600/95 to-green-500/90 text-white shadow-[0_10px_24px_rgba(16,185,129,0.3)] backdrop-blur-md hover:border-white/45 hover:from-emerald-500 hover:to-green-400 focus-visible:ring-emerald-300",
       },
       size: {
         default: "h-9 px-4 py-2",
