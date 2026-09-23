@@ -263,5 +263,9 @@ Lower layers must not import higher layers. Document exceptions if a primitive e
 | 2026-05-13 | Web app shell implemented per **docs/features/app-shell.md** (nav, layouts, table/card wrappers). |
 | 2026-09-18 | Added shared button-variant usage pattern for conversion-focused customer CTAs via reusable green gradient button styling (`tamayoGradient`) instead of per-page ad-hoc gradient classes. |
 | 2026-09-18 | Updated `tamayoGradient` shared button variant with glassmorphism treatment (translucent border, blur, and elevated shadow) so all gradient conversion CTAs share one modern visual behavior. |
+| 2026-09-19 | Darkened global `tamayoGradient` button token (deeper emerald gradient, stronger shadow, slightly subtler border) so all reuse points inherit a higher-contrast premium CTA treatment without per-page overrides. |
+| 2026-09-19 | Refined `tamayoGradient` to match dark-emerald reference style (deeper base, balanced inner highlight, softer edge border) after visual correction feedback, while keeping it as the same shared CTA variant. |
+| 2026-09-19 | Reverted `tamayoGradient` to the previous shared tone (pre dark-emerald correction) per visual preference, restoring the earlier lighter dark-green gradient across all reuse points. |
+| 2026-09-19 | Restored `tamayoGradient` to the original shared token (pre-darkening baseline: emerald-to-green with lighter glow/shadow) per latest visual rollback request. |
 
 When you materially change tokens, patterns, or philosophy, add a row here and link any superseded sections from `docs/architecture.md` if needed.

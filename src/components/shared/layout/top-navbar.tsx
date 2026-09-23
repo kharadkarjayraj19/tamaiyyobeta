@@ -1,15 +1,16 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Menu } from "lucide-react";
+import { ArrowLeft, LogIn, LogOut, Menu } from "lucide-react";
 
 import type { AppRole } from "@/config/navigation";
 import { siteConfig } from "@/config/site";
 import { uiLayout } from "@/config/ui";
 import { Button } from "@/components/ui/button";
+import { TAMAYO_SESSION_COOKIE } from "@/lib/auth/constants";
 import { cn } from "@/lib/utils";
 
 const ROLE_TITLE: Record<AppRole, string> = {
@@ -28,7 +29,7 @@ type TopNavbarProps = {
 };
 
 /**
- * Sticky top bar: mobile menu, home link, role context. No auth controls (by design).
+ * Sticky top bar: mobile menu/back control, brand/role context, and sign-out action.
  */
 export function TopNavbar({
   role,
@@ -39,7 +40,26 @@ export function TopNavbar({
   className,
 }: TopNavbarProps) {
   const router = useRouter();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [hasSession, setHasSession] = useState(false);
   const isCustomer = role === "customer";
+
+  useEffect(() => {
+    function syncAuthStateFromCookie() {
+      const cookie = document.cookie;
+      setHasSession(
+        cookie.includes(`${TAMAYO_SESSION_COOKIE}=`) || cookie.includes("better-auth.session_token=")
+      );
+    }
+
+    syncAuthStateFromCookie();
+    window.addEventListener("focus", syncAuthStateFromCookie);
+    document.addEventListener("visibilitychange", syncAuthStateFromCookie);
+    return () => {
+      window.removeEventListener("focus", syncAuthStateFromCookie);
+      document.removeEventListener("visibilitychange", syncAuthStateFromCookie);
+    };
+  }, []);
 
   function handleBackNavigation() {
     if (window.history.length > 1) {
@@ -47,6 +67,30 @@ export function TopNavbar({
       return;
     }
     router.push("/customer");
+  }
+
+  async function handleSignOut() {
+    if (isSigningOut) {
+      return;
+    }
+
+    setIsSigningOut(true);
+    try {
+      await fetch("/api/v1/auth/logout", { method: "POST" });
+      router.replace("/login");
+      router.refresh();
+    } finally {
+      setIsSigningOut(false);
+    }
+  }
+
+  function handleAuthAction() {
+    if (hasSession) {
+      void handleSignOut();
+      return;
+    }
+
+    router.push("/login?callbackUrl=%2Fcustomer");
   }
 
   return (
@@ -103,7 +147,20 @@ export function TopNavbar({
           </>
         )}
       </div>
-      {trailing ? <div className="flex shrink-0 items-center gap-2">{trailing}</div> : null}
+      <div className="flex shrink-0 items-center gap-1.5">
+        <Button
+          type="button"
+          variant="ghost"
+          className="h-8 gap-1.5 rounded-full bg-emerald-50 px-2.5 text-xs font-semibold text-emerald-700 shadow-none hover:bg-emerald-100 hover:text-emerald-900"
+          onClick={handleAuthAction}
+          disabled={isSigningOut}
+          aria-label={hasSession ? "Sign out" : "Sign in"}
+        >
+          {hasSession ? <LogOut className="h-3.5 w-3.5" aria-hidden /> : <LogIn className="h-3.5 w-3.5" aria-hidden />}
+          <span>{hasSession ? (isSigningOut ? "Signing out..." : "Sign out") : "Sign in"}</span>
+        </Button>
+        {trailing ? <div className="flex items-center gap-2">{trailing}</div> : null}
+      </div>
     </header>
   );
 }

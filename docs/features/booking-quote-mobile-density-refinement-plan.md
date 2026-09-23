@@ -44,3 +44,4 @@
 | 2026-09-18 | Card stack spacing tweak: set quote-card vertical stack spacing to `0` on mobile (`space-y-0`) while preserving desktop spacing (`md:space-y-4`). |
 | 2026-09-18 | Mobile helper-text density pass: hid “Assured new vehicle / Economy age vehicle selected” and “All-inclusive selected / Self-pay selected” lines on mobile while preserving them on desktop. |
 | 2026-09-18 | Vehicle card visual emphasis: increased quote-card vehicle thumbnail size by ~15% to improve recognition without changing pricing/content hierarchy. |
+| 2026-09-19 | Date-time density pass: upgraded mobile pickup-date editor to include return-day stepper in the same overlay, reducing need for separate end-date controls while keeping round-trip/multi-city duration explicit. |

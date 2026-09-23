@@ -2,15 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ChevronLeft,
-  CircleDot,
-  Flag,
-  MapPin,
   ShieldCheck,
   TriangleAlert,
 } from "lucide-react";
 
 import { SectionHeader } from "@/components/shared/layout/section-header";
 import { Button } from "@/components/ui/button";
+import { ReserveRouteAnimation } from "@/features/booking/ui/reserve-route-animation";
 
 type ReservePageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -247,111 +245,77 @@ export default async function CustomerReservePage({ searchParams }: ReservePageP
           ) : null}
         </article>
 
-        <article className="space-y-3 rounded-2xl border border-emerald-200 bg-white p-3 shadow-sm">
-          <div className="flex gap-3">
-            <img
-              src={vehicleImage}
-              alt={vehicle}
-              className="h-[92px] w-[122px] shrink-0 rounded-lg border border-emerald-100 object-cover"
-              loading="lazy"
-            />
-            <div className="min-w-0 flex-1">
-              <div className="min-w-0">
-                <p className="truncate text-[18px] font-semibold leading-tight text-foreground">{vehicle}</p>
-                <p className="text-[12px] text-muted-foreground">or similar • {ageBucketLabel}</p>
-              </div>
-              <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[12px] text-muted-foreground">
-                <span className="inline-flex items-center gap-1 rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[11px] text-amber-700">
-                  <ReserveInfoIcon name="fuel" alt="Fuel type" />
-                  {fuelLabel}
-                </span>
-                {routeDistanceKm ? (
-                  <span className="inline-flex items-center gap-1">
-                    <ReserveInfoIcon name="route" alt="Route distance" />
-                    {routeDistanceKm} kms
-                  </span>
-                ) : null}
-                <span className="inline-flex items-center gap-1">
-                  <ReserveInfoIcon name="passengers" alt="Passenger capacity" />
-                  {paxCount}
-                </span>
-                {includedDays ? (
-                  <span className="inline-flex items-center gap-1">
-                    <ReserveInfoIcon name="duration" alt="Trip duration" />
-                    {includedDays} day{includedDays === "1" ? "" : "s"}
-                  </span>
-                ) : null}
-              </div>
-            </div>
-          </div>
-          <p className="rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-2 text-[12px] text-amber-800">
-            Cab operator will be assigned after booking confirmation.
-          </p>
-        </article>
-
-        <article className="rounded-xl border border-emerald-100 bg-gradient-to-b from-white to-emerald-50/40 p-2.5 shadow-sm">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">Route overview</p>
-          <div className="relative mt-1.5 space-y-1.5 pl-0.5">
-            <span
-              aria-hidden
-              className="absolute bottom-3 left-[11px] top-3 w-px bg-gradient-to-b from-emerald-200 via-emerald-300 to-emerald-200"
-            />
-            <div className="grid grid-cols-[22px_minmax(0,1fr)] items-start gap-1.5">
-              <span className="mt-0.5 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200">
-                <MapPin className="h-3 w-3" />
-              </span>
-              <div className="min-w-0">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Start city</p>
-                <p className="text-[13px] font-medium leading-snug text-foreground">{sourceCity}</p>
-              </div>
-            </div>
-            {intermediateStops.map((stop, index) => (
-              <div key={`${stop}-${index}`} className="grid grid-cols-[22px_minmax(0,1fr)] items-start gap-1.5">
-                <span className="mt-0.5 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200">
-                  <CircleDot className="h-3 w-3" />
-                </span>
+        <div className="grid gap-3 md:grid-cols-2 md:items-stretch">
+          <article className="space-y-3 rounded-2xl border border-emerald-200/90 bg-gradient-to-br from-white via-emerald-50/45 to-emerald-100/45 p-3 shadow-[0_10px_26px_rgba(16,185,129,0.14)]">
+            <div className="flex gap-3">
+              <img
+                src={vehicleImage}
+                alt={vehicle}
+                className="h-[92px] w-[122px] shrink-0 rounded-lg border border-emerald-100 object-cover"
+                loading="lazy"
+              />
+              <div className="min-w-0 flex-1">
                 <div className="min-w-0">
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    Stop {index + 1}
-                  </p>
-                  <p className="text-[13px] font-medium leading-snug text-foreground">{stop}</p>
+                  <p className="truncate text-[18px] font-semibold leading-tight text-foreground">{vehicle}</p>
+                  <p className="text-[12px] text-muted-foreground">or similar • {ageBucketLabel}</p>
+                </div>
+                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[12px] text-muted-foreground">
+                  <span className="inline-flex items-center gap-1">
+                    <ReserveInfoIcon name="fuel" alt="Fuel type" />
+                    {fuelLabel}
+                  </span>
+                  {routeDistanceKm ? (
+                    <span className="inline-flex items-center gap-1">
+                      <ReserveInfoIcon name="route" alt="Route distance" />
+                      {routeDistanceKm} kms
+                    </span>
+                  ) : null}
+                  <span className="inline-flex items-center gap-1">
+                    <ReserveInfoIcon name="passengers" alt="Passenger capacity" />
+                    {paxCount}
+                  </span>
+                  {includedDays ? (
+                    <span className="inline-flex items-center gap-1">
+                      <ReserveInfoIcon name="duration" alt="Trip duration" />
+                      {includedDays} day{includedDays === "1" ? "" : "s"}
+                    </span>
+                  ) : null}
                 </div>
               </div>
-            ))}
-            <div className="grid grid-cols-[22px_minmax(0,1fr)] items-start gap-1.5">
-              <span className="mt-0.5 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200">
-                <Flag className="h-3 w-3" />
-              </span>
-              <div className="min-w-0">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">End city</p>
-                <p className="text-[13px] font-medium leading-snug text-foreground">{endCityFromRoute}</p>
-              </div>
             </div>
-          </div>
-        </article>
+          </article>
 
-        <article className="rounded-xl border border-emerald-100 bg-white p-2.5 shadow-sm">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">Inclusions</p>
-          <ul className="mt-1.5 space-y-1.5">
-            {inclusions.map((item) => (
-              <li key={item} className="flex items-start gap-1.5">
-                <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-700" />
-                <p className="text-[12px] leading-snug text-foreground">{item}</p>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-2.5 border-t border-border/70 pt-2.5">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-700">Exclusions</p>
+          <article className="rounded-xl border border-emerald-100 bg-white p-2.5 shadow-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">Inclusions</p>
             <ul className="mt-1.5 space-y-1.5">
-              {exclusions.map((item) => (
+              {inclusions.map((item) => (
                 <li key={item} className="flex items-start gap-1.5">
-                  <TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-700" />
+                  <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-700" />
                   <p className="text-[12px] leading-snug text-foreground">{item}</p>
                 </li>
               ))}
             </ul>
-          </div>
-        </article>
+            <div className="mt-2.5 border-t border-border/70 pt-2.5">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-700">Exclusions</p>
+              <ul className="mt-1.5 space-y-1.5">
+                {exclusions.map((item) => (
+                  <li key={item} className="flex items-start gap-1.5">
+                    <TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-700" />
+                    <p className="text-[12px] leading-snug text-foreground">{item}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        </div>
+
+        <ReserveRouteAnimation
+          sourceCity={sourceCity}
+          destinationCity={endCityFromRoute}
+          intermediateStops={intermediateStops}
+          pickupTimeLabel={pickupTimeLabel}
+          endTimeLabel={tripEndDate ? endTimeLabel : ""}
+        />
       </section>
 
       <div className="fixed inset-x-0 bottom-0 z-[60] border-t border-emerald-200 bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+0.65rem)] pt-2 text-foreground shadow-[0_-8px_24px_rgba(0,0,0,0.12)] backdrop-blur md:hidden">

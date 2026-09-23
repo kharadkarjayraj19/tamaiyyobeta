@@ -57,6 +57,7 @@ export function RoleDashboardShell({ role, children }: RoleDashboardShellProps) 
                 onOpenSidebar={() => setMobileNavOpen(true)}
                 showMenuButton={!hideSidebar && !useBackButton}
                 showBackButton={useBackButton}
+                className={isCustomerOverview ? "border-b-0" : undefined}
               />
             )
           }
@@ -71,7 +72,7 @@ export function RoleDashboardShell({ role, children }: RoleDashboardShellProps) 
               variant="wide"
               className={
                 isCustomerOverview
-                  ? "px-0 py-3 sm:px-0 lg:px-0"
+                  ? "mx-auto w-full max-w-none px-0 py-0 sm:px-0 lg:px-0"
                   : isCustomerQuoteFlow
                     ? "pt-2 pb-4 sm:pt-3"
                     : undefined

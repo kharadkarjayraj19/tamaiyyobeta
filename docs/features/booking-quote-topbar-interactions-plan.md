@@ -40,3 +40,4 @@
 | --- | --- |
 | 2026-09-18 | Initial plan created from user-provided desktop and interaction screenshots; implementation to follow immediately in same change set. |
 | 2026-09-18 | Executed plan: interactive topbar editors added, intermediate-stop placement corrected, desktop overflow reduced, and verification completed (`ReadLints` + `npm run build`). |
+| 2026-09-19 | Mobile date-time UX upgrade: pickup editor now uses a compact single-sheet flow with integrated return-day stepper for tour trips, generating `tripEndDate` automatically from selected duration so end-date controls do not consume separate topbar space. |

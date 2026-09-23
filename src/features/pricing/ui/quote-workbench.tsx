@@ -514,6 +514,44 @@ function getTwelveHourParts(value: string): {
   return { hour, minute: parsed.getMinutes(), period };
 }
 
+function toDateTimeInputValue(date: Date): string {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  const hours = `${date.getHours()}`.padStart(2, "0");
+  const minutes = `${date.getMinutes()}`.padStart(2, "0");
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+function calculateTripDurationDays(start: string, end: string): number {
+  if (!start || !end) {
+    return 1;
+  }
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+    return 1;
+  }
+  const diffMs = endDate.getTime() - startDate.getTime();
+  const diffDays = diffMs / (1000 * 60 * 60 * 24);
+  return Math.max(1, Math.ceil(diffDays));
+}
+
+function formatPickerDateLabel(value: string): string {
+  if (!value) {
+    return "Select date";
+  }
+  const parsed = new Date(`${value}T00:00`);
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+  return new Intl.DateTimeFormat("en-IN", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+  }).format(parsed);
+}
+
 function TopbarOverlay({
   title,
   onClose,
@@ -588,6 +626,7 @@ export function QuoteWorkbench() {
   const [draftHour, setDraftHour] = useState(9);
   const [draftMinute, setDraftMinute] = useState(0);
   const [draftPeriod, setDraftPeriod] = useState<"AM" | "PM">("AM");
+  const [draftTripDurationDays, setDraftTripDurationDays] = useState(1);
   const autoReserveAttemptedRef = useRef(false);
 
   const routeStops = parseDestinationStops(form.destinationStops)
@@ -605,9 +644,15 @@ export function QuoteWorkbench() {
     intermediateStops.length > 0
       ? `${intermediateStops.length} stop${intermediateStops.length > 1 ? "s" : ""}`
       : "Add stops";
+  const requiresReturnDate = form.productType !== "ONE_WAY";
   const pickupDateToken = formatDateToken(form.tripStartDate);
   const pickupTimeToken = formatTimeToken(form.tripStartDate);
-  const compactDateTimeLabel = form.tripStartDate ? `${pickupDateToken} • ${pickupTimeToken}` : "Pick date & time";
+  const selectedTripDays = requiresReturnDate
+    ? calculateTripDurationDays(form.tripStartDate, form.tripEndDate)
+    : 1;
+  const compactDateTimeLabel = form.tripStartDate
+    ? `${pickupDateToken} • ${pickupTimeToken}${requiresReturnDate ? ` • ${selectedTripDays}d` : ""}`
+    : "Pick date & time";
 
   useEffect(() => {
     const productType = searchParams.get("productType");
@@ -897,6 +942,9 @@ export function QuoteWorkbench() {
     setDraftHour(parts.hour);
     setDraftMinute(parts.minute);
     setDraftPeriod(parts.period);
+    setDraftTripDurationDays(
+      requiresReturnDate ? calculateTripDurationDays(form.tripStartDate, form.tripEndDate) : 1
+    );
     setActiveEditor("pickupDateTime");
   }
 
@@ -948,13 +996,33 @@ export function QuoteWorkbench() {
     const formattedHour = `${twentyFourHour}`.padStart(2, "0");
     const formattedMinute = `${draftMinute}`.padStart(2, "0");
     const nextDateTime = `${draftTripDate}T${formattedHour}:${formattedMinute}`;
-    setForm((prev) => ({ ...prev, tripStartDate: nextDateTime }));
+    setForm((prev) => {
+      if (prev.productType === "ONE_WAY") {
+        return { ...prev, tripStartDate: nextDateTime, tripEndDate: "" };
+      }
+      const startDate = new Date(nextDateTime);
+      if (Number.isNaN(startDate.getTime())) {
+        return { ...prev, tripStartDate: nextDateTime };
+      }
+      const returnDate = new Date(startDate);
+      returnDate.setDate(returnDate.getDate() + Math.max(0, draftTripDurationDays - 1));
+      returnDate.setHours(23, 59, 0, 0);
+      return {
+        ...prev,
+        tripStartDate: nextDateTime,
+        tripEndDate: toDateTimeInputValue(returnDate),
+      };
+    });
     setShouldAutoQuote(true);
     setActiveEditor(null);
   }
 
   function handleTripTypeChange(nextType: ProductTypeOption) {
-    setForm((prev) => ({ ...prev, productType: nextType }));
+    setForm((prev) => ({
+      ...prev,
+      productType: nextType,
+      tripEndDate: nextType === "ONE_WAY" ? "" : prev.tripEndDate,
+    }));
     setShouldAutoQuote(true);
   }
 
@@ -999,6 +1067,10 @@ export function QuoteWorkbench() {
 
   function toggleDraftPeriod() {
     setDraftPeriod((prev) => (prev === "AM" ? "PM" : "AM"));
+  }
+
+  function adjustDraftTripDuration(delta: number) {
+    setDraftTripDurationDays((prev) => Math.min(15, Math.max(1, prev + delta)));
   }
 
   return (
@@ -1189,13 +1261,16 @@ export function QuoteWorkbench() {
 
       {activeEditor === "pickupDateTime" ? (
         <TopbarOverlay
-          title="Update pickup date & time"
+          title="Select pickup date and time"
           onClose={() => setActiveEditor(null)}
           onConfirm={applyPickupDateTimeEditor}
+          confirmLabel="Select"
         >
           <div className="space-y-3">
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Pickup date</label>
+              <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Pickup date
+              </label>
               <input
                 type="date"
                 value={draftTripDate}
@@ -1204,14 +1279,17 @@ export function QuoteWorkbench() {
               />
             </div>
             {draftTripDate ? (
-              <div>
-                <p className="mb-1 text-xs font-medium text-muted-foreground">Pickup time</p>
+              <div className="space-y-3">
+                <div>
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Pickup time
+                  </p>
                 <div className="grid grid-cols-3 gap-2">
-                  <div className="rounded-lg border border-border bg-muted/20 p-2 text-center">
+                  <div className="rounded-lg border border-emerald-200 bg-emerald-50/30 p-2 text-center">
                     <button
                       type="button"
                       onClick={() => adjustDraftHour(1)}
-                      className="w-full rounded border border-border bg-white py-1 text-xs font-semibold"
+                      className="w-full rounded border border-emerald-200 bg-white py-1 text-xs font-semibold text-emerald-800"
                     >
                       +
                     </button>
@@ -1219,16 +1297,16 @@ export function QuoteWorkbench() {
                     <button
                       type="button"
                       onClick={() => adjustDraftHour(-1)}
-                      className="w-full rounded border border-border bg-white py-1 text-xs font-semibold"
+                      className="w-full rounded border border-emerald-200 bg-white py-1 text-xs font-semibold text-emerald-800"
                     >
                       -
                     </button>
                   </div>
-                  <div className="rounded-lg border border-border bg-muted/20 p-2 text-center">
+                  <div className="rounded-lg border border-emerald-200 bg-emerald-50/30 p-2 text-center">
                     <button
                       type="button"
                       onClick={() => adjustDraftMinute(1)}
-                      className="w-full rounded border border-border bg-white py-1 text-xs font-semibold"
+                      className="w-full rounded border border-emerald-200 bg-white py-1 text-xs font-semibold text-emerald-800"
                     >
                       +
                     </button>
@@ -1236,16 +1314,16 @@ export function QuoteWorkbench() {
                     <button
                       type="button"
                       onClick={() => adjustDraftMinute(-1)}
-                      className="w-full rounded border border-border bg-white py-1 text-xs font-semibold"
+                      className="w-full rounded border border-emerald-200 bg-white py-1 text-xs font-semibold text-emerald-800"
                     >
                       -
                     </button>
                   </div>
-                  <div className="rounded-lg border border-border bg-muted/20 p-2 text-center">
+                  <div className="rounded-lg border border-emerald-200 bg-emerald-50/30 p-2 text-center">
                     <button
                       type="button"
                       onClick={toggleDraftPeriod}
-                      className="w-full rounded border border-border bg-white py-1 text-xs font-semibold"
+                      className="w-full rounded border border-emerald-200 bg-white py-1 text-xs font-semibold text-emerald-800"
                     >
                       toggle
                     </button>
@@ -1253,12 +1331,61 @@ export function QuoteWorkbench() {
                     <button
                       type="button"
                       onClick={toggleDraftPeriod}
-                      className="w-full rounded border border-border bg-white py-1 text-xs font-semibold"
+                      className="w-full rounded border border-emerald-200 bg-white py-1 text-xs font-semibold text-emerald-800"
                     >
                       toggle
                     </button>
                   </div>
                 </div>
+                </div>
+
+                {requiresReturnDate ? (
+                  <div className="rounded-lg border border-emerald-100 bg-emerald-50/30 px-3 py-2">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      Return
+                    </p>
+                    <div className="mt-1 flex items-center justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">
+                          {formatPickerDateLabel(
+                            (() => {
+                              const start = new Date(`${draftTripDate}T00:00`);
+                              if (Number.isNaN(start.getTime())) {
+                                return "";
+                              }
+                              start.setDate(start.getDate() + Math.max(0, draftTripDurationDays - 1));
+                              const year = start.getFullYear();
+                              const month = `${start.getMonth() + 1}`.padStart(2, "0");
+                              const day = `${start.getDate()}`.padStart(2, "0");
+                              return `${year}-${month}-${day}`;
+                            })()
+                          )}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {draftTripDurationDays} day{draftTripDurationDays > 1 ? "s" : ""}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => adjustDraftTripDuration(-1)}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-emerald-200 bg-white text-lg font-semibold text-emerald-800"
+                          aria-label="Reduce trip days"
+                        >
+                          -
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => adjustDraftTripDuration(1)}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-emerald-200 bg-white text-lg font-semibold text-emerald-800"
+                          aria-label="Increase trip days"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
               </div>
             ) : null}
           </div>

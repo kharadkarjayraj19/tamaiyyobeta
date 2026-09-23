@@ -14,6 +14,7 @@ The web app uses a single **role-aware dashboard shell** (`RoleDashboardShell`) 
 - Skip link → sticky **top navbar** → **desktop sidebar** + **scrollable main** (with `PageContainer`).
 - **Mobile:** the same primary nav renders in a **left `Sheet` drawer** (Radix Dialog) toggled from the navbar menu button.
 - **Navigation data** lives in `src/config/navigation.ts` (serializable items + `AppRole`). Icons are mapped client-side in `nav-icon.tsx` so config stays free of React components.
+- **Session control:** top navbar now includes a direct **Sign out** action (icon + label) that clears the fallback session cookie via `/api/v1/auth/logout` and redirects to `/login`.
 
 Customer, supplier, and admin route layouts each render the same shell with a different `role` prop—**one implementation, three surfaces**, reducing drift.
 
@@ -103,3 +104,7 @@ Behavioral and token-level parity for future Flutter work should follow `docs/fe
 | 2026-09-18 | Customer quote flow now uses a dedicated mobile back-arrow leading action in top navbar (replacing hamburger menu) with browser-back and `/customer` fallback behavior to prioritize conversion flow over drawer navigation. |
 | 2026-09-18 | Refined customer quote back-arrow visual style to a lighter ghost treatment with subtle neutral border and lower visual weight, avoiding heavy box/divider collision in compact mobile header. |
 | 2026-09-18 | Further simplified customer quote back-arrow control by removing visible box border/background and nudging icon position toward top-left for cleaner compact-header alignment. |
+| 2026-09-19 | Added top-navbar sign-out button (door/arrow icon + text) wired to `/api/v1/auth/logout`, with loading state and redirect to `/login` for faster manual session exit during customer flow testing. |
+| 2026-09-19 | Updated top-navbar auth action to always show readable text with icon on mobile/desktop, use green-themed styling, and switch label/behavior between `Sign in` and `Sign out` based on detected session cookie presence. |
+| 2026-09-19 | Customer overview shell spacing pass: removed topbar bottom divider line specifically on `/customer` and switched customer overview container spacing to edge-to-edge zero-gap (`mx-auto w-full max-w-none px-0 py-0 sm:px-0 lg:px-0`). |
+| 2026-09-19 | Customer top-navbar auth button styling adjusted to visually match customer hero pill language (`Schedule my tour`) by removing outlined border treatment and aligning to soft emerald chip styling. |
