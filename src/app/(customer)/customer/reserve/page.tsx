@@ -314,7 +314,7 @@ export default async function CustomerReservePage({ searchParams }: ReservePageP
           destinationCity={endCityFromRoute}
           intermediateStops={intermediateStops}
           pickupTimeLabel={pickupTimeLabel}
-          endTimeLabel={tripEndDate ? endTimeLabel : ""}
+          endTimeLabel={tripEndDate ? endTimeLabel : undefined}
         />
       </section>
 

@@ -1441,10 +1441,7 @@ export function QuoteWorkbench() {
               quote.routeDistanceKm ?? quote.usableDistanceKm ?? quote.billableKm;
             const distanceSourceLabel =
               form.estimatedKm.trim() ? "manual distance override" : "Google Maps";
-            const includedKmDisplay =
-              routeDistanceBase > quote.includedKmPerDay
-                ? Math.round(routeDistanceBase)
-                : quote.totalIncludedKm;
+            const includedKmDisplay = Math.max(Math.round(routeDistanceBase), quote.totalIncludedKm);
             const rawEstimatedTotal = Number(quote.estimatedTotal);
             const displayedTotal =
               operationalOption === "SELF_PAY"
@@ -1463,8 +1460,8 @@ export function QuoteWorkbench() {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="space-y-3">
+                <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_21.6rem] lg:items-start lg:gap-3">
+                    <div className="min-w-0 space-y-3">
                       <div className="space-y-2">
                         {vehicleQuote.preset.fuelTags.includes("CNG+Petrol") ? (
                           <p className="inline-flex items-center gap-1 rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] font-medium text-amber-800">
@@ -1615,7 +1612,7 @@ export function QuoteWorkbench() {
                       </div>
                     </div>
 
-                    <div className="w-full rounded-lg border border-emerald-100 bg-emerald-50/60 p-4 lg:w-[15rem]">
+                    <div className="w-full rounded-lg border border-emerald-100 bg-emerald-50/60 p-4 lg:w-[21.6rem]">
                       <p className="text-sm font-semibold text-emerald-700">Affordable fare</p>
                       <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
                         {currency(displayedTotal)}

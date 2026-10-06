@@ -40,7 +40,7 @@ export function RoleDashboardShell({ role, children }: RoleDashboardShellProps) 
   const isCustomerOverview = role === "customer" && pathname === "/customer";
   const isCustomerReserveFlow = role === "customer" && pathname.startsWith("/customer/reserve");
   const isCustomerQuoteFlow = role === "customer" && pathname.startsWith("/customer/booking-quote");
-  const hideSidebar = isCustomerOverview || isCustomerReserveFlow;
+  const hideSidebar = isCustomerOverview || isCustomerReserveFlow || isCustomerQuoteFlow;
   const hideTopBar = isCustomerReserveFlow;
   const useBackButton = isCustomerQuoteFlow;
   const sidebar = <Sidebar role={role} items={items} pathname={pathname} />;
