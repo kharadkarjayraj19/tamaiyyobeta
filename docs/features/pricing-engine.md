@@ -29,7 +29,9 @@
 - **Predictable pricing:** Same inputs (configuration version + trip inputs) yield the **same quoted outcome** until configuration or policy intentionally changes; surprise charges are limited to **metered** components already disclosed (billable km, operational bundle)—aligned with `booking-lifecycle.md` §7.
 - **Configuration-driven pricing:** All customer-visible **rate inputs** (base packages, per-km slabs, extension SKUs, eligibility flags, surge/night **when enabled**) are sourced from **data the platform controls** (admin tooling + optional automation), not embedded as immutable literals in application code.
 - **City-aware pricing:** Outstation markets differ by **origin/primary city** (and possibly corridor); the engine must **key** primary rates by **city** (or defined zone) so ops can tune markets independently.
-- **Trip-type alignment:** **Round Trip** and **Multi-City** share the **same pricing mode** (tour pricing). **One Way** uses **corridor pricing** (fixed route fare for hotspot drops).
+- **Trip-type alignment:** **Round Trip** and **Multi-City** share the **same pricing mode** (tour pricing). **One Way** uses fixed hotspot route fares for eligible city-pairs/categories, with fallback to tour pricing when ineligible.
+- **City-tour launch variant:** `MULTI_CITY` currently powers a fixed city-tour package model (`6h/60`, `8h/80`, `10h/100`, `12h/120`) for supported categories, with configured extra km/hour rates and no operational-bundle add-on.
+- **Airport launch variant:** `ONE_WAY` with airport package context uses fixed all-inclusive slabs (`10/20/30/40 km`) for supported categories, with airport-entry included and locked age/all-inclusive controls in quote UX.
 
 **Unresolved mechanics**
 
@@ -139,10 +141,14 @@ Dimensions are **inputs** to a quote or final reconciliation. The engine compose
 
 **Agreed**
 
-- **One-way** is a **distinct commercial product** where **eligible**: pricing uses **corridor pricing** (admin-configured fixed fare for hotspot routes) rather than a percentage surcharge.
+- **One-way** is a **distinct commercial product** where **eligible**: pricing uses fixed hotspot route fares (launch matrix) rather than a percentage surcharge.
 - **Round-trip and multi-city** share the same **tour pricing** model (included km/day, billable km = max(actual, included)).
 - **Round-trip fallback:** When one-way is **ineligible** for the selected city/category/route pattern, the customer journey falls back to **tour pricing** and included-km rules **transparently** (clear messaging that product is round trip).
 - **Eligibility** is a **first-class output** of the pricing engine (boolean + reason code for ops), not an ad-hoc UI check.
+- **Launch one-way matrix scope:** Supported city-pairs (bidirectional) are `Mumbai <-> Pune`, `Mumbai <-> Chhatrapati Sambhajinagar/Aurangabad`, `Pune <-> Chhatrapati Sambhajinagar/Aurangabad`, and `Pune <-> Nashik`; Sedan uses fixed fares, Ertiga uses Sedan + fixed surcharge, `KIA_CARENS` and `INNOVA_CRYSTA` currently have explicit fixed fares only on `Mumbai <-> Chhatrapati Sambhajinagar/Aurangabad`, and other unsupported combinations fall back to tour pricing.
+- **Launch one-way age policy:** For eligible fixed-route one-way quotes, `ZERO_TO_THREE` age bucket applies a fixed `₹200` surcharge.
+- **Launch one-way distance basis:** One-way fixed-route km basis is `A -> B` only; return leg km is excluded for one-way distance presentation and one-way operational-bundle km computation.
+- **Launch one-way operational policy:** For eligible fixed-route one-way quotes, toll/parking/driver-food operational bundle is not added to fare.
 - **Launch hub dispatch rule (MVP):** For the launch service area (`Mumbai`, `Pune`, `Chhatrapati Sambhajinagar`/`Aurangabad`, `Nashik`), pricing evaluates each hub as a closed loop (`hub -> pickup -> stops -> final drop -> same hub`) and selects the hub with the lowest total km; dispatch overhead is included in route-distance calculation.
 
 **Unresolved mechanics**
@@ -270,5 +276,11 @@ Aligned with **`docs/features/booking-lifecycle.md` §6** (included envelopes); 
 | 2026-08-11 | **Implemented (foundation):** server-side route distance resolver seam added in booking flow with Google Maps Directions API when configured and safe fallback to caller-provided distance when unavailable. |
 | 2026-08-28 | **Updated UX-aligned pricing notes:** added 12 hr / 120 km city-tour extension SKU and clarified ordered multi-city stop semantics for route capture and round-trip explanation. |
 | 2026-09-04 | **Implemented (MVP launch-ops rule):** hub selection now uses lowest closed-loop km across launch hubs (`hub -> pickup -> stops -> final drop -> same hub`); route distance includes dispatch and return overhead when Google Maps Directions is available. |
+| 2026-10-07 | **Implemented (MVP one-way matrix):** ONE_WAY now applies fixed fares only for configured city-pair/category combinations (Sedan + Ertiga surcharge) and falls back to tour pricing for unsupported routes/categories. |
+| 2026-10-21 | **Updated (MVP one-way refinement):** eligible one-way fixed-route quotes now add `₹200` for `ZERO_TO_THREE` age bucket and use one-way `A -> B` km basis (excluding return leg) for one-way distance display and one-way operational-bundle km. |
+| 2026-10-23 | **Updated (MVP one-way refinement):** eligible one-way fixed-route quotes no longer add toll/parking/driver-food operational bundle charges. |
+| 2026-10-23 | **Updated (MVP one-way matrix):** added category-specific fixed fares for `KIA_CARENS (₹8000)` and `INNOVA_CRYSTA (₹9500)` on `Mumbai <-> Chhatrapati Sambhajinagar/Aurangabad`. |
+| 2026-10-26 | **Updated (MVP city-tour launch):** city-tour fixed packages implemented for Sedan/Ertiga/Carens/Innova (`6h/60`, `8h/80`, `10h/100`, `12h/120`) with category-specific extra km/hour rates; Tempo Traveller city-tour pricing remains coming soon. |
+| 2026-10-26 | **Updated (MVP airport launch):** airport fixed all-inclusive packages implemented for Sedan/Ertiga/Carens/Innova across `10/20/30/40 km` slabs with airport-entry included; Tempo Traveller airport pricing remains coming soon. |
 
 When rate-card RBAC, version drift rules, and surge policies are fixed, add dated rows and consider raising **Maturity** toward `MVP` for covered scope.

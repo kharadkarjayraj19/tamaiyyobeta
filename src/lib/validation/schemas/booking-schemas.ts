@@ -17,6 +17,9 @@ import {
   BookingStatus,
 } from "@prisma/client";
 
+const CityTourPackageSchema = z.enum(["6h60km", "8h80km", "10h100km", "12h120km"]);
+const AirportPackageSchema = z.enum(["10km", "20km", "30km", "40km"]);
+
 /**
  * Destination stop schema (for multi-destination support).
  */
@@ -61,6 +64,8 @@ export const BookingQuoteRequestSchema = z.object({
     ProductType.ROUND_TRIP,
   ]),
   vehiclePresetId: z.string().min(1).max(50).optional(),
+  cityTourPackage: CityTourPackageSchema.optional(),
+  airportPackage: AirportPackageSchema.optional(),
   estimatedKm: z.number().int().positive().optional(),
   returnDistanceKm: z.number().int().positive().optional(),
 });
@@ -97,6 +102,8 @@ export const CreateBookingSchema = z.object({
     ProductType.ROUND_TRIP,
   ]),
   vehiclePresetId: z.string().min(1).max(50).optional(),
+  cityTourPackage: CityTourPackageSchema.optional(),
+  airportPackage: AirportPackageSchema.optional(),
   estimatedKm: z.number().int().positive().optional(),
   returnDistanceKm: z.number().int().positive().optional(),
 });

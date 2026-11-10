@@ -53,6 +53,8 @@ export interface BookingQuoteRequest {
   ageBucket: AgeBucket;
   productType: ProductType;
   vehiclePresetId?: string;
+  cityTourPackage?: "6h60km" | "8h80km" | "10h100km" | "12h120km";
+  airportPackage?: "10km" | "20km" | "30km" | "40km";
   estimatedKm?: number;
   returnDistanceKm?: number;
 }
@@ -72,6 +74,8 @@ export interface CreateBooking {
   ageBucket: AgeBucket;
   productType: ProductType;
   vehiclePresetId?: string;
+  cityTourPackage?: "6h60km" | "8h80km" | "10h100km" | "12h120km";
+  airportPackage?: "10km" | "20km" | "30km" | "40km";
   estimatedKm?: number;
   returnDistanceKm?: number;
 }
@@ -124,6 +128,8 @@ export class BookingService {
       category: request.category,
       ageBucket: request.ageBucket,
       productType: request.productType,
+      cityTourPackage: request.cityTourPackage,
+      airportPackage: request.airportPackage,
       tripStartDate: request.tripStartDate,
       tripEndDate: request.tripEndDate,
       estimatedKm: resolvedRouteDistanceKm,
@@ -183,6 +189,8 @@ export class BookingService {
         category: data.category,
         ageBucket: data.ageBucket,
         productType: data.productType,
+        cityTourPackage: data.cityTourPackage,
+        airportPackage: data.airportPackage,
         tripStartDate: data.tripStartDate,
         tripEndDate: data.tripEndDate,
         estimatedKm: resolvedRouteDistanceKm,

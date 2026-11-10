@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowLeftRight,
   BadgeIndianRupee,
   ArrowRight,
   BadgeCheck,
@@ -23,6 +24,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ComponentType, RefObject } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { CompactDropdown } from "@/components/shared/forms/compact-dropdown";
 import { LocationAutocompleteInput } from "@/components/shared/location/location-autocomplete-input";
 import { Button } from "@/components/ui/button";
 
@@ -101,14 +103,60 @@ const trustStats = [
 ];
 
 type RideMode = "oneWay" | "multiCityRoundTrip" | "cityTour" | "airportOnly";
-type CityTourPackage = "8h80km" | "12h120km";
+type CityTourPackage = "6h60km" | "8h80km" | "10h100km" | "12h120km";
+type AirportPackage = "10km" | "20km" | "30km" | "40km";
+type AirportTransferDirection = "HOTEL_TO_AIRPORT" | "AIRPORT_TO_HOTEL";
+type AirportCityKey = "MUMBAI" | "PUNE" | "NASHIK" | "AURANGABAD";
+type AirportDirectoryItem = {
+  id: string;
+  name: string;
+  terminals: string[];
+};
 
 const rideModes: Array<{ id: RideMode; label: string }> = [
-  { id: "oneWay", label: "One way" },
   { id: "multiCityRoundTrip", label: "Multi city / Round trip" },
+  { id: "oneWay", label: "One way" },
   { id: "cityTour", label: "City tour" },
   { id: "airportOnly", label: "Airport only" },
 ];
+
+const AIRPORT_CITY_OPTIONS: Array<{ value: AirportCityKey; label: string }> = [
+  { value: "MUMBAI", label: "Mumbai" },
+  { value: "PUNE", label: "Pune" },
+  { value: "NASHIK", label: "Nashik" },
+  { value: "AURANGABAD", label: "Aurangabad / Sambhajinagar" },
+];
+
+const AIRPORT_DIRECTORY: Record<AirportCityKey, AirportDirectoryItem[]> = {
+  MUMBAI: [
+    {
+      id: "csmia-bom",
+      name: "CSMIA (BOM)",
+      terminals: ["Terminal 1 (T1)", "Terminal 2 (T2)"],
+    },
+  ],
+  PUNE: [
+    {
+      id: "pnq",
+      name: "Pune International Airport (PNQ)",
+      terminals: ["Main Integrated Terminal"],
+    },
+  ],
+  NASHIK: [
+    {
+      id: "isk-ozar",
+      name: "Nashik Airport (Ozar) (ISK)",
+      terminals: ["Main Terminal"],
+    },
+  ],
+  AURANGABAD: [
+    {
+      id: "ixu",
+      name: "Chhatrapati Sambhajinagar Airport (IXU)",
+      terminals: ["Main Terminal"],
+    },
+  ],
+};
 
 const PICKER_ITEM_HEIGHT = 48;
 const PICKER_VIEW_HEIGHT = 144;
@@ -241,8 +289,16 @@ function getCityTokenFromLocation(location: string) {
 
 export default function CustomerOverviewPage() {
   const defaultPickupRef = useRef(getDefaultPickupValues());
-  const [selectedRideMode, setSelectedRideMode] = useState<RideMode>("oneWay");
+  const [selectedRideMode, setSelectedRideMode] = useState<RideMode>("multiCityRoundTrip");
   const [cityTourPackage, setCityTourPackage] = useState<CityTourPackage>("8h80km");
+  const [airportPackage, setAirportPackage] = useState<AirportPackage>("10km");
+  const [airportTransferDirection, setAirportTransferDirection] =
+    useState<AirportTransferDirection>("HOTEL_TO_AIRPORT");
+  const [airportCity, setAirportCity] = useState<AirportCityKey>("MUMBAI");
+  const [airportId, setAirportId] = useState<string>(AIRPORT_DIRECTORY.MUMBAI[0].id);
+  const [airportTerminal, setAirportTerminal] = useState<string>(
+    AIRPORT_DIRECTORY.MUMBAI[0].terminals[0]
+  );
   const [pickupLocationInput, setPickupLocationInput] = useState("");
   const [dropoffLocationInput, setDropoffLocationInput] = useState("");
   const [stopLocations, setStopLocations] = useState<string[]>([]);
@@ -285,6 +341,23 @@ export default function CustomerOverviewPage() {
     [nowReference]
   );
   const isTourMode = selectedRideMode === "multiCityRoundTrip" || selectedRideMode === "cityTour";
+  const airportOptions = AIRPORT_DIRECTORY[airportCity];
+  const selectedAirportOption =
+    airportOptions.find((airport) => airport.id === airportId) ?? airportOptions[0];
+  const selectedAirportTerminals = selectedAirportOption?.terminals ?? [];
+  const hasMultipleAirportTerminals = selectedAirportTerminals.length > 1;
+  const airportCityDropdownOptions = AIRPORT_CITY_OPTIONS.map((city) => ({
+    value: city.value,
+    label: city.label,
+  }));
+  const airportDropdownOptions = airportOptions.map((airport) => ({
+    value: airport.id,
+    label: airport.name,
+  }));
+  const terminalDropdownOptions = selectedAirportTerminals.map((terminal) => ({
+    value: terminal,
+    label: terminal,
+  }));
   const dateOptions = useMemo(() => {
     const firstDate = new Date(`${todayDate}T00:00:00`);
     return Array.from({ length: 121 }, (_, index) => {
@@ -362,6 +435,25 @@ export default function CustomerOverviewPage() {
           : tripStartTime
         : tripStartTime
       : minimumEndTimeBase;
+
+  useEffect(() => {
+    const cityAirports = AIRPORT_DIRECTORY[airportCity];
+    if (cityAirports.length === 0) {
+      return;
+    }
+
+    const currentAirport = cityAirports.find((airport) => airport.id === airportId) ?? cityAirports[0];
+    if (currentAirport.id !== airportId) {
+      setAirportId(currentAirport.id);
+    }
+
+    const nextTerminal = currentAirport.terminals.includes(airportTerminal)
+      ? airportTerminal
+      : currentAirport.terminals[0];
+    if (nextTerminal !== airportTerminal) {
+      setAirportTerminal(nextTerminal);
+    }
+  }, [airportCity, airportId, airportTerminal]);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -689,15 +781,41 @@ export default function CustomerOverviewPage() {
     const normalizedStops = stopLocations.map((location) => location.trim()).filter(Boolean);
     const normalizedDropoff = dropoffLocationInput.trim();
     const normalizedPickup = pickupLocationInput.trim();
-    const sourceCityToken = normalizedPickup ? getCityTokenFromLocation(normalizedPickup) : "";
-    const destinationCityToken = normalizedDropoff
-      ? getCityTokenFromLocation(normalizedDropoff)
-      : "";
+    const airportCityLabel =
+      AIRPORT_CITY_OPTIONS.find((city) => city.value === airportCity)?.label ?? "Mumbai";
+    const airportEndpoint = selectedAirportOption
+      ? `${selectedAirportOption.name}, ${airportTerminal}, ${airportCityLabel}`
+      : `Airport, ${airportCityLabel}`;
+
+    const airportHotelLocation =
+      airportTransferDirection === "HOTEL_TO_AIRPORT" ? normalizedPickup : normalizedDropoff;
+    const hotelCityToken = airportHotelLocation ? getCityTokenFromLocation(airportHotelLocation) : "";
+
+    const sourceCityToken =
+      selectedRideMode === "airportOnly"
+        ? hotelCityToken || airportCityLabel
+        : normalizedPickup
+          ? getCityTokenFromLocation(normalizedPickup)
+          : "";
+    const destinationCityToken =
+      selectedRideMode === "cityTour"
+        ? sourceCityToken
+        : selectedRideMode === "airportOnly"
+          ? airportCityLabel
+          : normalizedDropoff
+            ? getCityTokenFromLocation(normalizedDropoff)
+            : "";
 
     params.set("productType", mappedProductType);
     params.set("rideMode", selectedRideMode);
-    if (normalizedPickup) {
-      params.set("pickupLocation", normalizedPickup);
+    const quotePickupLocation =
+      selectedRideMode === "airportOnly"
+        ? airportTransferDirection === "HOTEL_TO_AIRPORT"
+          ? normalizedPickup
+          : airportEndpoint
+        : normalizedPickup;
+    if (quotePickupLocation) {
+      params.set("pickupLocation", quotePickupLocation);
     }
 
     if (sourceCityToken) {
@@ -708,15 +826,44 @@ export default function CustomerOverviewPage() {
       params.set("destinationCity", destinationCityToken);
     }
 
-    normalizedStops.forEach((stop) => params.append("drop", stop));
+    if (selectedRideMode === "multiCityRoundTrip") {
+      normalizedStops.forEach((stop) => params.append("drop", stop));
+    }
 
-    if (normalizedDropoff) {
-      params.append("drop", normalizedDropoff);
+    const quoteDropLocation =
+      selectedRideMode === "airportOnly"
+        ? airportTransferDirection === "HOTEL_TO_AIRPORT"
+          ? airportEndpoint
+          : normalizedDropoff
+        : normalizedDropoff;
+    if (selectedRideMode !== "cityTour" && quoteDropLocation) {
+      params.append("drop", quoteDropLocation);
     }
 
     if (selectedRideMode === "cityTour") {
       params.set("cityTourPackage", cityTourPackage);
-      params.set("estimatedKm", cityTourPackage === "8h80km" ? "80" : "120");
+      const cityTourKmMap: Record<CityTourPackage, string> = {
+        "6h60km": "60",
+        "8h80km": "80",
+        "10h100km": "100",
+        "12h120km": "120",
+      };
+      params.set("estimatedKm", cityTourKmMap[cityTourPackage]);
+    }
+
+    if (selectedRideMode === "airportOnly") {
+      const airportKmMap: Record<AirportPackage, string> = {
+        "10km": "10",
+        "20km": "20",
+        "30km": "30",
+        "40km": "40",
+      };
+      params.set("airportPackage", airportPackage);
+      params.set("airportTransferDirection", airportTransferDirection);
+      params.set("airportCity", airportCity);
+      params.set("airportId", airportId);
+      params.set("airportTerminal", airportTerminal);
+      params.set("estimatedKm", airportKmMap[airportPackage]);
     }
 
     if (tripStartDate) {
@@ -730,6 +877,12 @@ export default function CustomerOverviewPage() {
     return `/customer/booking-quote?${params.toString()}`;
   }, [
     cityTourPackage,
+    airportPackage,
+    airportTransferDirection,
+    airportCity,
+    airportId,
+    airportTerminal,
+    selectedAirportOption,
     dropoffLocationInput,
     isTourMode,
     pickupLocationInput,
@@ -807,6 +960,17 @@ export default function CustomerOverviewPage() {
                     <div className="mt-2 grid grid-cols-2 gap-2">
                       <button
                         type="button"
+                        onClick={() => setCityTourPackage("6h60km")}
+                        className={
+                          cityTourPackage === "6h60km"
+                            ? "rounded-md bg-emerald-600 px-2 py-2 text-xs font-semibold text-white"
+                            : "rounded-md border border-emerald-200 bg-white px-2 py-2 text-xs font-semibold text-emerald-700"
+                        }
+                      >
+                        6 hours / 60 km
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => setCityTourPackage("8h80km")}
                         className={
                           cityTourPackage === "8h80km"
@@ -815,6 +979,17 @@ export default function CustomerOverviewPage() {
                         }
                       >
                         8 hours / 80 km
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCityTourPackage("10h100km")}
+                        className={
+                          cityTourPackage === "10h100km"
+                            ? "rounded-md bg-emerald-600 px-2 py-2 text-xs font-semibold text-white"
+                            : "rounded-md border border-emerald-200 bg-white px-2 py-2 text-xs font-semibold text-emerald-700"
+                        }
+                      >
+                        10 hours / 100 km
                       </button>
                       <button
                         type="button"
@@ -882,33 +1057,198 @@ export default function CustomerOverviewPage() {
                         </span>
                       </span>
                     </div>
+                    <div className="mt-1.5 flex items-center gap-1.5 text-[10px] text-emerald-800">
+                      <span>One-way pricing applies only on selected hot routes.</span>
+                      <span className="group relative inline-flex">
+                        <Info className="h-3 w-3 cursor-help text-emerald-700" />
+                        <span className="pointer-events-none absolute left-1/2 top-[125%] z-20 hidden w-72 -translate-x-1/2 rounded-md bg-foreground px-2 py-1.5 text-[10px] font-normal normal-case leading-relaxed text-background shadow-lg group-hover:block">
+                          <span className="mb-1 block font-semibold text-emerald-200">
+                            Hot one-way routes (both directions):
+                          </span>
+                          <span className="block">Mumbai <ArrowLeftRight className="mx-1 inline h-2.5 w-2.5" /> Pune</span>
+                          <span className="block">Mumbai <ArrowLeftRight className="mx-1 inline h-2.5 w-2.5" /> Sambhajinagar / Aurangabad</span>
+                          <span className="block">Pune <ArrowLeftRight className="mx-1 inline h-2.5 w-2.5" /> Sambhajinagar / Aurangabad</span>
+                          <span className="block">Pune <ArrowLeftRight className="mx-1 inline h-2.5 w-2.5" /> Nashik</span>
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                ) : null}
+
+                {selectedRideMode === "airportOnly" ? (
+                  <div className="mt-2 rounded-md border border-emerald-100 bg-emerald-50 px-2 py-2">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
+                      Airport transfer route
+                    </p>
+                    <div className="mt-1.5 grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setAirportTransferDirection("HOTEL_TO_AIRPORT")}
+                        className={
+                          airportTransferDirection === "HOTEL_TO_AIRPORT"
+                            ? "rounded-md bg-emerald-600 px-2 py-2 text-xs font-semibold text-white"
+                            : "rounded-md border border-emerald-200 bg-white px-2 py-2 text-xs font-semibold text-emerald-700"
+                        }
+                      >
+                        Hotel to Airport
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAirportTransferDirection("AIRPORT_TO_HOTEL")}
+                        className={
+                          airportTransferDirection === "AIRPORT_TO_HOTEL"
+                            ? "rounded-md bg-emerald-600 px-2 py-2 text-xs font-semibold text-white"
+                            : "rounded-md border border-emerald-200 bg-white px-2 py-2 text-xs font-semibold text-emerald-700"
+                        }
+                      >
+                        Airport to Hotel
+                      </button>
+                    </div>
+                    <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                      <label className="space-y-1">
+                        <span className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
+                          City
+                        </span>
+                        <CompactDropdown
+                          value={airportCity}
+                          options={airportCityDropdownOptions}
+                          onValueChange={(next) => setAirportCity(next as AirportCityKey)}
+                          ariaLabel="Airport city"
+                        />
+                      </label>
+                      <label className="space-y-1">
+                        <span className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
+                          Airport
+                        </span>
+                        <CompactDropdown
+                          value={airportId}
+                          options={airportDropdownOptions}
+                          onValueChange={setAirportId}
+                          ariaLabel="Airport"
+                        />
+                      </label>
+                      <label className="space-y-1">
+                        <span className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
+                          Terminal
+                        </span>
+                        {hasMultipleAirportTerminals ? (
+                          <CompactDropdown
+                            value={airportTerminal}
+                            options={terminalDropdownOptions}
+                            onValueChange={setAirportTerminal}
+                            ariaLabel="Airport terminal"
+                          />
+                        ) : (
+                          <div className="rounded-md border border-emerald-200 bg-white px-2 py-2 text-xs font-medium text-foreground">
+                            {airportTerminal}
+                          </div>
+                        )}
+                      </label>
+                    </div>
+                    <div className="flex items-start gap-1.5">
+                      <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-700" />
+                      <p className="text-[10px] leading-relaxed text-emerald-800">
+                        Planning to visit multiple places in the city? Choose a City Tour package
+                        for better value and flexibility.
+                      </p>
+                    </div>
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      {(["10km", "20km", "30km", "40km"] as const).map((pkg) => (
+                        <button
+                          key={pkg}
+                          type="button"
+                          onClick={() => setAirportPackage(pkg)}
+                          className={
+                            airportPackage === pkg
+                              ? "rounded-md bg-emerald-600 px-2 py-2 text-xs font-semibold text-white"
+                              : "rounded-md border border-emerald-200 bg-white px-2 py-2 text-xs font-semibold text-emerald-700"
+                          }
+                        >
+                          Upto {pkg.replace("km", " km")}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 ) : null}
 
                 <div className="mt-2 space-y-2">
-                  <div className="space-y-1.5">
-                    <LocationAutocompleteInput
-                      value={pickupLocationInput}
-                      onValueChange={setPickupLocationInput}
-                      placeholder="Pickup location"
-                      leadingIcon={<MapPin className="h-4 w-4 shrink-0 text-emerald-600" />}
-                      inputClassName={getFieldTextClass(pickupLocationInput)}
-                      trailingContent={
-                        <button
-                          type="button"
-                          onClick={detectPickupLocation}
-                          disabled={isDetectingLocation}
-                          className="inline-flex items-center gap-1 whitespace-nowrap rounded border border-emerald-200 bg-white px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          <LocateFixed className="h-3.5 w-3.5" />
-                          {isDetectingLocation ? "Detecting..." : "Detect my location"}
-                        </button>
-                      }
-                    />
-                    {locationHint ? (
-                      <p className="text-xs text-muted-foreground">{locationHint}</p>
-                    ) : null}
-                  </div>
+                  {selectedRideMode === "airportOnly" ? (
+                    <>
+                      {airportTransferDirection === "HOTEL_TO_AIRPORT" ? (
+                        <div className="space-y-1.5">
+                          <LocationAutocompleteInput
+                            value={pickupLocationInput}
+                            onValueChange={setPickupLocationInput}
+                            placeholder="Hotel pickup location"
+                            leadingIcon={<MapPin className="h-4 w-4 shrink-0 text-emerald-600" />}
+                            inputClassName={getFieldTextClass(pickupLocationInput)}
+                            trailingContent={
+                              <button
+                                type="button"
+                                onClick={detectPickupLocation}
+                                disabled={isDetectingLocation}
+                                className="inline-flex items-center gap-1 whitespace-nowrap rounded border border-emerald-200 bg-white px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+                              >
+                                <LocateFixed className="h-3.5 w-3.5" />
+                                {isDetectingLocation ? "Detecting..." : "Detect my location"}
+                              </button>
+                            }
+                          />
+                          {locationHint ? (
+                            <p className="text-xs text-muted-foreground">{locationHint}</p>
+                          ) : null}
+                        </div>
+                      ) : (
+                        <div className="rounded-md border border-emerald-100 bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
+                          Pickup at airport:{" "}
+                          <span className="font-semibold">
+                            {selectedAirportOption?.name}, {airportTerminal}
+                          </span>
+                        </div>
+                      )}
+
+                      {airportTransferDirection === "HOTEL_TO_AIRPORT" ? (
+                        <div className="rounded-md border border-emerald-100 bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
+                          Drop at airport:{" "}
+                          <span className="font-semibold">
+                            {selectedAirportOption?.name}, {airportTerminal}
+                          </span>
+                        </div>
+                      ) : (
+                        <LocationAutocompleteInput
+                          value={dropoffLocationInput}
+                          onValueChange={setDropoffLocationInput}
+                          placeholder="Hotel dropoff location"
+                          leadingIcon={<MapPinned className="h-4 w-4 text-emerald-600" />}
+                          inputClassName={getFieldTextClass(dropoffLocationInput)}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <div className="space-y-1.5">
+                      <LocationAutocompleteInput
+                        value={pickupLocationInput}
+                        onValueChange={setPickupLocationInput}
+                        placeholder="Pickup location"
+                        leadingIcon={<MapPin className="h-4 w-4 shrink-0 text-emerald-600" />}
+                        inputClassName={getFieldTextClass(pickupLocationInput)}
+                        trailingContent={
+                          <button
+                            type="button"
+                            onClick={detectPickupLocation}
+                            disabled={isDetectingLocation}
+                            className="inline-flex items-center gap-1 whitespace-nowrap rounded border border-emerald-200 bg-white px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            <LocateFixed className="h-3.5 w-3.5" />
+                            {isDetectingLocation ? "Detecting..." : "Detect my location"}
+                          </button>
+                        }
+                      />
+                      {locationHint ? (
+                        <p className="text-xs text-muted-foreground">{locationHint}</p>
+                      ) : null}
+                    </div>
+                  )}
 
                   {selectedRideMode === "multiCityRoundTrip" ? (
                     <>
@@ -941,7 +1281,12 @@ export default function CustomerOverviewPage() {
                         inputClassName={getFieldTextClass(dropoffLocationInput)}
                       />
                     </>
-                  ) : (
+                  ) : selectedRideMode === "cityTour" ? (
+                    <div className="rounded-md border border-emerald-100 bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
+                      Drop location is not required for City Tour. You can roam anywhere within
+                      the city.
+                    </div>
+                  ) : selectedRideMode === "airportOnly" ? null : (
                     <LocationAutocompleteInput
                       value={dropoffLocationInput}
                       onValueChange={setDropoffLocationInput}

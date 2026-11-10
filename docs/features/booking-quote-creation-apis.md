@@ -58,7 +58,8 @@
 - Minimum included km per day: **300 km/day**
 - Billable km = **max(estimated km, included km total)**
 - Round-trip and multi-city share the same tour pricing logic
-- One-way uses **corridor pricing** (admin-configured fixed fare)
+- City tour (`MULTI_CITY`) uses fixed package pricing by vehicle category and selected package (`6h/60`, `8h/80`, `10h/100`, `12h/120`)
+- One-way uses **launch corridor pricing** for eligible routes/categories, otherwise auto-falls back to round-trip tour pricing
 - Operational bundle (toll, parking, driver food, halting) added as a **single total line item**
 
 **Response:**
@@ -101,7 +102,33 @@
   - `TEMPO_TRAVELLER`: ₹25/km
 - **Minimum included km:** 300 km/day
 - **Operational bundle:** computed in backend, shown as a single total line item
-- **One-way pricing:** fixed corridor fare configured by admin
+- **One-way pricing (launch matrix):**
+  - Supported city pairs (both directions, normalized): `Mumbai <-> Pune`, `Mumbai <-> Chhatrapati Sambhajinagar/Aurangabad`, `Pune <-> Chhatrapati Sambhajinagar/Aurangabad`, `Pune <-> Nashik`
+  - Sedan fixed fares: `Mumbai-Pune ₹2800`, `Mumbai-Sambhajinagar ₹5800`, `Pune-Sambhajinagar ₹3300`, `Pune-Nashik ₹3200`
+  - Ertiga fare: `Sedan + ₹900`
+  - Mumbai-Sambhajinagar route category fares: `KIA_CARENS ₹8000`, `INNOVA_CRYSTA ₹9500`
+  - Vehicle age surcharge (one-way fixed route only): `ZERO_TO_THREE + ₹200`
+  - Operational bundle in one-way fixed route: `₹0` (toll, parking, and driver food are not added)
+  - Other routes/categories outside configured pairs: **fallback to tour pricing** (e.g. `TEMPO_TRAVELLER`, and `KIA_CARENS`/`INNOVA_CRYSTA` on non-configured one-way routes)
+  - If route/category is ineligible, quote service **falls back to tour pricing** (does not fail request)
+  - One-way fixed-route distance basis uses `A -> B` route km (return leg is excluded for one-way display and one-way operational-bundle km)
+- **City tour pricing (fixed packages):**
+  - Sedan (`Dzire/Aura`): `₹2000 (6h/60)`, `₹2200 (8h/80)`, `₹2500 (10h/100)`, `₹2800 (12h/120)`; extra `₹15/km`, `₹150/hr`
+  - Ertiga: `₹2300 (6h/60)`, `₹2600 (8h/80)`, `₹2950 (10h/100)`, `₹3300 (12h/120)`; extra `₹17/km`, `₹150/hr`
+  - Kia Carens: `₹3200 (6h/60)`, `₹3550 (8h/80)`, `₹3900 (10h/100)`, `₹4200 (12h/120)`; extra `₹18/km`, `₹200/hr`
+  - Innova Crysta: `₹3300 (6h/60)`, `₹3750 (8h/80)`, `₹4200 (10h/100)`, `₹4600 (12h/120)`; extra `₹23/km`, `₹200/hr`
+  - Tempo Traveller variants (`Urbania 16`, `Traveller 21`): **coming soon**
+  - City tour input behavior: customer flow allows pickup-only capture (drop location optional) for in-city roaming journeys.
+- **Airport pricing (all inclusive fixed packages):**
+  - Distance slabs: `upto 10 km`, `upto 20 km`, `upto 30 km`, `upto 40 km`
+  - Sedan: `₹1500`, `₹1700`, `₹1800`, `₹1900`
+  - Ertiga: `₹1800`, `₹2000`, `₹2100`, `₹2300`
+  - Kia Carens: `₹2000`, `₹2200`, `₹2400`, `₹2600`
+  - Innova Crysta: `₹2500`, `₹2700`, `₹2900`, `₹3100`
+  - Airport entry charges are included; operational add-on is not added separately.
+  - Vehicle age for airport packages is fixed at `0-3 years`; all-inclusive mode is locked.
+  - Tempo Traveller airport options: **coming soon**
+  - Airport pickup/drop capture flow: `Hotel -> Airport` or `Airport -> Hotel`, with cascading airport selection (`City -> Airport -> Terminal`) and auto-default terminal for single-terminal airports.
 
 ---
 
@@ -109,7 +136,7 @@
 
 **Endpoint:** `POST /api/v1/admin/one-way-corridors`
 
-**Purpose:** Admin-configured fixed fares for hotspot one-way transfers. Required for ONE_WAY quotes.
+**Purpose:** Admin-configured fixed fares for hotspot one-way transfers and corridor operations. Launch ONE_WAY quote computation currently uses an in-service fixed matrix with fallback rules.
 
 **Request body:**
 ```json
@@ -125,8 +152,8 @@
 ```
 
 **Notes:**
-- ONE_WAY quotes fail if no active corridor exists for the route + category.
 - Corridor fare is treated as fixed base fare; operational bundle is added separately.
+- Launch logic currently prioritizes in-service fixed one-way matrix + fallback behavior in quote engine. Admin corridor APIs remain available for corridor operations and future expansion.
 
 ## 2. Booking creation API
 
@@ -395,3 +422,10 @@ The current implementation uses **hardcoded placeholder rates** in `QuoteService
 | --- | --- |
 | 2026-05-18 | **Implemented:** Booking quote and creation APIs with repositories, services, MVP placeholder pricing, transactional integrity, and domain events. |
 | 2026-07-11 | **Updated:** Per-km tour pricing (min 300 km/day), operational bundle line item, one-way corridor pricing, return distance support, and admin corridor API documented. |
+| 2026-10-07 | **Updated:** ONE_WAY launch behavior now applies fixed fares only for configured city-pairs/categories (Sedan + Ertiga surcharge) and automatically falls back to tour pricing for ineligible routes/categories instead of failing quote generation. |
+| 2026-10-21 | **Updated:** ONE_WAY fixed-route quotes now add `₹200` for `ZERO_TO_THREE` age bucket and use one-way `A -> B` km basis (excluding return leg) for one-way distance display and one-way operational-bundle km. |
+| 2026-10-23 | **Updated:** ONE_WAY fixed-route fares now exclude operational bundle charges (toll, parking, driver food) so these are not added to one-way fixed-route totals. |
+| 2026-10-23 | **Updated:** Added one-way fixed fares for `KIA_CARENS (₹8000)` and `INNOVA_CRYSTA (₹9500)` on `Mumbai <-> Chhatrapati Sambhajinagar/Aurangabad`. |
+| 2026-10-26 | **Updated:** Implemented City Tour fixed-package pricing for Sedan/Ertiga/Carens/Innova across 6h/60, 8h/80, 10h/100, 12h/120 with configured extra km/hour rates; Tempo Traveller options marked coming soon. |
+| 2026-10-26 | **Updated:** City Tour customer flow now supports pickup-only input (drop optional) to reflect roam-anywhere within city behavior. |
+| 2026-10-26 | **Updated:** Implemented Airport fixed all-inclusive package pricing (`10/20/30/40 km` slabs) for Sedan/Ertiga/Carens/Innova with airport-entry included, and locked airport quote controls for age (`0-3`) and all-inclusive mode. |

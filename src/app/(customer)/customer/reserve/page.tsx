@@ -147,6 +147,10 @@ export default async function CustomerReservePage({ searchParams }: ReservePageP
   const includedDays = readParam(params.includedDays, "");
   const totalIncludedKm = readParam(params.totalIncludedKm, "");
   const operationalOption = readParam(params.operationalOption, "ALL_INCLUSIVE");
+  const productType = readParam(params.productType, "ROUND_TRIP");
+  const cityTourPackage = readParam(params.cityTourPackage, "");
+  const cityTourExtraKmInfo = readParam(params.cityTourExtraKmInfo, "");
+  const cityTourExtraHourInfo = readParam(params.cityTourExtraHourInfo, "");
   const ageBucketLabel = readParam(params.ageBucketLabel, "0-3 years").trim();
   const quoteReturnUrlParam = readParam(params.quoteReturnUrl, "").trim();
   const perKmRateParam = readParam(params.perKmRate, "").trim();
@@ -194,17 +198,26 @@ export default async function CustomerReservePage({ searchParams }: ReservePageP
   );
   const effectiveIncludedKmLabel =
     effectiveIncludedKm !== null ? `${effectiveIncludedKm} kms included in current fare.` : null;
+  const isOneWayTrip = productType === "ONE_WAY";
+  const isCityTourTrip = productType === "MULTI_CITY";
 
   const inclusions = [
-    effectiveIncludedKmLabel ?? "Package kms included in current fare.",
-    "Toll, state tax, and parking charges are included.",
-    "Driver allowance is included for selected trip option.",
+    isCityTourTrip && cityTourPackage
+      ? `City tour package selected: ${cityTourPackage.replace("h", " hr / ").replace("km", " km")}.`
+      : effectiveIncludedKmLabel ?? "Package kms included in current fare.",
+    ...(isOneWayTrip ? [] : ["Toll, state tax, and parking charges are included."]),
+    ...(isOneWayTrip ? [] : ["Driver allowance is included for selected trip option."]),
   ];
   const exclusions = [
-    resolvedPerKmRate
+    isCityTourTrip && cityTourExtraKmInfo
+      ? cityTourExtraKmInfo
+      : resolvedPerKmRate
       ? `After included kms, additional usage is charged at ₹${resolvedPerKmRate}/km.`
       : "Additional distance beyond package will be charged extra.",
-    operationalOption === "ALL_INCLUSIVE"
+    ...(isCityTourTrip && cityTourExtraHourInfo ? [cityTourExtraHourInfo] : []),
+    isOneWayTrip
+      ? "Toll, parking and driver food are not added in one-way fare."
+      : operationalOption === "ALL_INCLUSIVE"
       ? "Major route/time changes after booking may change fare."
       : "Self-pay selected: toll, parking and driver food are paid during trip.",
   ];

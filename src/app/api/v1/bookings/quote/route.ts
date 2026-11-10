@@ -50,6 +50,8 @@ export async function POST(request: NextRequest) {
       ageBucket: validatedData.ageBucket,
       productType: validatedData.productType,
       vehiclePresetId: validatedData.vehiclePresetId,
+      cityTourPackage: validatedData.cityTourPackage,
+      airportPackage: validatedData.airportPackage,
       estimatedKm: validatedData.estimatedKm,
       returnDistanceKm: validatedData.returnDistanceKm,
     });
